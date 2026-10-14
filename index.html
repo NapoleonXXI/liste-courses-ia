@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#16a34a">
+<title>Liste de courses IA</title>
+<style>
+:root{--acc:#16a34a;--acc2:#dcfce7;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
+[hidden]{display:none!important}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--acc);color:#fff;padding:calc(env(safe-area-inset-top) + 12px) 16px 12px}
+header h1{margin:0;font-size:1.2rem}
+header small{opacity:.85}
+main{padding:16px 16px calc(96px + env(safe-area-inset-bottom));max-width:640px;margin:0 auto}
+.screen{display:none}.screen.active{display:block}
+.card{background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+h2{font-size:1.15rem;margin:0 0 10px}h3{font-size:1rem;margin:0 0 8px;color:var(--acc)}
+label{display:block;font-weight:600;margin:12px 0 6px;font-size:.95rem}
+input,textarea,select{width:100%;font-size:16px;padding:12px;border:1px solid #d1d5db;border-radius:10px;background:#fff;color:var(--txt)}
+textarea{min-height:96px;resize:vertical}
+input:focus,textarea:focus{outline:2px solid var(--acc);border-color:transparent}
+.btn{display:block;width:100%;min-height:50px;border:0;border-radius:12px;background:var(--acc);color:#fff;font-size:1rem;font-weight:700;margin-top:14px;cursor:pointer}
+.btn.sec{background:var(--acc2);color:#14532d}.btn.danger{background:#fee2e2;color:var(--err)}
+.btn:active{transform:scale(.98)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid #d1d5db;border-radius:999px;padding:10px 14px;background:#fff;font-size:.9rem;cursor:pointer;min-height:44px}
+.chip.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.note{font-size:.85rem;color:var(--mut)}
+.warn{background:#fef3c7;color:var(--warn);border-radius:10px;padding:10px 12px;margin:8px 0;font-size:.9rem}
+.ok{background:var(--acc2);color:#14532d;border-radius:10px;padding:10px 12px;margin:8px 0;font-size:.9rem}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:10;display:flex;background:#fff;border-top:1px solid #e5e7eb;padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;border:0;background:none;padding:8px 0 10px;min-height:62px;font-size:.75rem;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;position:relative}
+nav button span{font-size:1.4rem}
+nav button.active{color:var(--acc);font-weight:700}
+.badge{position:absolute;top:4px;left:55%;background:var(--err);color:#fff;border-radius:999px;font-size:.65rem;padding:1px 6px}
+.prog{height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin:8px 0}
+.prog>div{height:100%;background:var(--acc);width:0;transition:width .3s}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.9rem}
+.stats b{display:block;font-size:1.15rem}
+.item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0f0f0}
+.item:last-child{border-bottom:0}
+.item input[type=checkbox]{width:30px;height:30px;flex:0 0 30px;accent-color:var(--acc);margin:0}
+.item .nm{flex:1;min-width:0}
+.item .nm div{font-weight:600;word-break:break-word}
+.item.done .nm div{text-decoration:line-through;color:var(--mut)}
+.item .qty{width:72px;padding:8px;text-align:center}
+.item .pr{width:62px;text-align:right;font-weight:600;font-size:.95rem}
+.item .del{border:0;background:#fee2e2;color:var(--err);width:40px;height:40px;border-radius:10px;font-size:1.1rem;cursor:pointer}
+.sub{font-size:.78rem;color:var(--mut)}
+.sub.alt{color:var(--warn)}
+.empty{text-align:center;color:var(--mut);padding:30px 10px}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#111827;color:#fff;padding:10px 16px;border-radius:10px;font-size:.9rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:20;max-width:90%}
+.toast.show{opacity:1}
+details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;align-items:center}
+.spin{display:inline-block;width:18px;height:18px;border:3px solid #fff;border-top-color:transparent;border-radius:50%;animation:s 1s linear infinite;vertical-align:middle}
+@keyframes s{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<header><h1>🛒 Liste de courses IA</h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
+<main>
+<!-- PROFIL -->
+<section class="screen" id="s-profil">
+ <div class="card"><h2>Mon profil alimentaire</h2>
+  <label>Préférences</label>
+  <div class="chips" id="prefChips"></div>
+  <label>Restrictions / allergies</label>
+  <div class="chips" id="restChips"></div>
+  <label for="restOther">Autres aliments à exclure (séparés par des virgules)</label>
+  <input id="restOther" placeholder="ex : champignons, coriandre">
+  <div class="row">
+   <div><label for="people">Personnes</label><input id="people" type="number" min="1" max="20" value="2" inputmode="numeric"></div>
+   <div><label for="budget">Budget (€)</label><input id="budget" type="number" min="0" step="1" value="60" inputmode="decimal"></div>
+  </div>
+  <label for="budgetType">Type de budget</label>
+  <select id="budgetType"><option value="week">Par semaine</option><option value="meal">Par repas</option></select>
+  <button class="btn" id="saveProfile">Enregistrer le profil</button>
+ </div>
+ <div class="card"><details id="aiSettings"><summary>⚙️ Paramètres IA (optionnel)</summary>
+  <p class="note">Sans clé, l'app utilise une génération simulée hors ligne. La clé est stockée uniquement dans ce navigateur (localStorage).</p>
+  <label for="apiKey">Clé API (compatible OpenAI)</label><input id="apiKey" type="password" placeholder="sk-..." autocomplete="off">
+  <label for="apiBase">URL de base</label><input id="apiBase" value="https://api.openai.com/v1">
+  <label for="apiModel">Modèle</label><input id="apiModel" value="gpt-4o-mini">
+  <button class="btn sec" id="saveAi">Enregistrer les paramètres IA</button>
+  <button class="btn danger" id="clearAi">Effacer la clé</button>
+ </details></div>
+</section>
+<!-- DEMANDE -->
+<section class="screen" id="s-demande">
+ <div class="card"><h2>Que voulez-vous cuisiner ?</h2>
+  <textarea id="request" placeholder="ex : des pâtes carbonara pour ce soir, une ratatouille…"></textarea>
+  <div class="chips" id="suggest" style="margin-top:10px"></div>
+  <label style="display:flex;align-items:center;gap:10px;font-weight:400"><input type="checkbox" id="appendMode" style="width:24px;height:24px"> Ajouter à la liste existante</label>
+  <button class="btn" id="generate">✨ Générer ma liste</button>
+  <p class="note" id="modeInfo"></p>
+ </div>
+ <div class="card"><h3>📍 Supermarché le plus proche</h3>
+  <div id="storeInfo" class="note" aria-live="polite">Position non demandée.</div>
+  <div id="storeStatus" class="note" aria-live="polite"></div>
+  <button class="btn sec" id="locate">📍 Me localiser</button>
+  <div id="cityBox" hidden>
+   <label for="cityInput">Ville ou code postal</label>
+   <input id="cityInput" placeholder="ex : Lyon ou 69003" autocomplete="postal-code">
+   <button class="btn sec" id="cityBtn">🔎 Chercher un magasin</button>
+  </div>
+  <button class="btn sec" id="changeStore" hidden>🔄 Changer de magasin</button>
+ </div>
+ <div id="genResult"></div>
+</section>
+<!-- LISTE -->
+<section class="screen" id="s-liste">
+ <div class="card"><h2 id="listTitle">Ma liste</h2>
+  <div class="prog"><div id="progBar"></div></div>
+  <div class="stats">
+   <div>Articles cochés<b id="stCount">0 / 0</b></div>
+   <div>Progression<b id="stPct">0 %</b></div>
+   <div>Dans le panier<b id="stCart">0,00 €</b></div>
+   <div>Reste estimé<b id="stRemain">0,00 €</b></div>
+  </div>
+  <div id="listWarn"></div>
+  <p class="note" id="factorInfo"></p>
+  <p class="note">💡 Prix indicatifs estimés (moyennes supermarchés France), non contractuels.</p>
+ </div>
+ <div id="listBody"></div>
+ <div class="card"><h3>Ajouter un article</h3>
+  <input id="addName" placeholder="Nom de l'article">
+  <div class="row" style="margin-top:8px"><input id="addQty" placeholder="Quantité" inputmode="decimal"><input id="addUnit" placeholder="Unité (g, pièce…)"></div>
+  <button class="btn sec" id="addBtn">+ Ajouter</button>
+ </div>
+</section>
+<!-- PANIER -->
+<section class="screen" id="s-panier">
+ <div class="card"><h2>Mon panier</h2>
+  <div class="stats">
+   <div>Total dépensé (estimé)<b id="pTotal">0,00 €</b></div>
+   <div>Budget<b id="pBudget">—</b></div>
+  </div>
+  <div class="prog"><div id="pBar"></div></div>
+  <div id="pMsg"></div>
+ </div>
+ <div class="card" id="pItems"></div>
+ <button class="btn" id="finish">✅ Terminer les courses</button>
+ <button class="btn danger" id="reset">Vider la liste</button>
+</section>
+</main>
+<nav>
+ <button data-s="profil"><span>👤</span>Profil</button>
+ <button data-s="demande"><span>💬</span>Demande</button>
+ <button data-s="liste"><span>📝</span>Liste<i class="badge" id="badgeList" hidden></i></button>
+ <button data-s="panier"><span>🧺</span>Panier</button>
+</nav>
+<div class="toast" id="toast"></div>
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+const LS={get(k,d){try{const v=localStorage.getItem('lcia_'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('lcia_'+k,JSON.stringify(v))}catch(e){}}};
+const eur=n=>(Math.round(n*100)/100).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2500)}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+/* ---- Prix indicatifs (EUR) : prix par unité de référence ---- 
+   unit: 'kg' (prix/kg, qty en g), 'l' (prix/L, qty en ml), 'pc' (prix/pièce) */
+const P={
+ 'pâtes':{p:1.8,u:'kg',c:'Épicerie',t:['gluten']},'spaghetti':{p:1.8,u:'kg',c:'Épicerie',t:['gluten']},'lasagnes (feuilles)':{p:3.2,u:'kg',c:'Épicerie',t:['gluten']},
+ 'riz basmati':{p:2.9,u:'kg',c:'Épicerie'},'riz arborio':{p:4.5,u:'kg',c:'Épicerie'},'riz à sushi':{p:5,u:'kg',c:'Épicerie'},'farine':{p:1,u:'kg',c:'Épicerie',t:['gluten']},
+ 'sucre':{p:1.3,u:'kg',c:'Épicerie'},'huile d\'olive':{p:9,u:'l',c:'Épicerie'},'huile de tournesol':{p:2.5,u:'l',c:'Épicerie'},'sel':{p:.8,u:'kg',c:'Épicerie'},
+ 'poivre':{p:2,u:'pc',c:'Épicerie'},'bouillon cube':{p:.25,u:'pc',c:'Épicerie'},'lait de coco':{p:1.9,u:'pc',c:'Épicerie'},'pâte de curry':{p:2.8,u:'pc',c:'Épicerie'},
+ 'pois chiches (boîte)':{p:1.1,u:'pc',c:'Épicerie'},'haricots rouges (boîte)':{p:1.2,u:'pc',c:'Épicerie'},'tomates concassées (boîte)':{p:1.1,u:'pc',c:'Épicerie'},
+ 'coulis de tomate':{p:1.5,u:'pc',c:'Épicerie'},'concentré de tomate':{p:.9,u:'pc',c:'Épicerie'},'épices chili':{p:2.2,u:'pc',c:'Épicerie'},'cumin':{p:1.9,u:'pc',c:'Épicerie'},
+ 'herbes de Provence':{p:1.8,u:'pc',c:'Épicerie'},'thon (boîte)':{p:2.2,u:'pc',c:'Épicerie',t:['poisson']},'olives noires':{p:2,u:'pc',c:'Épicerie'},'sauce soja':{p:2.3,u:'pc',c:'Épicerie',t:['soja','gluten']},
+ 'pâte brisée':{p:1.4,u:'pc',c:'Épicerie',t:['gluten','lactose']},'tortillas / tacos':{p:2.2,u:'pc',c:'Épicerie',t:['gluten']},'vin rouge':{p:5,u:'pc',c:'Boissons',t:['alcool']},'vin blanc':{p:4.5,u:'pc',c:'Boissons',t:['alcool']},
+ 'graines de sésame':{p:1.9,u:'pc',c:'Épicerie',t:['sesame']},'pain':{p:1.1,u:'pc',c:'Boulangerie',t:['gluten']},'sauce salsa':{p:2.5,u:'pc',c:'Épicerie'},'lentilles corail':{p:3.2,u:'kg',c:'Épicerie'},
+ 'tomate':{p:3,u:'kg',c:'Fruits & légumes'},'oignon':{p:1.8,u:'kg',c:'Fruits & légumes'},'ail':{p:.6,u:'pc',c:'Fruits & légumes'},'échalote':{p:5,u:'kg',c:'Fruits & légumes'},
+ 'courgette':{p:2.5,u:'kg',c:'Fruits & légumes'},'aubergine':{p:3,u:'kg',c:'Fruits & légumes'},'poivron':{p:4,u:'kg',c:'Fruits & légumes'},'carotte':{p:1.4,u:'kg',c:'Fruits & légumes'},
+ 'pomme de terre':{p:1.5,u:'kg',c:'Fruits & légumes'},'poireau':{p:2.8,u:'kg',c:'Fruits & légumes'},'champignons de Paris':{p:5.5,u:'kg',c:'Fruits & légumes'},'salade':{p:1.2,u:'pc',c:'Fruits & légumes'},
+ 'haricots verts':{p:5,u:'kg',c:'Fruits & légumes'},'concombre':{p:.9,u:'pc',c:'Fruits & légumes'},'avocat':{p:1.2,u:'pc',c:'Fruits & légumes'},'citron':{p:.5,u:'pc',c:'Fruits & légumes'},
+ 'basilic':{p:1.5,u:'pc',c:'Fruits & légumes'},'persil':{p:1.2,u:'pc',c:'Fruits & légumes'},'thym':{p:1.2,u:'pc',c:'Fruits & légumes'},'coriandre':{p:1.3,u:'pc',c:'Fruits & légumes'},
+ 'chou-fleur':{p:2.5,u:'pc',c:'Fruits & légumes'},'épinards':{p:6,u:'kg',c:'Fruits & légumes'},'mangue':{p:2,u:'pc',c:'Fruits & légumes'},'edamame':{p:12,u:'kg',c:'Surgelés',t:['soja']},
+ 'banane':{p:2,u:'kg',c:'Fruits & légumes'},'pomme':{p:2.5,u:'kg',c:'Fruits & légumes'},'gingembre':{p:12,u:'kg',c:'Fruits & légumes'},'radis':{p:1.3,u:'pc',c:'Fruits & légumes'},
+ 'lardons':{p:12,u:'kg',c:'Boucherie',t:['porc','viande']},'poulet entier':{p:7.5,u:'kg',c:'Boucherie',t:['viande']},'blanc de poulet':{p:13,u:'kg',c:'Boucherie',t:['viande']},
+ 'bœuf haché':{p:13,u:'kg',c:'Boucherie',t:['viande']},'bœuf à braiser':{p:16,u:'kg',c:'Boucherie',t:['viande']},'jambon':{p:15,u:'kg',c:'Boucherie',t:['porc','viande']},'saumon frais':{p:28,u:'kg',c:'Poissonnerie',t:['poisson']},
+ 'œufs':{p:.35,u:'pc',c:'Crèmerie',t:['oeuf']},'beurre':{p:10,u:'kg',c:'Crèmerie',t:['lactose']},'lait':{p:1.1,u:'l',c:'Crèmerie',t:['lactose']},'crème fraîche':{p:5,u:'l',c:'Crèmerie',t:['lactose']},
+ 'parmesan':{p:22,u:'kg',c:'Crèmerie',t:['lactose']},'gruyère râpé':{p:12,u:'kg',c:'Crèmerie',t:['lactose']},'mozzarella':{p:9,u:'kg',c:'Crèmerie',t:['lactose']},'emmental':{p:10,u:'kg',c:'Crèmerie',t:['lactose']},
+ 'tofu':{p:10,u:'kg',c:'Crèmerie',t:['soja']},'lait d\'avoine':{p:1.8,u:'l',c:'Crèmerie',t:['gluten']},'crème végétale':{p:6,u:'l',c:'Crèmerie',t:['soja']},'fromage végétal':{p:20,u:'kg',c:'Crèmerie'},
+ 'margarine végétale':{p:6,u:'kg',c:'Crèmerie'},'pâtes sans gluten':{p:5,u:'kg',c:'Épicerie'},'farine sans gluten':{p:4,u:'kg',c:'Épicerie'},'tortillas de maïs':{p:3,u:'pc',c:'Épicerie'},
+ 'tamari (sans gluten)':{p:4,u:'pc',c:'Épicerie'},'champignons':{p:5.5,u:'kg',c:'Fruits & légumes'},'protéines de soja':{p:14,u:'kg',c:'Épicerie',t:['soja']},'pois chiches rôtis':{p:8,u:'kg',c:'Épicerie'},
+ 'bouillon de légumes':{p:.25,u:'pc',c:'Épicerie'},'jus de raisin':{p:2,u:'pc',c:'Boissons'},'bacon de dinde':{p:14,u:'kg',c:'Boucherie',t:['viande']},'jambon de dinde':{p:16,u:'kg',c:'Boucherie',t:['viande']},
+ 'graines de tournesol':{p:8,u:'kg',c:'Épicerie'},'noix de cajou':{p:20,u:'kg',c:'Épicerie',t:['fruits a coque']},'cacahuètes':{p:8,u:'kg',c:'Épicerie',t:['arachide']},'graines de chia':{p:15,u:'kg',c:'Épicerie'},
+ 'sauce aux noix de coco':{p:3,u:'pc',c:'Épicerie'},'crème de soja':{p:6,u:'l',c:'Crèmerie',t:['soja']},'crème d\'avoine':{p:6,u:'l',c:'Crèmerie',t:['gluten']},'bœuf':{p:16,u:'kg',c:'Boucherie',t:['viande']}
+};
+/* Restrictions -> tags exclus */
+const REST={'Sans gluten':['gluten'],'Sans lactose':['lactose'],'Sans œufs':['oeuf'],'Sans porc':['porc'],'Sans alcool':['alcool'],'Sans arachides':['arachide'],'Fruits à coque':['fruits a coque'],'Sans soja':['soja'],'Sans poisson':['poisson'],'Sans sésame':['sesame']};
+const PREFS={'Végétarien':['viande','poisson'],'Vegan':['viande','poisson','lactose','oeuf'],'Pescétarien':['viande'],'Halal':['porc','alcool'],'Économique':[],'Bio':[],'Rapide':[]};
+/* Substituts par tag */
+const SUBS={
+ 'lardons':{porc:'bacon de dinde',viande:'champignons'},'jambon':{porc:'jambon de dinde',viande:'champignons'},'poulet entier':{viande:'tofu'},'blanc de poulet':{viande:'tofu'},
+ 'bœuf haché':{viande:'protéines de soja'},'bœuf à braiser':{viande:'champignons'},'bœuf':{viande:'protéines de soja'},'saumon frais':{poisson:'tofu',viande:'tofu'},'thon (boîte)':{poisson:'pois chiches (boîte)'},
+ 'pâtes':{gluten:'pâtes sans gluten'},'spaghetti':{gluten:'pâtes sans gluten'},'lasagnes (feuilles)':{gluten:'pâtes sans gluten'},'farine':{gluten:'farine sans gluten'},
+ 'tortillas / tacos':{gluten:'tortillas de maïs'},'sauce soja':{gluten:'tamari (sans gluten)',soja:'sel'},'pâte brisée':{gluten:'farine sans gluten',lactose:'farine'},'pain':{gluten:null},
+ 'beurre':{lactose:'margarine végétale'},'lait':{lactose:'lait d\'avoine',gluten:'lait'},'crème fraîche':{lactose:'crème d\'avoine',gluten:'crème de soja'},'parmesan':{lactose:'fromage végétal'},'gruyère râpé':{lactose:'fromage végétal'},
+ 'mozzarella':{lactose:'fromage végétal'},'emmental':{lactose:'fromage végétal'},'œufs':{oeuf:'graines de chia'},'vin rouge':{alcool:'jus de raisin'},'vin blanc':{alcool:'bouillon de légumes'},
+ 'tofu':{soja:'pois chiches (boîte)'},'edamame':{soja:'haricots verts'},'graines de sésame':{sesame:'graines de tournesol'},'cacahuètes':{arachide:'graines de tournesol'},'noix de cajou':{'fruits a coque':'graines de tournesol'},
+ "lait d'avoine":{gluten:'lait'},'crème de soja':{soja:"crème d'avoine"},'protéines de soja':{soja:'lentilles corail'}
+};
+/* Base de recettes : quantités pour 1 personne (g / ml / pièces) */
+const R=[
+ {n:'Pâtes carbonara',k:['carbonara'],i:[['spaghetti',125,'g'],['lardons',60,'g'],['œufs',1.5,'pièce'],['parmesan',30,'g'],['poivre',0.1,'pièce']]},
+ {n:'Ratatouille',k:['ratatouille'],i:[['courgette',150,'g'],['aubergine',150,'g'],['poivron',100,'g'],['tomate',150,'g'],['oignon',60,'g'],['ail',0.5,'pièce'],['huile d\'olive',20,'ml'],['herbes de Provence',0.1,'pièce']]},
+ {n:'Poulet rôti et pommes de terre',k:['poulet roti','poulet','roti'],i:[['poulet entier',350,'g'],['pomme de terre',250,'g'],['ail',0.5,'pièce'],['thym',0.25,'pièce'],['beurre',15,'g'],['citron',0.25,'pièce']]},
+ {n:'Quiche lorraine',k:['quiche'],i:[['pâte brisée',0.25,'pièce'],['lardons',50,'g'],['œufs',1,'pièce'],['crème fraîche',50,'ml'],['lait',40,'ml'],['gruyère râpé',25,'g']]},
+ {n:'Salade niçoise',k:['nicoise','salade'],i:[['salade',0.3,'pièce'],['tomate',120,'g'],['thon (boîte)',0.5,'pièce'],['œufs',1,'pièce'],['haricots verts',80,'g'],['olives noires',0.2,'pièce'],['huile d\'olive',15,'ml'],['pomme de terre',100,'g']]},
+ {n:'Curry de légumes',k:['curry'],i:[['lait de coco',0.5,'pièce'],['pâte de curry',0.25,'pièce'],['pois chiches (boîte)',0.5,'pièce'],['chou-fleur',0.25,'pièce'],['carotte',100,'g'],['épinards',60,'g'],['oignon',50,'g'],['riz basmati',80,'g'],['gingembre',10,'g']]},
+ {n:'Lasagnes à la bolognaise',k:['lasagne'],i:[['lasagnes (feuilles)',80,'g'],['bœuf haché',120,'g'],['coulis de tomate',0.4,'pièce'],['oignon',40,'g'],['lait',150,'ml'],['beurre',15,'g'],['farine',15,'g'],['emmental',40,'g']]},
+ {n:'Soupe de légumes',k:['soupe','veloute','potage'],i:[['carotte',120,'g'],['poireau',100,'g'],['pomme de terre',150,'g'],['oignon',40,'g'],['bouillon cube',0.5,'pièce'],['crème fraîche',20,'ml']]},
+ {n:'Crêpes',k:['crepe'],i:[['farine',60,'g'],['œufs',1,'pièce'],['lait',125,'ml'],['sucre',15,'g'],['beurre',10,'g']]},
+ {n:'Chili con carne',k:['chili'],i:[['bœuf haché',120,'g'],['haricots rouges (boîte)',0.4,'pièce'],['tomates concassées (boîte)',0.4,'pièce'],['oignon',50,'g'],['poivron',60,'g'],['épices chili',0.2,'pièce'],['riz basmati',80,'g']]},
+ {n:'Risotto aux champignons',k:['risotto'],i:[['riz arborio',90,'g'],['champignons de Paris',120,'g'],['échalote',30,'g'],['vin blanc',0.1,'pièce'],['parmesan',25,'g'],['bouillon cube',0.5,'pièce'],['beurre',15,'g']]},
+ {n:'Tacos',k:['tacos','taco','burrito'],i:[['tortillas / tacos',0.4,'pièce'],['bœuf haché',110,'g'],['tomate',80,'g'],['salade',0.15,'pièce'],['avocat',0.5,'pièce'],['sauce salsa',0.25,'pièce'],['emmental',30,'g'],['cumin',0.1,'pièce']]},
+ {n:'Gratin dauphinois',k:['gratin','dauphinois'],i:[['pomme de terre',300,'g'],['crème fraîche',80,'ml'],['lait',80,'ml'],['ail',0.25,'pièce'],['beurre',10,'g']]},
+ {n:'Bœuf bourguignon',k:['bourguignon'],i:[['bœuf à braiser',200,'g'],['vin rouge',0.25,'pièce'],['carotte',100,'g'],['oignon',50,'g'],['lardons',30,'g'],['champignons de Paris',80,'g'],['farine',10,'g'],['thym',0.2,'pièce']]},
+ {n:'Poke bowl au saumon',k:['poke','bowl'],i:[['riz à sushi',90,'g'],['saumon frais',120,'g'],['avocat',0.5,'pièce'],['concombre',0.25,'pièce'],['edamame',40,'g'],['mangue',0.25,'pièce'],['sauce soja',0.1,'pièce'],['graines de sésame',0.1,'pièce']]},
+ {n:'Spaghetti bolognaise',k:['bolognaise','bolo'],i:[['spaghetti',125,'g'],['bœuf haché',120,'g'],['coulis de tomate',0.4,'pièce'],['oignon',40,'g'],['carotte',50,'g'],['parmesan',20,'g']]},
+ {n:'Omelette aux champignons',k:['omelette'],i:[['œufs',3,'pièce'],['champignons de Paris',80,'g'],['beurre',10,'g'],['persil',0.2,'pièce']]},
+ {n:'Croque-monsieur',k:['croque'],i:[['pain',0.3,'pièce'],['jambon',60,'g'],['emmental',40,'g'],['beurre',10,'g']]},
+ {n:'Dahl de lentilles',k:['dahl','dal','lentille'],i:[['lentilles corail',80,'g'],['lait de coco',0.3,'pièce'],['tomates concassées (boîte)',0.3,'pièce'],['oignon',40,'g'],['gingembre',8,'g'],['riz basmati',70,'g'],['coriandre',0.2,'pièce']]},
+ {n:'Salade de fruits',k:['fruit'],i:[['pomme',150,'g'],['banane',120,'g'],['mangue',0.3,'pièce'],['citron',0.25,'pièce']]}
+];
+const GENERIC={n:'Repas équilibré (suggestion générique)',i:[['blanc de poulet',130,'g'],['riz basmati',80,'g'],['courgette',150,'g'],['tomate',100,'g'],['oignon',40,'g'],['huile d\'olive',10,'ml'],['salade',0.2,'pièce'],['pomme',150,'g']]};
+
+/* ---- État ---- */
+let profile=LS.get('profile',{prefs:[],rest:[],other:'',people:2,budget:60,budgetType:'week'});
+let ai=LS.get('ai',{key:'',base:'https://api.openai.com/v1',model:'gpt-4o-mini'});
+let list=LS.get('list',{title:'',items:[]});
+let store=LS.get('store',null);if(store&&!store.factor)store=null;
+const save=()=>LS.set('list',list);
+const BRANDS=[[/lidl|aldi|leader price|netto|e\.?\s?leclerc|leclerc|intermarche/,0.9,'enseigne discount / prix bas'],[/carrefour (city|express)|monoprix|monop|franprix|daily monop|naturalia|g20|spar|vival|proxi|casino shop|u express/,1.15,'enseigne de proximité (plus chère)'],[/auchan|carrefour|super u|hyper u|casino|cora|match/,1.0,'enseigne standard']];
+function brandFactor(name){const n=norm(name);for(const [re,f,l] of BRANDS)if(re.test(n))return {f,l};return {f:1,l:'facteur par défaut'}}
+const fac=()=>store&&store.factor?store.factor:1;
+const pp=i=>(+i.price||0)*fac();
+
+function excludedTags(){const s=new Set();profile.prefs.forEach(p=>(PREFS[p]||[]).forEach(t=>s.add(t)));profile.rest.forEach(r=>(REST[r]||[]).forEach(t=>s.add(t)));return s}
+function otherExcl(){return profile.other.split(',').map(x=>norm(x.trim())).filter(Boolean)}
+function isBlocked(name){const tags=(P[name]&&P[name].t)||[];const ex=excludedTags();const bad=tags.filter(t=>ex.has(t));const nn=norm(name);if(otherExcl().some(o=>nn.includes(o)||o.includes(nn)))bad.push('perso');return bad}
+function guessCat(name){const nn=norm(name);for(const k in P){if(norm(k)===nn||nn.includes(norm(k)))return P[k].c}return 'Divers'}
+function priceFor(name,qty,unit){
+ let e=P[name];if(!e){const nn=norm(name);const k=Object.keys(P).find(k=>nn.includes(norm(k))||norm(k).includes(nn));e=k&&P[k]}
+ if(!e)return 2.5;const q=+qty||0,u=norm(unit);
+ if(e.u==='kg')return e.p*(u==='kg'?q:u==='g'?q/1000:q*0.2);
+ if(e.u==='l')return e.p*(u==='l'?q:u==='cl'?q/100:u==='ml'?q/1000:q*0.5);
+ return e.p*Math.max(1,Math.ceil(q-1e-9));
+}
+function roundQty(q,u){if(u==='g'||u==='ml')return q>=100?Math.round(q/10)*10:Math.round(q);return Math.max(1,Math.ceil(q-0.05))}
+
+function applyProfile(raw){
+ const out=[],notes=[];
+ raw.forEach(it=>{
+  let name=it.name,bad=isBlocked(name);
+  if(bad.length){
+   const sm=SUBS[name]||{};let sub;for(const t of bad){if(t in sm){sub=sm[t];break}}
+   if(sub&&!isBlocked(sub).length){notes.push(`${name} → ${sub}`);out.push({...it,name:sub,alt:'remplace '+name,category:(P[sub]||{}).c||it.category})}
+   else notes.push(`${name} retiré (profil)`);
+  }else out.push(it);
+ });
+ return {items:out,notes};
+}
+function simulate(text){
+ const t=norm(text);const found=R.filter(r=>r.k.some(k=>t.includes(k)));
+ const recipes=found.length?found:[GENERIC];const n=Math.max(1,+profile.people||1);
+ const map={};
+ recipes.forEach(r=>r.i.forEach(([name,q,u])=>{const key=name;if(map[key])map[key].quantity+=q*n;else map[key]={name,quantity:q*n,unit:u,category:P[name]?P[name].c:'Divers'}}));
+ const items=Object.values(map).map(i=>({...i,quantity:roundQty(i.quantity,i.unit)}));
+ return {title:recipes.map(r=>r.n).join(' + '),items,generic:!found.length};
+}
+async function callAI(text){
+ const sys='Tu es un assistant de courses pour supermarché français. Réponds UNIQUEMENT en JSON strict: {"title":string,"items":[{"name":string,"quantity":number,"unit":string,"category":string,"estimatedPrice":number}]}. Prix en euros indicatifs France. Catégories parmi: Fruits & légumes, Boucherie, Poissonnerie, Crèmerie, Épicerie, Boulangerie, Surgelés, Boissons, Divers.';
+ const ex=[...profile.prefs,...profile.rest,profile.other].filter(Boolean).join(', ')||'aucune';
+ const user=`Demande: "${text}". Nombre de personnes: ${profile.people}. Préférences/restrictions à respecter strictement (proposer des substituts): ${ex}. Budget: ${profile.budget} € ${profile.budgetType==='week'?'par semaine':'par repas'}.`;
+ const ctl=new AbortController();const to=setTimeout(()=>ctl.abort(),25000);
+ try{
+  const r=await fetch(ai.base.replace(/\/+$/,'')+'/chat/completions',{method:'POST',signal:ctl.signal,headers:{'Content-Type':'application/json','Authorization':'Bearer '+ai.key},body:JSON.stringify({model:ai.model,temperature:0.3,response_format:{type:'json_object'},messages:[{role:'system',content:sys},{role:'user',content:user}]})});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const j=await r.json();let c=j.choices[0].message.content.trim().replace(/^```(json)?|```$/g,'');
+  const d=JSON.parse(c);if(!Array.isArray(d.items)||!d.items.length)throw new Error('format');
+  return {title:d.title||text,items:d.items.filter(i=>i&&i.name).map(i=>({name:String(i.name),quantity:+i.quantity||1,unit:String(i.unit||'pièce'),category:String(i.category||guessCat(i.name)),price:Math.max(0,+i.estimatedPrice||0)}))};
+ }finally{clearTimeout(to)}
+}
+
+async function generate(){
+ const text=$('#request').value.trim();if(!text){toast('Décrivez ce que vous voulez cuisiner');return}
+ const btn=$('#generate');btn.disabled=true;btn.innerHTML='<span class="spin"></span> Génération…';
+ let res,source='simulation';
+ try{
+  if(ai.key){try{res=await callAI(text);source='ia'}catch(e){console.warn('IA indisponible',e);toast('IA indisponible, génération simulée');}}
+  if(!res)res=simulate(text);
+  const {items,notes}=applyProfile(res.items);
+  const newItems=items.map(i=>({id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),name:i.name,quantity:i.quantity,unit:i.unit,category:i.category||guessCat(i.name),price:+(i.price!=null&&source==='ia'&&!i.alt?i.price:priceFor(i.name,i.quantity,i.unit)).toFixed(2),alt:i.alt||'',checked:false}));
+  if($('#appendMode').checked&&list.items.length){list.items.push(...newItems);list.title+=' + '+res.title}else list={title:res.title,items:newItems};
+  save();
+  const tot=newItems.reduce((s,i)=>s+pp(i),0);
+  let h=`<div class="card"><h3>${source==='ia'?'🤖 Généré par IA':'🧪 Génération simulée'}</h3><div><b>${esc(res.title)}</b> — ${newItems.length} articles, ~${eur(tot)} pour ${profile.people} pers.</div>`;
+  if(res.generic)h+=`<div class="warn">Plat non reconnu : voici une liste générique équilibrée. Ajoutez une clé IA pour des résultats sur mesure.</div>`;
+  if(notes.length)h+=`<div class="warn">Adapté à votre profil : ${notes.map(esc).join(' ; ')}</div>`;
+  h+=budgetMsg(tot,'liste')+`<button class="btn" onclick="go('liste')">Voir ma liste →</button></div>`;
+  $('#genResult').innerHTML=h;render();toast('Liste générée ✔');
+ }finally{btn.disabled=false;btn.textContent='✨ Générer ma liste'}
+}
+function budgetMsg(total,what){
+ const b=+profile.budget;if(!b)return '';
+ const lbl=profile.budgetType==='week'?'hebdomadaire':'par repas';
+ if(total>b)return `<div class="warn">⚠️ Dépassement du budget ${lbl} : ${eur(total)} pour ${eur(b)} (+${eur(total-b)}).</div>`;
+ return `<div class="ok">Dans le budget ${lbl} : ${eur(total)} / ${eur(b)}.</div>`;
+}
+
+/* ---- Rendu liste ---- */
+const CAT_ORDER=['Fruits & légumes','Boucherie','Poissonnerie','Crèmerie','Boulangerie','Épicerie','Surgelés','Boissons','Divers'];
+function totals(){const t=list.items.length,c=list.items.filter(i=>i.checked);const all=list.items.reduce((s,i)=>s+pp(i),0);const cart=c.reduce((s,i)=>s+pp(i),0);return {t,c:c.length,cart,remain:all-cart,all}}
+function updateStats(){
+ const s=totals();const pct=s.t?Math.round(s.c/s.t*100):0;
+ $('#progBar').style.width=pct+'%';$('#stCount').textContent=`${s.c} / ${s.t}`;$('#stPct').textContent=pct+' %';$('#stCart').textContent=eur(s.cart);$('#stRemain').textContent=eur(s.remain);
+ $('#listWarn').innerHTML=s.t?budgetMsg(s.all):'';
+ $('#factorInfo').textContent=store?`🏪 Magasin : ${store.name} · facteur prix ×${fac().toFixed(2).replace('.',',')} (${store.factorLabel||'défaut'})`:'🏪 Aucun magasin choisi · facteur prix ×1,00 (défaut)';
+ const b=$('#badgeList');b.hidden=!(s.t-s.c);b.textContent=s.t-s.c;
+ renderPanier();
+}
+function render(){
+ $('#listTitle').textContent=list.title?'Ma liste : '+list.title:'Ma liste';
+ const body=$('#listBody');
+ if(!list.items.length){body.innerHTML='<div class="card empty">Votre liste est vide.<br>Allez dans « Demande » pour la générer ✨</div>';updateStats();return}
+ const g={};list.items.forEach(i=>{(g[i.category]=g[i.category]||[]).push(i)});
+ const cats=Object.keys(g).sort((a,b)=>(CAT_ORDER.indexOf(a)+99)%108-(CAT_ORDER.indexOf(b)+99)%108);
+ body.innerHTML=cats.map(c=>`<div class="card"><h3>${esc(c)}</h3>${g[c].map(i=>`
+  <div class="item${i.checked?' done':''}" data-id="${i.id}">
+   <input type="checkbox" ${i.checked?'checked':''} aria-label="Cocher ${esc(i.name)}">
+   <div class="nm"><div>${esc(i.name)}</div><span class="sub">${esc(i.unit)}</span>${i.alt?`<div class="sub alt">↺ ${esc(i.alt)}</div>`:''}</div>
+   <input class="qty" type="number" min="0" step="any" inputmode="decimal" value="${i.quantity}" aria-label="Quantité">
+   <span class="pr">${eur(pp(i))}</span>
+   <button class="del" aria-label="Supprimer">✕</button></div>`).join('')}</div>`).join('');
+ updateStats();
+}
+$('#listBody').addEventListener('change',e=>{
+ const row=e.target.closest('.item');if(!row)return;const it=list.items.find(i=>i.id===row.dataset.id);if(!it)return;
+ if(e.target.type==='checkbox'){it.checked=e.target.checked;row.classList.toggle('done',it.checked)}
+ else if(e.target.classList.contains('qty')){const q=Math.max(0,+e.target.value||0);const known=P[it.name]||Object.keys(P).some(k=>norm(it.name).includes(norm(k)));it.price=+(known?priceFor(it.name,q,it.unit):(it.price||0)*q/(it.quantity||1)).toFixed(2);it.quantity=q;row.querySelector('.pr').textContent=eur(pp(it))}
+ save();updateStats();
+});
+$('#listBody').addEventListener('click',e=>{
+ if(!e.target.classList.contains('del'))return;const id=e.target.closest('.item').dataset.id;
+ list.items=list.items.filter(i=>i.id!==id);save();render();toast('Article supprimé');
+});
+$('#addBtn').onclick=()=>{
+ const name=$('#addName').value.trim();if(!name){toast("Indiquez un nom d'article");return}
+ const q=parseFloat(($('#addQty').value||'1').replace(',','.'))||1,u=$('#addUnit').value.trim()||'pièce';
+ if(isBlocked(name).length)toast('⚠️ Cet article ne respecte pas votre profil');
+ list.items.push({id:Date.now().toString(36),name,quantity:q,unit:u,category:guessCat(name),price:+priceFor(name,q,u).toFixed(2),alt:'',checked:false});
+ save();render();$('#addName').value=$('#addQty').value=$('#addUnit').value='';toast('Article ajouté');
+};
+
+/* ---- Panier ---- */
+function renderPanier(){
+ const s=totals(),b=+profile.budget;
+ $('#pTotal').textContent=eur(s.cart);$('#pBudget').textContent=b?eur(b)+(profile.budgetType==='week'?' /sem.':' /repas'):'—';
+ const pct=b?Math.min(100,s.cart/b*100):0;$('#pBar').style.width=pct+'%';$('#pBar').style.background=s.cart>b&&b?'var(--err)':'';
+ $('#pMsg').innerHTML=(b?budgetMsg(s.cart):'')+`<p class="note">Reste à acheter : ${s.t-s.c} article(s), ~${eur(s.remain)}. Prix estimés.</p>`;
+ const c=list.items.filter(i=>i.checked);
+ $('#pItems').innerHTML=c.length?'<h3>Articles dans le panier</h3>'+c.map(i=>`<div class="item"><div class="nm"><div>✔ ${esc(i.name)}</div><span class="sub">${i.quantity} ${esc(i.unit)}</span></div><span class="pr">${eur(pp(i))}</span></div>`).join(''):'<div class="empty">Aucun article coché pour le moment.</div>';
+}
+$('#finish').onclick=()=>{const s=totals();if(!s.t){toast('Liste vide');return}
+ if(!confirm(`Terminer les courses ? Total estimé : ${eur(s.cart)}. Les articles cochés seront retirés de la liste.`))return;
+ const hist=LS.get('history',[]);hist.push({date:new Date().toISOString(),title:list.title,total:s.cart});LS.set('history',hist.slice(-50));
+ list.items=list.items.filter(i=>!i.checked);if(!list.items.length)list.title='';save();render();toast('Courses terminées 🎉');};
+$('#reset').onclick=()=>{if(!confirm('Vider complètement la liste ?'))return;list={title:'',items:[]};save();render();$('#genResult').innerHTML='';toast('Liste vidée')};
+
+/* ---- Profil ---- */
+function chips(el,opts,sel){el.innerHTML=opts.map(o=>`<button type="button" class="chip${sel.includes(o)?' on':''}" data-v="${esc(o)}">${esc(o)}</button>`).join('');el.onclick=e=>{const b=e.target.closest('.chip');if(b)b.classList.toggle('on')}}
+function loadProfile(){
+ chips($('#prefChips'),Object.keys(PREFS),profile.prefs);chips($('#restChips'),Object.keys(REST),profile.rest);
+ $('#restOther').value=profile.other;$('#people').value=profile.people;$('#budget').value=profile.budget;$('#budgetType').value=profile.budgetType;
+ $('#apiKey').value=ai.key;$('#apiBase').value=ai.base;$('#apiModel').value=ai.model;
+ $('#hdrSub').textContent=`${profile.people} pers. · budget ${profile.budget} € ${profile.budgetType==='week'?'/sem.':'/repas'}`+(profile.prefs.length?' · '+profile.prefs.join(', '):'');
+ $('#modeInfo').textContent=ai.key?`Mode IA : ${ai.model} (repli automatique sur la simulation en cas d'erreur).`:'Mode simulation hors ligne (aucune clé IA configurée).';
+}
+$('#saveProfile').onclick=()=>{
+ profile={prefs:[...document.querySelectorAll('#prefChips .on')].map(b=>b.dataset.v),rest:[...document.querySelectorAll('#restChips .on')].map(b=>b.dataset.v),other:$('#restOther').value.trim(),people:Math.max(1,Math.min(20,parseInt($('#people').value)||1)),budget:Math.max(0,parseFloat($('#budget').value)||0),budgetType:$('#budgetType').value};
+ LS.set('profile',profile);LS.set('profileDone',true);loadProfile();updateStats();toast('Profil enregistré ✔');go('demande');
+};
+$('#saveAi').onclick=()=>{ai={key:$('#apiKey').value.trim(),base:$('#apiBase').value.trim()||'https://api.openai.com/v1',model:$('#apiModel').value.trim()||'gpt-4o-mini'};LS.set('ai',ai);loadProfile();toast('Paramètres IA enregistrés')};
+$('#clearAi').onclick=()=>{ai.key='';LS.set('ai',ai);loadProfile();toast('Clé supprimée')};
+
+/* ---- Géolocalisation + Overpass ---- */
+function dist(a,b,c,d){const R=6371e3,r=x=>x*Math.PI/180;const h=Math.sin(r(c-a)/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(r(d-b)/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function fmtD(d){return d<1000?Math.round(d)+' m':(d/1000).toFixed(1).replace('.',',')+' km'}
+function status(m,cls){const el=$('#storeStatus');el.className=cls||'note';el.textContent=m}
+function showStore(){
+ const el=$('#storeInfo');$('#changeStore').hidden=!store;$('#locate').hidden=!!store;
+ if(!store){el.textContent='Aucun magasin sélectionné.';return}
+ el.innerHTML=`<b>${esc(store.name)}</b><br>à ${fmtD(store.d)}${store.addr?' · '+esc(store.addr):''}${store.origin?' · depuis '+esc(store.origin):''}<br>Facteur prix : ×${store.factor.toFixed(2).replace('.',',')} (${esc(store.factorLabel)})`+(store.estimate?'':`<br><a href="https://www.openstreetmap.org/?mlat=${store.lat}&mlon=${store.lon}#map=17/${store.lat}/${store.lon}" target="_blank" rel="noopener">Voir sur la carte</a>`);
+}
+function setStore(st){const bf=st.estimate?{f:1,l:'magasin estimé, facteur par défaut'}:brandFactor(st.name);st.factor=bf.f;st.factorLabel=bf.l;store=st;LS.set('store',store);showStore();$('#cityBox').hidden=true;render()}
+function setBusy(btn,busy,label){btn.disabled=busy;btn.innerHTML=busy?'<span class="spin" style="border-color:#14532d;border-top-color:transparent"></span> '+label:btn.dataset.label}
+function showFallback(msg){status(msg,'warn');$('#cityBox').hidden=false;$('#locate').hidden=false}
+async function findStore(la,lo,origin){
+ status('Recherche du supermarché le plus proche…');
+ const q=`[out:json][timeout:20];(node["shop"~"supermarket|convenience"](around:3000,${la},${lo});way["shop"~"supermarket|convenience"](around:3000,${la},${lo}););out center 40;`;
+ const eps=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];let empty=false;
+ for(const ep of eps){try{
+  const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),20000);
+  const r=await fetch(ep,{method:'POST',body:'data='+encodeURIComponent(q),headers:{'Content-Type':'application/x-www-form-urlencoded'},signal:ctl.signal});clearTimeout(t);
+  if(!r.ok)throw new Error(r.status);const j=await r.json();
+  const c=(j.elements||[]).map(e=>{const a=e.lat??e.center?.lat,b=e.lon??e.center?.lon,tg=e.tags||{};return {name:tg.name||tg.brand||(tg.shop==='supermarket'?'Supermarché':'Supérette'),sup:tg.shop==='supermarket',lat:a,lon:b,addr:[tg['addr:housenumber'],tg['addr:street'],tg['addr:city']].filter(Boolean).join(' '),d:dist(la,lo,a,b)}}).filter(x=>x.lat!=null);
+  if(!c.length){empty=true;break}
+  c.sort((x,y)=>(x.sup?x.d:x.d*1.5)-(y.sup?y.d:y.d*1.5));setStore({...c[0],origin});status('✔ Magasin trouvé via OpenStreetMap.','ok');return;
+ }catch(e){console.warn('Overpass',ep,e)}}
+ setStore({name:'Supermarché de proximité (estimation)',estimate:true,lat:la,lon:lo,d:800,addr:'',origin});
+ status(empty?'Aucun supermarché référencé dans un rayon de 3 km : magasin estimé utilisé pour les prix.':'Service OpenStreetMap indisponible : magasin estimé utilisé pour les prix (environ 800 m).','warn');
+}
+function locate(){
+ const btn=$('#locate');
+ if(!window.isSecureContext){showFallback("La géolocalisation est bloquée car la page n'est pas dans un contexte sécurisé (ouverte en fichier local ou en http). Les navigateurs ne l'autorisent qu'en HTTPS ou sur localhost. Indiquez votre ville ou votre code postal :");return}
+ if(!('geolocation' in navigator)){showFallback("La géolocalisation n'est pas disponible sur cet appareil. Indiquez votre ville ou votre code postal :");return}
+ setBusy(btn,true,'Localisation…');status('Localisation en cours…');
+ navigator.geolocation.getCurrentPosition(async pos=>{
+  try{await findStore(pos.coords.latitude,pos.coords.longitude,'votre position')}finally{setBusy(btn,false)}
+ },err=>{setBusy(btn,false);
+  const m=err.code===1?'Localisation refusée. Autorisez-la dans les réglages du navigateur, ou indiquez votre ville / code postal :':err.code===3?'La localisation a pris trop de temps. Indiquez votre ville / code postal :':'Position introuvable pour le moment. Indiquez votre ville / code postal :';
+  showFallback(m)},{enableHighAccuracy:false,timeout:15000,maximumAge:600000});
+}
+async function geocodeCity(){
+ const q=$('#cityInput').value.trim(),btn=$('#cityBtn');if(!q){toast('Saisissez une ville ou un code postal');return}
+ setBusy(btn,true,'Recherche…');status(`Recherche de « ${q} »…`);
+ try{
+  let hit=null;
+  try{const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),15000);
+   const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&countrycodes=fr&limit=1&q='+encodeURIComponent(q),{signal:ctl.signal,headers:{'Accept-Language':'fr'}});clearTimeout(t);
+   if(!r.ok)throw new Error(r.status);const j=await r.json();hit=j[0]||null;
+   if(!hit){status(`Lieu « ${q} » introuvable. Vérifiez l'orthographe ou le code postal.`,'warn');return}
+  }catch(e){console.warn('Nominatim',e);
+   setStore({name:'Supermarché de proximité (estimation)',estimate:true,lat:0,lon:0,d:800,addr:'',origin:q});
+   status('Service de recherche de ville indisponible : magasin estimé utilisé pour les prix.','warn');return}
+  await findStore(+hit.lat,+hit.lon,(hit.display_name||q).split(',').slice(0,2).join(','));
+ }finally{setBusy(btn,false)}
+}
+$('#locate').dataset.label='📍 Me localiser';$('#cityBtn').dataset.label='🔎 Chercher un magasin';
+$('#locate').onclick=locate;$('#cityBtn').onclick=geocodeCity;
+$('#cityInput').addEventListener('keydown',e=>{if(e.key==='Enter')geocodeCity()});
+$('#changeStore').onclick=()=>{status('Choisissez un autre magasin : localisez-vous ou saisissez une ville.');$('#cityBox').hidden=false;$('#locate').hidden=false;$('#changeStore').hidden=true};
+
+/* ---- Navigation ---- */
+function go(s){document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id==='s-'+s));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.s===s));LS.set('screen',s);window.scrollTo(0,0)}
+window.go=go;
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.s));
+$('#generate').onclick=generate;
+$('#suggest').innerHTML=['Pâtes carbonara','Ratatouille','Poulet rôti','Curry de légumes','Crêpes','Poke bowl'].map(s=>`<button type="button" class="chip" data-v="${s}">${s}</button>`).join('');
+$('#suggest').onclick=e=>{const b=e.target.closest('.chip');if(b)$('#request').value=b.dataset.v};
+
+loadProfile();render();showStore();
+go(LS.get('profileDone',false)?LS.get('screen','demande'):'profil');
+</script>
+</body>
+</html>
