@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.13">
+<meta name="app-version" content="v1.14">
 <title>Liste de courses IA</title>
 <style>
 :root{--acc:#16a34a;--acc2:#dcfce7;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -89,10 +89,18 @@ details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;alig
 .pillgrid button.pill.pill-still,.pillgrid button.pill.pill-still:hover,.pillgrid button.pill.pill-still:focus,.pillgrid button.pill.pill-still:active{grid-column:1/-1;background:#EDE4F7!important;border:1px solid #7B2D8E!important;color:#5B1F6B!important;font-weight:700!important;height:56px}
 .pillgrid button.pill.pill-still:active{filter:brightness(.92)}
 .pillgrid button.pill.pill-still:focus-visible{outline:3px solid #b48ac4;outline-offset:2px}
+
+.pfgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(min-width:600px){.pfgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.pfchip{min-height:52px;padding:6px 10px;border:1px solid var(--acc);border-radius:999px;background:#fff;color:#14532d;font-size:.95rem;font-weight:600;line-height:1.2;overflow-wrap:anywhere;cursor:pointer}
+.pfchip[aria-pressed="true"]{background:var(--acc2);border-width:2px;padding:5px 9px;box-shadow:inset 0 0 0 1px var(--acc)}
+.pfchip[aria-pressed="true"]::before{content:"✓ ";font-weight:800}
+.pfchip:focus-visible{outline:3px solid #86efac;outline-offset:2px}
+nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.13</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
+<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.14</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
 <main>
 <!-- PROFIL -->
 
@@ -175,10 +183,22 @@ details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;alig
 </section>
 <!-- PANIER -->
 
+<section class="screen" id="s-monprofil">
+ <div class="card"><h2 id="pg-allergies">Allergies</h2><p class="note">Plusieurs choix possibles</p>
+  <div class="pfgrid" role="group" aria-labelledby="pg-allergies" data-group="allergies" data-excl="0"><button type="button" class="pfchip" aria-pressed="false" data-v="Gluten">Gluten</button><button type="button" class="pfchip" aria-pressed="false" data-v="Lactose">Lactose</button><button type="button" class="pfchip" aria-pressed="false" data-v="Arachides">Arachides</button><button type="button" class="pfchip" aria-pressed="false" data-v="Fruits à coque">Fruits à coque</button><button type="button" class="pfchip" aria-pressed="false" data-v="Œufs">Œufs</button><button type="button" class="pfchip" aria-pressed="false" data-v="Poisson">Poisson</button><button type="button" class="pfchip" aria-pressed="false" data-v="Crustacés">Crustacés</button><button type="button" class="pfchip" aria-pressed="false" data-v="Soja">Soja</button><button type="button" class="pfchip" aria-pressed="false" data-v="Sésame">Sésame</button><button type="button" class="pfchip" aria-pressed="false" data-v="Moutarde">Moutarde</button><button type="button" class="pfchip" aria-pressed="false" data-v="Céleri">Céleri</button><button type="button" class="pfchip" aria-pressed="false" data-v="Sulfites">Sulfites</button></div></div>
+ <div class="card"><h2 id="pg-style">Style de vie</h2><p class="note">Un seul choix (toucher à nouveau pour désélectionner)</p>
+  <div class="pfgrid" role="group" aria-labelledby="pg-style" data-group="style" data-excl="1"><button type="button" class="pfchip" aria-pressed="false" data-v="Sportif">Sportif</button><button type="button" class="pfchip" aria-pressed="false" data-v="Sédentaire">Sédentaire</button></div></div>
+ <div class="card"><h2 id="pg-objectif">Objectif de corpulence</h2><p class="note">Un seul choix (toucher à nouveau pour désélectionner)</p>
+  <div class="pfgrid" role="group" aria-labelledby="pg-objectif" data-group="objectif" data-excl="1"><button type="button" class="pfchip" aria-pressed="false" data-v="Prendre du muscle">Prendre du muscle</button><button type="button" class="pfchip" aria-pressed="false" data-v="Perdre du poids">Perdre du poids</button></div></div>
+ <div class="card"><h2 id="pg-type">Type de profil</h2><p class="note">Un seul choix (toucher à nouveau pour désélectionner)</p>
+  <div class="pfgrid" role="group" aria-labelledby="pg-type" data-group="type" data-excl="1"><button type="button" class="pfchip" aria-pressed="false" data-v="Perso">Perso</button><button type="button" class="pfchip" aria-pressed="false" data-v="Famille">Famille</button></div></div>
+ <p class="note" style="text-align:center">Profil enregistré sur cet appareil uniquement. Pas encore utilisé pour générer les listes.</p>
+</section>
 </main>
 <nav>
  <button data-s="demande"><span>💬</span>Demande</button>
  <button data-s="liste"><span>📝</span>Liste<i class="badge" id="badgeList" hidden></i></button>
+ <button data-s="monprofil"><span>👤</span>Mon profil</button>
 </nav>
 <div class="toast" id="toast"></div>
 <script>
@@ -576,8 +596,18 @@ $('#suggest').innerHTML=['Pâtes carbonara','Ratatouille','Poulet rôti','Curry 
 $('#suggest').onclick=e=>{const b=e.target.closest('.chip');if(b)$('#request').value=b.dataset.v};
 $('#appendMode').checked=false;
 
+
+/* ---- Mon profil (v1.14) : non relié à la génération ---- */
+const PF_KEY='lci_profil_v2';
+function pfLoad(){try{return JSON.parse(localStorage.getItem(PF_KEY))||{}}catch(e){return {}}}
+function pfSave(st){try{localStorage.setItem(PF_KEY,JSON.stringify(st))}catch(e){}}
+function pfRender(){const st=pfLoad();document.querySelectorAll('.pfgrid').forEach(g=>{const k=g.dataset.group,v=st[k];g.querySelectorAll('.pfchip').forEach(b=>b.setAttribute('aria-pressed',String(g.dataset.excl==='1'?v===b.dataset.v:Array.isArray(v)&&v.includes(b.dataset.v))))})}
+document.querySelectorAll('.pfgrid').forEach(g=>g.addEventListener('click',e=>{const b=e.target.closest('.pfchip');if(!b)return;const st=pfLoad(),k=g.dataset.group,v=b.dataset.v;
+ if(g.dataset.excl==='1')st[k]=st[k]===v?null:v;else{const a=new Set(Array.isArray(st[k])?st[k]:[]);a.has(v)?a.delete(v):a.add(v);st[k]=[...a]}
+ pfSave(st);pfRender()}));
+pfRender();
 loadProfile();render();showStore();
-{const sc=LS.get('screen','demande');go(['demande','liste'].includes(sc)?sc:'demande')}
+{const sc=LS.get('screen','demande');go(['demande','liste','monprofil'].includes(sc)?sc:'demande')}
 // Service worker : aucun n'est utilisé ; on désinscrit d'éventuels anciens SW pour éviter une version en cache.
 if('serviceWorker' in navigator&&navigator.serviceWorker.getRegistrations)navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});
 </script>
