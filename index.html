@@ -7,14 +7,16 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.6">
+<meta name="app-version" content="v1.7">
 <title>Liste de courses IA</title>
 <style>
 :root{--acc:#16a34a;--acc2:#dcfce7;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
 [hidden]{display:none!important}
 #s-demande.active{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 220px)}
-.searchwrap{width:100%;max-width:560px;display:flex;flex-direction:column;align-items:center;gap:18px}.searchbar{width:100%}
-.pill{min-height:46px;padding:0 22px;border:1px solid var(--acc);border-radius:999px;background:var(--acc2);color:#14532d;font-size:.95rem;font-weight:600;cursor:pointer}.pill:active{transform:scale(.98)}
+.searchwrap{width:100%;max-width:760px;display:flex;flex-direction:column;align-items:center;gap:18px}.searchbar{width:100%}
+.pillgrid{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(min-width:600px){.pillgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(min-width:900px){.pillgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.pill{width:100%;min-height:56px;padding:6px 12px;line-height:1.2;text-align:center;overflow-wrap:anywhere;border:1px solid var(--acc);border-radius:999px;background:var(--acc2);color:#14532d;font-size:.95rem;font-weight:600;cursor:pointer}.pill:active{transform:scale(.98)}
 .searchbar input{width:100%;height:58px;padding:0 24px;font-size:1.1rem;border:1px solid #dfe1e5;border-radius:29px;background:#fff;box-shadow:0 1px 6px rgba(32,33,36,.12);-webkit-appearance:none;appearance:none}
 .searchbar input:focus{outline:none;box-shadow:0 1px 8px rgba(32,33,36,.25);border-color:transparent}
 .ver{font-size:.7rem;font-weight:600;background:rgba(255,255,255,.25);border-radius:6px;padding:2px 6px;vertical-align:middle}
@@ -84,7 +86,7 @@ details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;alig
 </style>
 </head>
 <body>
-<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.6</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
+<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.7</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
 <main>
 <!-- PROFIL -->
 
@@ -94,7 +96,18 @@ details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;alig
  <form id="searchForm" class="searchbar" role="search" onsubmit="return false">
   <input id="request" type="search" enterkeyhint="go" autocomplete="off" placeholder="Que voulez-vous cuisiner ?" aria-label="Que voulez-vous cuisiner ?">
  </form>
-  <button type="button" class="pill" id="week7">Faire les courses pour 7 jours</button>
+  <div class="pillgrid">
+   <button type="button" class="pill" id="week7">Faire les courses pour 7 jours</button>
+   <button type="button" class="pill">Courses de la semaine</button>
+   <button type="button" class="pill">Repas express</button>
+   <button type="button" class="pill">Invités ce soir</button>
+   <button type="button" class="pill">Budget serré</button>
+   <button type="button" class="pill">Zéro déchet</button>
+   <button type="button" class="pill">Sans gluten</button>
+   <button type="button" class="pill">Végétarien</button>
+   <button type="button" class="pill">Goûter enfants</button>
+   <button type="button" class="pill">Oubli du frigo</button>
+  </div>
  </div>
  <!-- Ancien contenu de l'onglet Demande : conservé masqué (jamais affiché) car la logique magasin/IA/génération
       s'appuie sur ces éléments. Voir www/demande-desactive.js pour le réactiver. -->
