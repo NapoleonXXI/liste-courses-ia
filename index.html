@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.3">
+<meta name="app-version" content="v1.4">
 <title>Liste de courses IA</title>
 <style>
 :root{--acc:#16a34a;--acc2:#dcfce7;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -79,7 +79,7 @@ details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;alig
 </style>
 </head>
 <body>
-<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.3</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
+<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.4</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
 <main>
 <!-- PROFIL -->
 
@@ -130,6 +130,8 @@ details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;alig
   <p class="note">💡 Prix indicatifs estimés (moyennes supermarchés France), non contractuels.</p>
  </div>
  <div id="listBody"></div>
+ <button class="btn" id="finish">✅ Terminer les courses</button>
+ <button class="btn danger" id="reset">Vider la liste</button>
  <div class="card"><h3>Ajouter un article</h3>
   <input id="addName" placeholder="Nom de l'article">
   <div class="row" style="margin-top:8px"><input id="addQty" placeholder="Quantité" inputmode="decimal"><input id="addUnit" placeholder="Unité (g, pièce…)"></div>
@@ -137,24 +139,11 @@ details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;alig
  </div>
 </section>
 <!-- PANIER -->
-<section class="screen" id="s-panier">
- <div class="card"><h2>Mon panier</h2>
-  <div class="stats">
-   <div>Total dépensé (estimé)<b id="pTotal">0,00 €</b></div>
-   <div>Budget<b id="pBudget">—</b></div>
-  </div>
-  <div class="prog"><div id="pBar"></div></div>
-  <div id="pMsg"></div>
- </div>
- <div class="card" id="pItems"></div>
- <button class="btn" id="finish">✅ Terminer les courses</button>
- <button class="btn danger" id="reset">Vider la liste</button>
-</section>
+
 </main>
 <nav>
  <button data-s="demande"><span>💬</span>Demande</button>
  <button data-s="liste"><span>📝</span>Liste<i class="badge" id="badgeList" hidden></i></button>
- <button data-s="panier"><span>🧺</span>Panier</button>
 </nav>
 <div class="toast" id="toast"></div>
 <script>
@@ -357,7 +346,7 @@ function updateStats(){
  $('#listWarn').innerHTML=s.t?budgetMsg(s.all):'';
  $('#factorInfo').innerHTML=store?`🏪 Prix indicatifs chez <b>${esc(store.name)}</b> (niveau moyen ${fmtPct(Math.round((fac()-1)*100))}) : ${levelsText()}`:'🏪 Aucun magasin choisi : prix moyens nationaux.';
  const b=$('#badgeList');b.hidden=!(s.t-s.c);b.textContent=s.t-s.c;
- renderPanier();
+
 }
 function renderGen(){
  const g=LS.get('lastGen',null),el=$('#genResult');if(!g){el.innerHTML='';return}
@@ -404,14 +393,6 @@ $('#addBtn').onclick=()=>{
 };
 
 /* ---- Panier ---- */
-function renderPanier(){
- const s=totals(),b=+profile.budget;
- $('#pTotal').textContent=eur(s.cart);$('#pBudget').textContent=b?eur(b)+(profile.budgetType==='week'?' /sem.':' /repas'):'—';
- const pct=b?Math.min(100,s.cart/b*100):0;$('#pBar').style.width=pct+'%';$('#pBar').style.background=s.cart>b&&b?'var(--err)':'';
- $('#pMsg').innerHTML=(b?budgetMsg(s.cart):'')+`<p class="note">Reste à acheter : ${s.t-s.c} article(s), ~${eur(s.remain)}. Prix estimés.</p>`;
- const c=list.items.filter(i=>i.checked);
- $('#pItems').innerHTML=c.length?'<h3>Articles dans le panier</h3>'+c.map(i=>`<div class="item"><div class="nm"><div>✔ ${esc(i.name)}</div><div class="iprice">${priceLine(i)}</div><span class="sub">${i.quantity} ${esc(i.unit)}</span></div></div>`).join(''):'<div class="empty">Aucun article coché pour le moment.</div>';
-}
 $('#finish').onclick=()=>{const s=totals();if(!s.t){toast('Liste vide');return}
  if(!confirm(`Terminer les courses ? Total estimé : ${eur(s.cart)}. Les articles cochés seront retirés de la liste.`))return;
  const hist=LS.get('history',[]);hist.push({date:new Date().toISOString(),title:list.title,total:s.cart});LS.set('history',hist.slice(-50));
@@ -559,7 +540,7 @@ $('#suggest').innerHTML=['Pâtes carbonara','Ratatouille','Poulet rôti','Curry 
 $('#suggest').onclick=e=>{const b=e.target.closest('.chip');if(b)$('#request').value=b.dataset.v};
 
 loadProfile();render();showStore();
-{const sc=LS.get('screen','demande');go(['demande','liste','panier'].includes(sc)?sc:'demande')}
+{const sc=LS.get('screen','demande');go(['demande','liste'].includes(sc)?sc:'demande')}
 // Service worker : aucun n'est utilisé ; on désinscrit d'éventuels anciens SW pour éviter une version en cache.
 if('serviceWorker' in navigator&&navigator.serviceWorker.getRegistrations)navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});
 </script>
