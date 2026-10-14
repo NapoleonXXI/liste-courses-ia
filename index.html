@@ -4,10 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#16a34a">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="app-version" content="v1.3">
 <title>Liste de courses IA</title>
 <style>
 :root{--acc:#16a34a;--acc2:#dcfce7;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
 [hidden]{display:none!important}
+.ver{font-size:.7rem;font-weight:600;background:rgba(255,255,255,.25);border-radius:6px;padding:2px 6px;vertical-align:middle}
+.iname{font-weight:600;word-break:break-word}
+.iprice{font-size:.95rem;color:var(--txt);margin-top:2px;white-space:normal}.iprice b{color:#14532d;white-space:nowrap}
+.iprice .lvl{display:inline;font-size:.8rem;color:var(--mut);font-weight:500}
+.gl{display:block}
+.stepper{display:flex;align-items:center;gap:10px;margin-top:12px;font-weight:600}.stepper span{flex:1}
+.stepper button{width:48px;height:48px;border-radius:12px;border:1px solid #d1d5db;background:#fff;font-size:1.4rem;cursor:pointer}
+.stepper output{min-width:28px;text-align:center;font-size:1.1rem}
+.settings{background:transparent;box-shadow:none;padding:4px 16px}.settings summary{color:var(--mut);font-size:.9rem;font-weight:500}
+.item .qty{width:64px}
+
 .lvl{display:block;font-size:.7rem;font-weight:600;color:var(--mut)}.gl .lvl{display:inline;margin-left:4px}
 .genlist{margin:10px 0;border-top:1px solid #eee}.gl{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:.95rem}.gl b{white-space:nowrap}
 .lvls{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.lvls span{font-size:.78rem;padding:4px 8px;border-radius:999px;background:#f3f4f6}.lvls .cheap{background:var(--acc2);color:#14532d}.lvls .dear{background:#fee2e2;color:#991b1b}
@@ -48,8 +63,8 @@ nav button.active{color:var(--acc);font-weight:700}
 .item:last-child{border-bottom:0}
 .item input[type=checkbox]{width:30px;height:30px;flex:0 0 30px;accent-color:var(--acc);margin:0}
 .item .nm{flex:1;min-width:0}
-.item .nm div{font-weight:600;word-break:break-word}
-.item.done .nm div{text-decoration:line-through;color:var(--mut)}
+
+.item.done .nm .iname{text-decoration:line-through;color:var(--mut)}
 .item .qty{width:72px;padding:8px;text-align:center}
 .item .pr{width:62px;text-align:right;font-weight:600;font-size:.95rem}
 .item .del{border:0;background:#fee2e2;color:var(--err);width:40px;height:40px;border-radius:10px;font-size:1.1rem;cursor:pointer}
@@ -64,39 +79,16 @@ details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;alig
 </style>
 </head>
 <body>
-<header><h1>🛒 Liste de courses IA</h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
+<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.3</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
 <main>
 <!-- PROFIL -->
-<section class="screen" id="s-profil">
- <div class="card"><h2>Mon profil alimentaire</h2>
-  <label>Préférences</label>
-  <div class="chips" id="prefChips"></div>
-  <label>Restrictions / allergies</label>
-  <div class="chips" id="restChips"></div>
-  <label for="restOther">Autres aliments à exclure (séparés par des virgules)</label>
-  <input id="restOther" placeholder="ex : champignons, coriandre">
-  <div class="row">
-   <div><label for="people">Personnes</label><input id="people" type="number" min="1" max="20" value="2" inputmode="numeric"></div>
-   <div><label for="budget">Budget (€)</label><input id="budget" type="number" min="0" step="1" value="60" inputmode="decimal"></div>
-  </div>
-  <label for="budgetType">Type de budget</label>
-  <select id="budgetType"><option value="week">Par semaine</option><option value="meal">Par repas</option></select>
-  <button class="btn" id="saveProfile">Enregistrer le profil</button>
- </div>
- <div class="card"><details id="aiSettings"><summary>⚙️ Paramètres IA (optionnel)</summary>
-  <p class="note">Sans clé, l'app utilise une génération simulée hors ligne. La clé est stockée uniquement dans ce navigateur (localStorage).</p>
-  <label for="apiKey">Clé API (compatible OpenAI)</label><input id="apiKey" type="password" placeholder="sk-..." autocomplete="off">
-  <label for="apiBase">URL de base</label><input id="apiBase" value="https://api.openai.com/v1">
-  <label for="apiModel">Modèle</label><input id="apiModel" value="gpt-4o-mini">
-  <button class="btn sec" id="saveAi">Enregistrer les paramètres IA</button>
-  <button class="btn danger" id="clearAi">Effacer la clé</button>
- </details></div>
-</section>
+
 <!-- DEMANDE -->
 <section class="screen" id="s-demande">
  <div class="card"><h2>Que voulez-vous cuisiner ?</h2>
   <textarea id="request" placeholder="ex : des pâtes carbonara pour ce soir, une ratatouille…"></textarea>
   <div class="chips" id="suggest" style="margin-top:10px"></div>
+  <div class="stepper"><span>Personnes</span><button type="button" id="pMinus" aria-label="Moins">−</button><output id="peopleVal">2</output><button type="button" id="pPlus" aria-label="Plus">+</button></div>
   <label style="display:flex;align-items:center;gap:10px;font-weight:400"><input type="checkbox" id="appendMode" style="width:24px;height:24px"> Ajouter à la liste existante</label>
   <button class="btn" id="generate">✨ Générer ma liste</button>
   <p class="note" id="modeInfo"></p>
@@ -114,6 +106,14 @@ details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;alig
   <button class="btn danger" id="forgetStore" hidden>🗑️ Oublier ce magasin</button>
  </div>
  <div id="genResult"></div>
+ <div class="card settings"><details id="aiSettings"><summary>⚙️ Réglages IA (optionnel)</summary>
+  <p class="note">Sans clé, l'app utilise une génération simulée hors ligne. La clé est stockée uniquement dans ce navigateur (localStorage).</p>
+  <label for="apiKey">Clé API (compatible OpenAI)</label><input id="apiKey" type="password" placeholder="sk-..." autocomplete="off">
+  <label for="apiBase">URL de base</label><input id="apiBase" value="https://api.openai.com/v1">
+  <label for="apiModel">Modèle</label><input id="apiModel" value="gpt-4o-mini">
+  <button class="btn sec" id="saveAi">Enregistrer les paramètres IA</button>
+  <button class="btn danger" id="clearAi">Effacer la clé</button>
+ </details></div>
 </section>
 <!-- LISTE -->
 <section class="screen" id="s-liste">
@@ -152,7 +152,6 @@ details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;alig
 </section>
 </main>
 <nav>
- <button data-s="profil"><span>👤</span>Profil</button>
  <button data-s="demande"><span>💬</span>Demande</button>
  <button data-s="liste"><span>📝</span>Liste<i class="badge" id="badgeList" hidden></i></button>
  <button data-s="panier"><span>🧺</span>Panier</button>
@@ -237,7 +236,8 @@ const R=[
 const GENERIC={n:'Repas équilibré (suggestion générique)',i:[['blanc de poulet',130,'g'],['riz basmati',80,'g'],['courgette',150,'g'],['tomate',100,'g'],['oignon',40,'g'],['huile d\'olive',10,'ml'],['salade',0.2,'pièce'],['pomme',150,'g']]};
 
 /* ---- État ---- */
-let profile=LS.get('profile',{prefs:[],rest:[],other:'',people:2,budget:60,budgetType:'week'});
+// Profil désactivé : aucune restriction, aucun budget (pas d'alerte), seul le nombre de personnes est réglable.
+let profile={prefs:[],rest:[],other:'',people:LS.get('people',2),budget:0,budgetType:'week'};
 let ai=LS.get('ai',{key:'',base:'https://api.openai.com/v1',model:'gpt-4o-mini'});
 let list=LS.get('list',{title:'',items:[]});
 let store=LS.get('store',null);if(store&&!store.grid)store=null;
@@ -274,7 +274,10 @@ function pgroup(i){const c=i.category||'',n=norm(i.name);if(SAUCE_RE.test(n))ret
 const catFac=i=>store&&store.grid?1+store.grid[PGROUPS.indexOf(pgroup(i))]/100:1;
 const fac=()=>{if(!store||!store.grid)return 1;return 1+store.grid.reduce((a,b)=>a+b,0)/store.grid.length/100};
 const fmtPct=v=>(v>0?'+':v<0?'−':'±')+Math.abs(v)+' %';
-const pp=i=>Math.round((+i.price||0)*catFac(i)*100)/100;
+// Prix affiché = prix de base (table ou estimation) × facteur rayon du magasin, arrondi au centime. Jamais vide.
+const basePrice=i=>{const v=+i.price;return v>0&&isFinite(v)?v:Math.round(priceFor(i.name,i.quantity,i.unit)*100)/100||2.5};
+const pp=i=>Math.round(basePrice(i)*catFac(i)*100)/100;
+const priceLine=i=>`${store&&store.grid?`<span class="lvl">${PGLABEL[pgroup(i)]} ${fmtPct(store.grid[PGROUPS.indexOf(pgroup(i))])}</span> — `:''}<b>${eur(pp(i))}</b>${P[i.name]?'':' <span class="sub">(estimation)</span>'}`;
 
 function excludedTags(){const s=new Set();profile.prefs.forEach(p=>(PREFS[p]||[]).forEach(t=>s.add(t)));profile.rest.forEach(r=>(REST[r]||[]).forEach(t=>s.add(t)));return s}
 function otherExcl(){return profile.other.split(',').map(x=>norm(x.trim())).filter(Boolean)}
@@ -362,7 +365,7 @@ function renderGen(){
  const tot=items.reduce((s,i)=>s+pp(i),0);
  let h=`<div class="card"><h3>${g.source==='ia'?'🤖 Généré par IA':'🧪 Génération simulée'}</h3><div><b>${esc(g.title)}</b> — ${items.length} articles, ~${eur(tot)} pour ${profile.people} pers.</div>`;
  h+=`<p class="note">Prix indicatifs ${store?'chez <b>'+esc(store.name)+'</b>':'moyens (aucun magasin choisi)'}</p>`;
- h+='<div class="genlist">'+items.map(i=>`<div class="gl"><span>${esc(i.name)} <span class="sub">${i.quantity} ${esc(i.unit)}</span>${store?` <span class="lvl">${fmtPct(store.grid[PGROUPS.indexOf(pgroup(i))])}</span>`:''}</span><b>${eur(pp(i))}</b></div>`).join('')+'</div>';
+ h+='<div class="genlist">'+items.map(i=>`<div class="gl"><div class="iname">${esc(i.name)} <span class="sub">(${i.quantity} ${esc(i.unit)})</span></div><div class="iprice" data-price="${pp(i).toFixed(2)}">${priceLine(i)}</div></div>`).join('')+'</div>';
  if(g.generic)h+=`<div class="warn">Plat non reconnu : voici une liste générique équilibrée. Ajoutez une clé IA pour des résultats sur mesure.</div>`;
  if(g.notes&&g.notes.length)h+=`<div class="warn">Adapté à votre profil : ${g.notes.map(esc).join(' ; ')}</div>`;
  h+=budgetMsg(tot)+`<button class="btn" onclick="go('liste')">Voir ma liste →</button></div>`;el.innerHTML=h;
@@ -377,9 +380,8 @@ function render(){
  body.innerHTML=cats.map(c=>`<div class="card"><h3>${esc(c)}</h3>${g[c].map(i=>`
   <div class="item${i.checked?' done':''}" data-id="${i.id}">
    <input type="checkbox" ${i.checked?'checked':''} aria-label="Cocher ${esc(i.name)}">
-   <div class="nm"><div>${esc(i.name)}</div><span class="sub">${esc(i.unit)}</span>${i.alt?`<div class="sub alt">↺ ${esc(i.alt)}</div>`:''}</div>
+   <div class="nm"><div class="iname">${esc(i.name)}</div><div class="iprice" data-price="${pp(i).toFixed(2)}">${priceLine(i)}</div><span class="sub">en ${esc(i.unit)}</span>${i.alt?`<div class="sub alt">↺ ${esc(i.alt)}</div>`:''}</div>
    <input class="qty" type="number" min="0" step="any" inputmode="decimal" value="${i.quantity}" aria-label="Quantité">
-   <span class="pr">${eur(pp(i))}${store?`<small class="lvl">${fmtPct(store.grid[PGROUPS.indexOf(pgroup(i))])}</small>`:''}</span>
    <button class="del" aria-label="Supprimer">✕</button></div>`).join('')}</div>`).join('');
  updateStats();
 }
@@ -408,7 +410,7 @@ function renderPanier(){
  const pct=b?Math.min(100,s.cart/b*100):0;$('#pBar').style.width=pct+'%';$('#pBar').style.background=s.cart>b&&b?'var(--err)':'';
  $('#pMsg').innerHTML=(b?budgetMsg(s.cart):'')+`<p class="note">Reste à acheter : ${s.t-s.c} article(s), ~${eur(s.remain)}. Prix estimés.</p>`;
  const c=list.items.filter(i=>i.checked);
- $('#pItems').innerHTML=c.length?'<h3>Articles dans le panier</h3>'+c.map(i=>`<div class="item"><div class="nm"><div>✔ ${esc(i.name)}</div><span class="sub">${i.quantity} ${esc(i.unit)}</span></div><span class="pr">${eur(pp(i))}</span></div>`).join(''):'<div class="empty">Aucun article coché pour le moment.</div>';
+ $('#pItems').innerHTML=c.length?'<h3>Articles dans le panier</h3>'+c.map(i=>`<div class="item"><div class="nm"><div>✔ ${esc(i.name)}</div><div class="iprice">${priceLine(i)}</div><span class="sub">${i.quantity} ${esc(i.unit)}</span></div></div>`).join(''):'<div class="empty">Aucun article coché pour le moment.</div>';
 }
 $('#finish').onclick=()=>{const s=totals();if(!s.t){toast('Liste vide');return}
  if(!confirm(`Terminer les courses ? Total estimé : ${eur(s.cart)}. Les articles cochés seront retirés de la liste.`))return;
@@ -416,19 +418,15 @@ $('#finish').onclick=()=>{const s=totals();if(!s.t){toast('Liste vide');return}
  list.items=list.items.filter(i=>!i.checked);if(!list.items.length)list.title='';save();render();toast('Courses terminées 🎉');};
 $('#reset').onclick=()=>{if(!confirm('Vider complètement la liste ?'))return;list={title:'',items:[]};save();render();$('#genResult').innerHTML='';toast('Liste vidée')};
 
-/* ---- Profil ---- */
-function chips(el,opts,sel){el.innerHTML=opts.map(o=>`<button type="button" class="chip${sel.includes(o)?' on':''}" data-v="${esc(o)}">${esc(o)}</button>`).join('');el.onclick=e=>{const b=e.target.closest('.chip');if(b)b.classList.toggle('on')}}
+/* ---- Profil désactivé (voir profil-desactive.js) : valeurs neutres ---- */
 function loadProfile(){
- chips($('#prefChips'),Object.keys(PREFS),profile.prefs);chips($('#restChips'),Object.keys(REST),profile.rest);
- $('#restOther').value=profile.other;$('#people').value=profile.people;$('#budget').value=profile.budget;$('#budgetType').value=profile.budgetType;
+ $('#peopleVal').textContent=profile.people;
  $('#apiKey').value=ai.key;$('#apiBase').value=ai.base;$('#apiModel').value=ai.model;
- $('#hdrSub').textContent=`${profile.people} pers. · budget ${profile.budget} € ${profile.budgetType==='week'?'/sem.':'/repas'}`+(profile.prefs.length?' · '+profile.prefs.join(', '):'');
+ $('#hdrSub').textContent=`${profile.people} personne${profile.people>1?'s':''} · prix indicatifs`;
  $('#modeInfo').textContent=ai.key?`Mode IA : ${ai.model} (repli automatique sur la simulation en cas d'erreur).`:'Mode simulation hors ligne (aucune clé IA configurée).';
 }
-$('#saveProfile').onclick=()=>{
- profile={prefs:[...document.querySelectorAll('#prefChips .on')].map(b=>b.dataset.v),rest:[...document.querySelectorAll('#restChips .on')].map(b=>b.dataset.v),other:$('#restOther').value.trim(),people:Math.max(1,Math.min(20,parseInt($('#people').value)||1)),budget:Math.max(0,parseFloat($('#budget').value)||0),budgetType:$('#budgetType').value};
- LS.set('profile',profile);LS.set('profileDone',true);loadProfile();updateStats();toast('Profil enregistré ✔');go('demande');
-};
+function setPeople(n){profile.people=Math.max(1,Math.min(20,n));LS.set('people',profile.people);loadProfile()}
+$('#pMinus').onclick=()=>setPeople(profile.people-1);$('#pPlus').onclick=()=>setPeople(profile.people+1);
 $('#saveAi').onclick=()=>{ai={key:$('#apiKey').value.trim(),base:$('#apiBase').value.trim()||'https://api.openai.com/v1',model:$('#apiModel').value.trim()||'gpt-4o-mini'};LS.set('ai',ai);loadProfile();toast('Paramètres IA enregistrés')};
 $('#clearAi').onclick=()=>{ai.key='';LS.set('ai',ai);loadProfile();toast('Clé supprimée')};
 
@@ -561,7 +559,9 @@ $('#suggest').innerHTML=['Pâtes carbonara','Ratatouille','Poulet rôti','Curry 
 $('#suggest').onclick=e=>{const b=e.target.closest('.chip');if(b)$('#request').value=b.dataset.v};
 
 loadProfile();render();showStore();
-go(LS.get('profileDone',false)?LS.get('screen','demande'):'profil');
+{const sc=LS.get('screen','demande');go(['demande','liste','panier'].includes(sc)?sc:'demande')}
+// Service worker : aucun n'est utilisé ; on désinscrit d'éventuels anciens SW pour éviter une version en cache.
+if('serviceWorker' in navigator&&navigator.serviceWorker.getRegistrations)navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});
 </script>
 </body>
 </html>
