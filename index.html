@@ -107,6 +107,7 @@ details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;alig
    <button class="btn sec" id="cityBtn">🔎 Chercher un magasin</button>
   </div>
   <button class="btn sec" id="changeStore" hidden>🔄 Changer de magasin</button>
+  <button class="btn danger" id="forgetStore" hidden>🗑️ Oublier ce magasin</button>
  </div>
  <div id="genResult"></div>
 </section>
@@ -237,6 +238,7 @@ let ai=LS.get('ai',{key:'',base:'https://api.openai.com/v1',model:'gpt-4o-mini'}
 let list=LS.get('list',{title:'',items:[]});
 let store=LS.get('store',null);if(store&&!store.factor)store=null;
 const save=()=>LS.set('list',list);
+let _uidN=0;const uid=()=>Date.now().toString(36)+'-'+(_uidN++).toString(36);
 const BRANDS=[[/lidl|aldi|leader price|netto|e\.?\s?leclerc|leclerc|intermarche/,0.9,'enseigne discount / prix bas'],[/carrefour (city|express)|monoprix|monop|franprix|daily monop|naturalia|g20|spar|vival|proxi|casino shop|u express/,1.15,'enseigne de proximité (plus chère)'],[/auchan|carrefour|super u|hyper u|casino|cora|match/,1.0,'enseigne standard']];
 function brandFactor(name){const n=norm(name);for(const [re,f,l] of BRANDS)if(re.test(n))return {f,l};return {f:1,l:'facteur par défaut'}}
 const fac=()=>store&&store.factor?store.factor:1;
@@ -297,7 +299,7 @@ async function generate(){
   if(ai.key){try{res=await callAI(text);source='ia'}catch(e){console.warn('IA indisponible',e);toast('IA indisponible, génération simulée');}}
   if(!res)res=simulate(text);
   const {items,notes}=applyProfile(res.items);
-  const newItems=items.map(i=>({id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),name:i.name,quantity:i.quantity,unit:i.unit,category:i.category||guessCat(i.name),price:+(i.price!=null&&source==='ia'&&!i.alt?i.price:priceFor(i.name,i.quantity,i.unit)).toFixed(2),alt:i.alt||'',checked:false}));
+  const newItems=items.map(i=>({id:uid(),name:i.name,quantity:i.quantity,unit:i.unit,category:i.category||guessCat(i.name),price:+(i.price!=null&&source==='ia'&&!i.alt?i.price:priceFor(i.name,i.quantity,i.unit)).toFixed(2),alt:i.alt||'',checked:false}));
   if($('#appendMode').checked&&list.items.length){list.items.push(...newItems);list.title+=' + '+res.title}else list={title:res.title,items:newItems};
   save();
   const tot=newItems.reduce((s,i)=>s+pp(i),0);
@@ -355,7 +357,7 @@ $('#addBtn').onclick=()=>{
  const name=$('#addName').value.trim();if(!name){toast("Indiquez un nom d'article");return}
  const q=parseFloat(($('#addQty').value||'1').replace(',','.'))||1,u=$('#addUnit').value.trim()||'pièce';
  if(isBlocked(name).length)toast('⚠️ Cet article ne respecte pas votre profil');
- list.items.push({id:Date.now().toString(36),name,quantity:q,unit:u,category:guessCat(name),price:+priceFor(name,q,u).toFixed(2),alt:'',checked:false});
+ list.items.push({id:uid(),name,quantity:q,unit:u,category:guessCat(name),price:+priceFor(name,q,u).toFixed(2),alt:'',checked:false});
  save();render();$('#addName').value=$('#addQty').value=$('#addUnit').value='';toast('Article ajouté');
 };
 
@@ -395,27 +397,86 @@ function dist(a,b,c,d){const R=6371e3,r=x=>x*Math.PI/180;const h=Math.sin(r(c-a)
 function fmtD(d){return d<1000?Math.round(d)+' m':(d/1000).toFixed(1).replace('.',',')+' km'}
 function status(m,cls){const el=$('#storeStatus');el.className=cls||'note';el.textContent=m}
 function showStore(){
- const el=$('#storeInfo');$('#changeStore').hidden=!store;$('#locate').hidden=!!store;
+ const el=$('#storeInfo');$('#changeStore').hidden=!store;$('#forgetStore').hidden=!store;$('#locate').hidden=!!store;
  if(!store){el.textContent='Aucun magasin sélectionné.';return}
- el.innerHTML=`<b>${esc(store.name)}</b><br>à ${fmtD(store.d)}${store.addr?' · '+esc(store.addr):''}${store.origin?' · depuis '+esc(store.origin):''}<br>Facteur prix : ×${store.factor.toFixed(2).replace('.',',')} (${esc(store.factorLabel)})`+(store.estimate?'':`<br><a href="https://www.openstreetmap.org/?mlat=${store.lat}&mlon=${store.lon}#map=17/${store.lat}/${store.lon}" target="_blank" rel="noopener">Voir sur la carte</a>`);
+ el.innerHTML=`<b>${esc(store.name)}</b><br>à ${fmtD(store.d)}${store.addr?' · '+esc(store.addr):''}${store.origin?' · depuis '+esc(store.origin):''}<br>Facteur prix : ×${store.factor.toFixed(2).replace('.',',')} (${esc(store.factorLabel)})`+(store.estimate?'<br><span class="sub alt">Magasin indicatif (estimation, données hors ligne)</span>':'')+(store.estimate||store.lat==null?'':`<br><a href="https://www.openstreetmap.org/?mlat=${store.lat}&mlon=${store.lon}#map=17/${store.lat}/${store.lon}" target="_blank" rel="noopener">Voir sur la carte</a>`);
 }
-function setStore(st){const bf=st.estimate?{f:1,l:'magasin estimé, facteur par défaut'}:brandFactor(st.name);st.factor=bf.f;st.factorLabel=bf.l;store=st;LS.set('store',store);showStore();$('#cityBox').hidden=true;render()}
+function setStore(st){const bf=brandFactor(st.brand||st.name);st.factor=bf.f;st.factorLabel=bf.l;store=st;LS.set('store',store);showStore();$('#cityBox').hidden=true;render()}
 function setBusy(btn,busy,label){btn.disabled=busy;btn.innerHTML=busy?'<span class="spin" style="border-color:#14532d;border-top-color:transparent"></span> '+label:btn.dataset.label}
 function showFallback(msg){status(msg,'warn');$('#cityBox').hidden=false;$('#locate').hidden=false}
-async function findStore(la,lo,origin){
- status('Recherche du supermarché le plus proche…');
+/* ---- Magasins de repli déterministes (aucun aléa) ---- */
+const DEPTS={ // département -> [ville, enseigne, adresse indicative, distance m]
+ '75':['Paris','Monoprix','52 rue de Rivoli, 75004 Paris',450],'69':['Lyon','Carrefour','Centre commercial Part-Dieu, 69003 Lyon',900],
+ '13':['Marseille','Auchan','Avenue du Prado, 13008 Marseille',1100],'31':['Toulouse','E.Leclerc','Route de Blagnac, 31200 Toulouse',1300],
+ '33':['Bordeaux','Auchan','Quai des Chartrons, 33000 Bordeaux',950],'59':['Lille','Carrefour','Rue du Molinel, 59000 Lille',700],
+ '44':['Nantes','E.Leclerc','Boulevard de la Prairie-au-Duc, 44200 Nantes',1200],'67':['Strasbourg','Super U','Route du Polygone, 67100 Strasbourg',1000],
+ '34':['Montpellier','Carrefour','Avenue de la Mer, 34000 Montpellier',1100],'06':['Nice','Carrefour City','Avenue Jean-Médecin, 06000 Nice',500],
+ '35':['Rennes','E.Leclerc','Rue de Saint-Malo, 35000 Rennes',1000],'51':['Reims','Intermarché','Avenue de Laon, 51100 Reims',900],
+ '76':['Le Havre','Auchan','Cours de la République, 76600 Le Havre',1200],'42':['Saint-Étienne','Casino','Rue des Docteurs-Charcot, 42100 Saint-Étienne',800],
+ '83':['Toulon','Intermarché','Avenue de la République, 83000 Toulon',850],'38':['Grenoble','Carrefour','Cours Jean-Jaurès, 38000 Grenoble',900],
+ '21':['Dijon','Intermarché','Avenue du Drapeau, 21000 Dijon',950],'49':['Angers','Super U','Boulevard Foch, 49100 Angers',800],
+ '30':['Nîmes','E.Leclerc','Route de Montpellier, 30900 Nîmes',1400],'63':['Clermont-Ferrand','Carrefour','Rue Montlosier, 63000 Clermont-Ferrand',900],
+ '72':['Le Mans','E.Leclerc','Avenue Bollée, 72000 Le Mans',1200],'29':['Brest','Super U','Rue de Siam, 29200 Brest',800],
+ '37':['Tours','Auchan','Avenue de Grammont, 37000 Tours',1000],'87':['Limoges','Carrefour','Avenue Garibaldi, 87000 Limoges',1000],
+ '80':['Amiens','Lidl','Rue Jules-Barni, 80000 Amiens',700],'66':['Perpignan','Lidl','Avenue du Maréchal-Leclerc, 66000 Perpignan',800],
+ '57':['Metz','Cora','Rue Serpenoise, 57000 Metz',1100],'25':['Besançon','Intermarché','Rue de Belfort, 25000 Besançon',900],
+ '45':['Orléans','Auchan','Rue de Bourgogne, 45000 Orléans',1000],'14':['Caen','Carrefour','Rue Saint-Jean, 14000 Caen',850],
+ '64':['Pau','E.Leclerc','Boulevard des Pyrénées, 64000 Pau',1100],'92':['Hauts-de-Seine','Franprix','Avenue Charles-de-Gaulle, 92200 Neuilly',350],
+ '93':['Seine-Saint-Denis','Lidl','Rue de la République, 93200 Saint-Denis',600],'94':['Val-de-Marne','Carrefour Market','Avenue du Général-de-Gaulle, 94000 Créteil',700]
+};
+const CITY2DEPT={};for(const [d,v] of Object.entries(DEPTS))CITY2DEPT[norm(v[0])]=d;
+Object.assign(CITY2DEPT,{'marseille':'13','saint etienne':'42','st etienne':'42','nimes':'30','le havre':'76','clermont ferrand':'63','besancon':'25','orleans':'45','neuilly':'92','saint denis':'93','creteil':'94'});
+const HASH_BRANDS=['Carrefour Market','Intermarché','Super U','E.Leclerc','Lidl','Auchan','Casino','Aldi','Monoprix','Franprix'];
+function hash(str){let h=2166136261;for(const c of str){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+const normKey=s=>norm(s).replace(/[^a-z0-9]+/g,' ').trim();
+function deptOf(cp){cp=String(cp).trim();if(/^2[ab]/i.test(cp))return '20';return cp.slice(0,2)}
+function placeKey(q){const t=String(q||'').trim();const cp=t.match(/\b(\d{5})\b/);if(cp)return {key:'cp:'+cp[1],cp:cp[1]};return {key:'ville:'+normKey(t),city:normKey(t)}}
+function gpsKey(la,lo){return 'gps:'+la.toFixed(2)+','+lo.toFixed(2)} // ~1 km
+function fallbackStore(p,origin){
+ // p: {cp?, city?, key}
+ let d=p.cp?deptOf(p.cp):(p.city&&CITY2DEPT[p.city]);
+ if(!d&&p.city){const k=Object.keys(CITY2DEPT).find(c=>p.city.includes(c));if(k)d=CITY2DEPT[k]}
+ const e=d&&DEPTS[d];
+ if(e)return {name:e[1],brand:e[1],addr:e[2]+' (adresse indicative)',d:e[3],estimate:true,origin:origin||e[0],lat:null,lon:null};
+ const h=hash(p.key);const brand=HASH_BRANDS[h%HASH_BRANDS.length];const dist=400+((h>>>8)%12)*100;
+ return {name:brand,brand,addr:'Centre-ville'+(p.cp?' '+p.cp:p.city?' de '+p.city:'')+' (adresse indicative)',d:dist,estimate:true,origin,lat:null,lon:null};
+}
+const getCache=()=>LS.get('storeCache',{});
+function cachePut(key,st){const c=getCache();c[key]=st;LS.set('storeCache',c)}
+async function overpass(la,lo){
  const q=`[out:json][timeout:20];(node["shop"~"supermarket|convenience"](around:3000,${la},${lo});way["shop"~"supermarket|convenience"](around:3000,${la},${lo}););out center 40;`;
- const eps=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];let empty=false;
- for(const ep of eps){try{
+ for(const ep of ['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter']){try{
   const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),20000);
   const r=await fetch(ep,{method:'POST',body:'data='+encodeURIComponent(q),headers:{'Content-Type':'application/x-www-form-urlencoded'},signal:ctl.signal});clearTimeout(t);
   if(!r.ok)throw new Error(r.status);const j=await r.json();
-  const c=(j.elements||[]).map(e=>{const a=e.lat??e.center?.lat,b=e.lon??e.center?.lon,tg=e.tags||{};return {name:tg.name||tg.brand||(tg.shop==='supermarket'?'Supermarché':'Supérette'),sup:tg.shop==='supermarket',lat:a,lon:b,addr:[tg['addr:housenumber'],tg['addr:street'],tg['addr:city']].filter(Boolean).join(' '),d:dist(la,lo,a,b)}}).filter(x=>x.lat!=null);
-  if(!c.length){empty=true;break}
-  c.sort((x,y)=>(x.sup?x.d:x.d*1.5)-(y.sup?y.d:y.d*1.5));setStore({...c[0],origin});status('✔ Magasin trouvé via OpenStreetMap.','ok');return;
+  const c=(j.elements||[]).map(e=>{const a=e.lat??e.center?.lat,b=e.lon??e.center?.lon,tg=e.tags||{};return {name:tg.name||tg.brand||(tg.shop==='supermarket'?'Supermarché':'Supérette'),sup:tg.shop==='supermarket',lat:a,lon:b,addr:[tg['addr:housenumber'],tg['addr:street'],tg['addr:city']].filter(Boolean).join(' '),d:Math.round(dist(la,lo,a,b))}}).filter(x=>x.lat!=null);
+  // tri stable et déterministe : distance pondérée puis nom
+  c.sort((x,y)=>((x.sup?x.d:x.d*1.5)-(y.sup?y.d:y.d*1.5))||x.name.localeCompare(y.name));
+  return c[0]||null;
  }catch(e){console.warn('Overpass',ep,e)}}
- setStore({name:'Supermarché de proximité (estimation)',estimate:true,lat:la,lon:lo,d:800,addr:'',origin});
- status(empty?'Aucun supermarché référencé dans un rayon de 3 km : magasin estimé utilisé pour les prix.':'Service OpenStreetMap indisponible : magasin estimé utilisé pour les prix (environ 800 m).','warn');
+ return null;
+}
+async function nominatim(url){const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),15000);
+ try{const r=await fetch(url,{signal:ctl.signal,headers:{'Accept-Language':'fr'}});if(!r.ok)throw new Error(r.status);return await r.json()}finally{clearTimeout(t)}}
+function useCached(key,label){const st=getCache()[key];if(!st)return false;setStore(st);status(`✔ Magasin mémorisé pour ${label} (résultat identique à la précédente recherche).`,'ok');return true}
+async function resolveStore(la,lo,origin,keys,place){
+ // keys: clés de cache à alimenter ; place: {cp|city,key} pour le repli
+ status('Recherche du supermarché le plus proche…');
+ const osm=la!=null?await overpass(la,lo):null;
+ let st;
+ if(osm){st={...osm,origin};status('✔ Magasin trouvé via OpenStreetMap.','ok')}
+ else{
+  if(!place&&la!=null){ // GPS : reverse geocode pour obtenir un code postal
+   try{const j=await nominatim(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${la}&lon=${lo}&zoom=16&addressdetails=1`);
+    const a=j&&j.address||{};if(a.postcode)place={cp:a.postcode.slice(0,5),key:'cp:'+a.postcode.slice(0,5)};else if(a.city||a.town||a.village)place={city:normKey(a.city||a.town||a.village),key:'ville:'+normKey(a.city||a.town||a.village)};
+   }catch(e){console.warn('Reverse',e)}
+   if(place){const c=getCache()[place.key];if(c){keys.forEach(k=>cachePut(k,c));setStore(c);status('✔ Magasin mémorisé pour votre secteur.','ok');return}keys.push(place.key)}
+   else place={key:keys[0]};
+  }
+  st=fallbackStore(place,origin);
+  status('OpenStreetMap indisponible : magasin indicatif (estimation stable pour ce lieu).','warn');
+ }
+ st.cacheKey=keys[0];keys.forEach(k=>cachePut(k,st));setStore(st);
 }
 function locate(){
  const btn=$('#locate');
@@ -423,29 +484,31 @@ function locate(){
  if(!('geolocation' in navigator)){showFallback("La géolocalisation n'est pas disponible sur cet appareil. Indiquez votre ville ou votre code postal :");return}
  setBusy(btn,true,'Localisation…');status('Localisation en cours…');
  navigator.geolocation.getCurrentPosition(async pos=>{
-  try{await findStore(pos.coords.latitude,pos.coords.longitude,'votre position')}finally{setBusy(btn,false)}
+  const la=pos.coords.latitude,lo=pos.coords.longitude,k=gpsKey(la,lo);
+  try{if(!useCached(k,'votre secteur'))await resolveStore(la,lo,'votre position',[k],null)}
+  catch(e){console.warn(e);status('Erreur pendant la recherche : magasin précédent conservé.','warn')}
+  finally{setBusy(btn,false)}
  },err=>{setBusy(btn,false);
   const m=err.code===1?'Localisation refusée. Autorisez-la dans les réglages du navigateur, ou indiquez votre ville / code postal :':err.code===3?'La localisation a pris trop de temps. Indiquez votre ville / code postal :':'Position introuvable pour le moment. Indiquez votre ville / code postal :';
   showFallback(m)},{enableHighAccuracy:false,timeout:15000,maximumAge:600000});
 }
 async function geocodeCity(){
  const q=$('#cityInput').value.trim(),btn=$('#cityBtn');if(!q){toast('Saisissez une ville ou un code postal');return}
+ const place=placeKey(q);if(!place.cp&&!place.city){status('Saisie invalide : magasin précédent conservé.','warn');return}
+ if(useCached(place.key,`« ${q} »`))return;
  setBusy(btn,true,'Recherche…');status(`Recherche de « ${q} »…`);
  try{
   let hit=null;
-  try{const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),15000);
-   const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&countrycodes=fr&limit=1&q='+encodeURIComponent(q),{signal:ctl.signal,headers:{'Accept-Language':'fr'}});clearTimeout(t);
-   if(!r.ok)throw new Error(r.status);const j=await r.json();hit=j[0]||null;
-   if(!hit){status(`Lieu « ${q} » introuvable. Vérifiez l'orthographe ou le code postal.`,'warn');return}
-  }catch(e){console.warn('Nominatim',e);
-   setStore({name:'Supermarché de proximité (estimation)',estimate:true,lat:0,lon:0,d:800,addr:'',origin:q});
-   status('Service de recherche de ville indisponible : magasin estimé utilisé pour les prix.','warn');return}
-  await findStore(+hit.lat,+hit.lon,(hit.display_name||q).split(',').slice(0,2).join(','));
- }finally{setBusy(btn,false)}
+  try{const j=await nominatim('https://nominatim.openstreetmap.org/search?format=json&countrycodes=fr&limit=1&q='+encodeURIComponent(q));hit=j&&j[0]||null}catch(e){console.warn('Nominatim',e)}
+  if(hit)await resolveStore(+hit.lat,+hit.lon,(hit.display_name||q).split(',').slice(0,2).join(','),[place.key],place);
+  else await resolveStore(null,null,q,[place.key],place);
+ }catch(e){console.warn(e);status('Erreur pendant la recherche : magasin précédent conservé.','warn')}
+ finally{setBusy(btn,false)}
 }
 $('#locate').dataset.label='📍 Me localiser';$('#cityBtn').dataset.label='🔎 Chercher un magasin';
 $('#locate').onclick=locate;$('#cityBtn').onclick=geocodeCity;
 $('#cityInput').addEventListener('keydown',e=>{if(e.key==='Enter')geocodeCity()});
+$('#forgetStore').onclick=()=>{store=null;LS.set('store',null);showStore();render();status('Magasin oublié. Recherchez-en un nouveau.');$('#cityBox').hidden=false;$('#locate').hidden=false};
 $('#changeStore').onclick=()=>{status('Choisissez un autre magasin : localisez-vous ou saisissez une ville.');$('#cityBox').hidden=false;$('#locate').hidden=false;$('#changeStore').hidden=true};
 
 /* ---- Navigation ---- */
