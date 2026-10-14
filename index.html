@@ -8,6 +8,10 @@
 <style>
 :root{--acc:#16a34a;--acc2:#dcfce7;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
 [hidden]{display:none!important}
+.lvl{display:block;font-size:.7rem;font-weight:600;color:var(--mut)}.gl .lvl{display:inline;margin-left:4px}
+.genlist{margin:10px 0;border-top:1px solid #eee}.gl{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:.95rem}.gl b{white-space:nowrap}
+.lvls{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.lvls span{font-size:.78rem;padding:4px 8px;border-radius:999px;background:#f3f4f6}.lvls .cheap{background:var(--acc2);color:#14532d}.lvls .dear{background:#fee2e2;color:#991b1b}
+.item .pr{width:70px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 header{position:sticky;top:0;z-index:5;background:var(--acc);color:#fff;padding:calc(env(safe-area-inset-top) + 12px) 16px 12px}
@@ -236,13 +240,41 @@ const GENERIC={n:'Repas équilibré (suggestion générique)',i:[['blanc de poul
 let profile=LS.get('profile',{prefs:[],rest:[],other:'',people:2,budget:60,budgetType:'week'});
 let ai=LS.get('ai',{key:'',base:'https://api.openai.com/v1',model:'gpt-4o-mini'});
 let list=LS.get('list',{title:'',items:[]});
-let store=LS.get('store',null);if(store&&!store.factor)store=null;
+let store=LS.get('store',null);if(store&&!store.grid)store=null;
 const save=()=>LS.set('list',list);
 let _uidN=0;const uid=()=>Date.now().toString(36)+'-'+(_uidN++).toString(36);
 const BRANDS=[[/lidl|aldi|leader price|netto|e\.?\s?leclerc|leclerc|intermarche/,0.9,'enseigne discount / prix bas'],[/carrefour (city|express)|monoprix|monop|franprix|daily monop|naturalia|g20|spar|vival|proxi|casino shop|u express/,1.15,'enseigne de proximité (plus chère)'],[/auchan|carrefour|super u|hyper u|casino|cora|match/,1.0,'enseigne standard']];
 function brandFactor(name){const n=norm(name);for(const [re,f,l] of BRANDS)if(re.test(n))return {f,l};return {f:1,l:'facteur par défaut'}}
-const fac=()=>store&&store.factor?store.factor:1;
-const pp=i=>(+i.price||0)*fac();
+/* Grille de prix indicative par enseigne et par rayon (en % vs prix moyen national) — table fixe, aucun aléa */
+const PGROUPS=['Fruits & légumes','Viande & poisson','Crèmerie','Boulangerie','Épicerie','Sauces & condiments','Surgelés','Boissons'];
+const PGLABEL={'Fruits & légumes':'Légumes','Viande & poisson':'Viande','Crèmerie':'Crèmerie','Boulangerie':'Pain','Épicerie':'Épicerie','Sauces & condiments':'Sauces','Surgelés':'Surgelés','Boissons':'Boissons'};
+//               F&L  Viande Crème Pain  Épic  Sauce Surg  Boiss
+const BRAND_GRID={
+ 'lidl':        [-12, -8,  -10,  -12, -14,  -12,  -10,  -12],
+ 'aldi':        [-12, -9,  -11,  -12, -15,  -13,  -10,  -13],
+ 'e.leclerc':   [-8,  -6,  -8,   -5,  -10,  -9,   -7,   -9],
+ 'intermarche': [-6,  -4,  -5,   -6,  -7,   -6,   -5,   -6],
+ 'auchan':      [-5,  -2,  -4,   -3,  -6,   -5,   -4,   -5],
+ 'super u':     [-3,  -2,  -4,   -2,  -4,   -3,   -3,   -3],
+ 'cora':        [-2,  0,   -3,   -2,  -3,   -2,   -2,   -3],
+ 'carrefour market':[0,2,  -1,   0,   -1,   0,    0,    -1],
+ 'carrefour':   [-3,  0,   -3,   -2,  -4,   -3,   -3,   -4],
+ 'casino':      [2,   3,   1,    2,   2,    2,    1,    2],
+ 'carrefour city':[10,12,  10,   8,   12,   12,   10,   12],
+ 'monoprix':    [12,  14,  10,   8,   15,   14,   12,   15],
+ 'franprix':    [12,  12,  12,   10,  14,   14,   12,   14],
+ 'spar':        [10,  10,  10,   8,   12,   12,   10,   12]};
+const BRAND_ALIASES=[[/lidl/,'lidl'],[/aldi/,'aldi'],[/leclerc/,'e.leclerc'],[/intermarche/,'intermarche'],[/auchan/,'auchan'],[/super u|hyper u|u express/,'super u'],[/cora/,'cora'],[/carrefour (city|express)/,'carrefour city'],[/carrefour market/,'carrefour market'],[/carrefour/,'carrefour'],[/casino/,'casino'],[/monop/,'monoprix'],[/franprix|g20|naturalia/,'franprix'],[/spar|vival|proxi/,'spar']];
+function gridFor(name){const n=norm(name);for(const [re,k] of BRAND_ALIASES)if(re.test(n))return {key:k,g:BRAND_GRID[k]};
+ // enseigne inconnue : grille dérivée du hash du nom (déterministe), entre -6 % et +8 %
+ let h=2166136261;for(const c of n){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}h>>>=0;return {key:'autre',g:PGROUPS.map((_,i)=>-6+((h>>>(i*3))%15))}}
+const SAUCE_RE=/sauce|huile|poivre|^sel$|epice|cumin|herbes|concentre|coulis|bouillon|pate de curry|moutarde|vinaigre|ketchup|mayonnaise|tamari|salsa/;
+function pgroup(i){const c=i.category||'',n=norm(i.name);if(SAUCE_RE.test(n))return 'Sauces & condiments';
+ if(c==='Boucherie'||c==='Poissonnerie')return 'Viande & poisson';return PGROUPS.includes(c)?c:'Épicerie'}
+const catFac=i=>store&&store.grid?1+store.grid[PGROUPS.indexOf(pgroup(i))]/100:1;
+const fac=()=>{if(!store||!store.grid)return 1;return 1+store.grid.reduce((a,b)=>a+b,0)/store.grid.length/100};
+const fmtPct=v=>(v>0?'+':v<0?'−':'±')+Math.abs(v)+' %';
+const pp=i=>Math.round((+i.price||0)*catFac(i)*100)/100;
 
 function excludedTags(){const s=new Set();profile.prefs.forEach(p=>(PREFS[p]||[]).forEach(t=>s.add(t)));profile.rest.forEach(r=>(REST[r]||[]).forEach(t=>s.add(t)));return s}
 function otherExcl(){return profile.other.split(',').map(x=>norm(x.trim())).filter(Boolean)}
@@ -302,12 +334,8 @@ async function generate(){
   const newItems=items.map(i=>({id:uid(),name:i.name,quantity:i.quantity,unit:i.unit,category:i.category||guessCat(i.name),price:+(i.price!=null&&source==='ia'&&!i.alt?i.price:priceFor(i.name,i.quantity,i.unit)).toFixed(2),alt:i.alt||'',checked:false}));
   if($('#appendMode').checked&&list.items.length){list.items.push(...newItems);list.title+=' + '+res.title}else list={title:res.title,items:newItems};
   save();
-  const tot=newItems.reduce((s,i)=>s+pp(i),0);
-  let h=`<div class="card"><h3>${source==='ia'?'🤖 Généré par IA':'🧪 Génération simulée'}</h3><div><b>${esc(res.title)}</b> — ${newItems.length} articles, ~${eur(tot)} pour ${profile.people} pers.</div>`;
-  if(res.generic)h+=`<div class="warn">Plat non reconnu : voici une liste générique équilibrée. Ajoutez une clé IA pour des résultats sur mesure.</div>`;
-  if(notes.length)h+=`<div class="warn">Adapté à votre profil : ${notes.map(esc).join(' ; ')}</div>`;
-  h+=budgetMsg(tot,'liste')+`<button class="btn" onclick="go('liste')">Voir ma liste →</button></div>`;
-  $('#genResult').innerHTML=h;render();toast('Liste générée ✔');
+  LS.set('lastGen',{source,title:res.title,ids:newItems.map(i=>i.id),notes,generic:!!res.generic});
+  render();toast('Liste générée ✔');
  }finally{btn.disabled=false;btn.textContent='✨ Générer ma liste'}
 }
 function budgetMsg(total,what){
@@ -324,11 +352,23 @@ function updateStats(){
  const s=totals();const pct=s.t?Math.round(s.c/s.t*100):0;
  $('#progBar').style.width=pct+'%';$('#stCount').textContent=`${s.c} / ${s.t}`;$('#stPct').textContent=pct+' %';$('#stCart').textContent=eur(s.cart);$('#stRemain').textContent=eur(s.remain);
  $('#listWarn').innerHTML=s.t?budgetMsg(s.all):'';
- $('#factorInfo').textContent=store?`🏪 Magasin : ${store.name} · facteur prix ×${fac().toFixed(2).replace('.',',')} (${store.factorLabel||'défaut'})`:'🏪 Aucun magasin choisi · facteur prix ×1,00 (défaut)';
+ $('#factorInfo').innerHTML=store?`🏪 Prix indicatifs chez <b>${esc(store.name)}</b> (niveau moyen ${fmtPct(Math.round((fac()-1)*100))}) : ${levelsText()}`:'🏪 Aucun magasin choisi : prix moyens nationaux.';
  const b=$('#badgeList');b.hidden=!(s.t-s.c);b.textContent=s.t-s.c;
  renderPanier();
 }
+function renderGen(){
+ const g=LS.get('lastGen',null),el=$('#genResult');if(!g){el.innerHTML='';return}
+ const items=list.items.filter(i=>g.ids.includes(i.id));if(!items.length){el.innerHTML='';return}
+ const tot=items.reduce((s,i)=>s+pp(i),0);
+ let h=`<div class="card"><h3>${g.source==='ia'?'🤖 Généré par IA':'🧪 Génération simulée'}</h3><div><b>${esc(g.title)}</b> — ${items.length} articles, ~${eur(tot)} pour ${profile.people} pers.</div>`;
+ h+=`<p class="note">Prix indicatifs ${store?'chez <b>'+esc(store.name)+'</b>':'moyens (aucun magasin choisi)'}</p>`;
+ h+='<div class="genlist">'+items.map(i=>`<div class="gl"><span>${esc(i.name)} <span class="sub">${i.quantity} ${esc(i.unit)}</span>${store?` <span class="lvl">${fmtPct(store.grid[PGROUPS.indexOf(pgroup(i))])}</span>`:''}</span><b>${eur(pp(i))}</b></div>`).join('')+'</div>';
+ if(g.generic)h+=`<div class="warn">Plat non reconnu : voici une liste générique équilibrée. Ajoutez une clé IA pour des résultats sur mesure.</div>`;
+ if(g.notes&&g.notes.length)h+=`<div class="warn">Adapté à votre profil : ${g.notes.map(esc).join(' ; ')}</div>`;
+ h+=budgetMsg(tot)+`<button class="btn" onclick="go('liste')">Voir ma liste →</button></div>`;el.innerHTML=h;
+}
 function render(){
+ renderGen();
  $('#listTitle').textContent=list.title?'Ma liste : '+list.title:'Ma liste';
  const body=$('#listBody');
  if(!list.items.length){body.innerHTML='<div class="card empty">Votre liste est vide.<br>Allez dans « Demande » pour la générer ✨</div>';updateStats();return}
@@ -339,14 +379,14 @@ function render(){
    <input type="checkbox" ${i.checked?'checked':''} aria-label="Cocher ${esc(i.name)}">
    <div class="nm"><div>${esc(i.name)}</div><span class="sub">${esc(i.unit)}</span>${i.alt?`<div class="sub alt">↺ ${esc(i.alt)}</div>`:''}</div>
    <input class="qty" type="number" min="0" step="any" inputmode="decimal" value="${i.quantity}" aria-label="Quantité">
-   <span class="pr">${eur(pp(i))}</span>
+   <span class="pr">${eur(pp(i))}${store?`<small class="lvl">${fmtPct(store.grid[PGROUPS.indexOf(pgroup(i))])}</small>`:''}</span>
    <button class="del" aria-label="Supprimer">✕</button></div>`).join('')}</div>`).join('');
  updateStats();
 }
 $('#listBody').addEventListener('change',e=>{
  const row=e.target.closest('.item');if(!row)return;const it=list.items.find(i=>i.id===row.dataset.id);if(!it)return;
  if(e.target.type==='checkbox'){it.checked=e.target.checked;row.classList.toggle('done',it.checked)}
- else if(e.target.classList.contains('qty')){const q=Math.max(0,+e.target.value||0);const known=P[it.name]||Object.keys(P).some(k=>norm(it.name).includes(norm(k)));it.price=+(known?priceFor(it.name,q,it.unit):(it.price||0)*q/(it.quantity||1)).toFixed(2);it.quantity=q;row.querySelector('.pr').textContent=eur(pp(it))}
+ else if(e.target.classList.contains('qty')){const q=Math.max(0,+e.target.value||0);const known=P[it.name]||Object.keys(P).some(k=>norm(it.name).includes(norm(k)));it.price=+(known?priceFor(it.name,q,it.unit):(it.price||0)*q/(it.quantity||1)).toFixed(2);it.quantity=q;render()}
  save();updateStats();
 });
 $('#listBody').addEventListener('click',e=>{
@@ -396,12 +436,13 @@ $('#clearAi').onclick=()=>{ai.key='';LS.set('ai',ai);loadProfile();toast('Clé s
 function dist(a,b,c,d){const R=6371e3,r=x=>x*Math.PI/180;const h=Math.sin(r(c-a)/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(r(d-b)/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
 function fmtD(d){return d<1000?Math.round(d)+' m':(d/1000).toFixed(1).replace('.',',')+' km'}
 function status(m,cls){const el=$('#storeStatus');el.className=cls||'note';el.textContent=m}
+function levelsText(){return store&&store.grid?PGROUPS.map((p,i)=>PGLABEL[p]+' '+fmtPct(store.grid[i])).join(', '):''}
 function showStore(){
  const el=$('#storeInfo');$('#changeStore').hidden=!store;$('#forgetStore').hidden=!store;$('#locate').hidden=!!store;
  if(!store){el.textContent='Aucun magasin sélectionné.';return}
- el.innerHTML=`<b>${esc(store.name)}</b><br>à ${fmtD(store.d)}${store.addr?' · '+esc(store.addr):''}${store.origin?' · depuis '+esc(store.origin):''}<br>Facteur prix : ×${store.factor.toFixed(2).replace('.',',')} (${esc(store.factorLabel)})`+(store.estimate?'<br><span class="sub alt">Magasin indicatif (estimation, données hors ligne)</span>':'')+(store.estimate||store.lat==null?'':`<br><a href="https://www.openstreetmap.org/?mlat=${store.lat}&mlon=${store.lon}#map=17/${store.lat}/${store.lon}" target="_blank" rel="noopener">Voir sur la carte</a>`);
+ el.innerHTML=`<b>${esc(store.name)}</b><br>à ${fmtD(store.d)}${store.addr?' · '+esc(store.addr):''}${store.origin?' · depuis '+esc(store.origin):''}<div class="lvls">${PGROUPS.map((p,i)=>`<span class="${store.grid[i]<0?'cheap':store.grid[i]>0?'dear':''}">${PGLABEL[p]} ${fmtPct(store.grid[i])}</span>`).join('')}</div><span class="sub">Niveau de prix ${esc(store.factorLabel)} · moyenne ${fmtPct(Math.round((fac()-1)*100))}</span>`+(store.estimate?'<br><span class="sub alt">Magasin indicatif (estimation, données hors ligne)</span>':'')+(store.estimate||store.lat==null?'':`<br><a href="https://www.openstreetmap.org/?mlat=${store.lat}&mlon=${store.lon}#map=17/${store.lat}/${store.lon}" target="_blank" rel="noopener">Voir sur la carte</a>`);
 }
-function setStore(st){const bf=brandFactor(st.brand||st.name);st.factor=bf.f;st.factorLabel=bf.l;store=st;LS.set('store',store);showStore();$('#cityBox').hidden=true;render()}
+function setStore(st){const gr=gridFor(st.brand||st.name);st.grid=gr.g;st.gridKey=gr.key;st.factor=1;st.factorLabel=gr.key==='autre'?'estimé (enseigne non référencée)':'grille '+gr.key;store=st;LS.set('store',store);showStore();$('#cityBox').hidden=true;render()}
 function setBusy(btn,busy,label){btn.disabled=busy;btn.innerHTML=busy?'<span class="spin" style="border-color:#14532d;border-top-color:transparent"></span> '+label:btn.dataset.label}
 function showFallback(msg){status(msg,'warn');$('#cityBox').hidden=false;$('#locate').hidden=false}
 /* ---- Magasins de repli déterministes (aucun aléa) ---- */
