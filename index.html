@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.24">
+<meta name="app-version" content="v1.25">
 <title>Liste de courses IA</title>
 <style>
 :root{--acc:#16a34a;--acc2:#dcfce7;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -42,6 +42,16 @@ header h1{margin:0;font-size:1.2rem}
 header small{opacity:.85}
 main{padding:16px 16px calc(96px + env(safe-area-inset-bottom));max-width:640px;margin:0 auto}
 .screen{display:none}.screen.active{display:block}
+/* v1.25 : page d'entrée (présélection foyer) */
+body.entree nav{display:none}body.entree main{padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+#s-entree.active{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:1fr 1fr;gap:12px;min-height:calc(100vh - 120px);min-height:calc(100dvh - 120px)}
+.ecase{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-width:0;padding:16px 10px;border:1px solid var(--acc);border-radius:var(--r);background:var(--acc2);color:#14532d;font:inherit;font-weight:700;font-size:1.05rem;line-height:1.25;text-align:center;overflow-wrap:anywhere;cursor:pointer}
+.ecase:active{filter:brightness(.95)}#eSolo{grid-column:1/-1;font-size:1.2rem}
+.eicons{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.ecirc{display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:#fff;border:2px solid var(--acc)}
+#eSolo .ecirc{width:96px;height:96px}#eSolo .ecirc svg{width:56px;height:56px}
+.ecirc svg{width:38px;height:38px}
+@media(max-width:380px){.ecase{font-size:.95rem}.ecirc{width:54px;height:54px}.ecirc svg{width:32px;height:32px}}
 .card{background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
 h2{font-size:1.15rem;margin:0 0 10px}h3{font-size:1rem;margin:0 0 8px;color:var(--acc)}
 label{display:block;font-weight:600;margin:12px 0 6px;font-size:.95rem}
@@ -106,12 +116,18 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.24</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
+<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.25</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <button type="button" class="xback" id="navBack" hidden style="margin-bottom:10px" aria-label="Retour à la vue précédente">← Retour</button>
 <!-- PROFIL -->
 
+<!-- v1.25 : PAGE D'ENTRÉE (racine) : présélection du foyer, choix gardé en session (lci_foyer_session), non exploité -->
+<section class="screen" id="s-entree" aria-label="Pour qui faites-vous les courses ?">
+ <button type="button" class="ecase" id="eSolo" data-foyer="solo"><span class="eicons"><span class="ecirc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span></span>Je fais les courses pour moi seul</button>
+ <button type="button" class="ecase" id="eDuo" data-foyer="duo"><span class="eicons"><span class="ecirc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span class="ecirc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span></span>Je fais les courses pour mon couple</button>
+ <button type="button" class="ecase" id="eGroupe" data-foyer="groupe"><span class="eicons"><span class="ecirc"><svg style="width:46px" viewBox="0 0 36 24" aria-hidden="true" fill="#15803d"><circle cx="8" cy="9" r="3"/><path d="M2.5 20c0-3.4 2.4-5.8 5.5-5.8s5.5 2.4 5.5 5.8z"/><circle cx="28" cy="9" r="3"/><path d="M22.5 20c0-3.4 2.4-5.8 5.5-5.8s5.5 2.4 5.5 5.8z"/><circle cx="18" cy="7" r="3.6"/><path d="M11 21c0-4 3.1-7 7-7s7 3 7 7z"/></svg></span></span>Je fais les courses pour plus de personnes</button>
+</section>
 <!-- DEMANDE -->
 <section class="screen" id="s-demande">
  <div class="searchwrap">
@@ -524,11 +540,12 @@ $('#changeStore').onclick=()=>{status('Choisissez un autre magasin : localisez-v
 /* v1.20-1.21 : bouton Retour unique ; historique simple (pile, sessionStorage). go(s) empile la vue courante ; goBack() dépile, repli Demande. */
 let curScreen=null,navStack=[];try{navStack=JSON.parse(sessionStorage.getItem('lci_nav'))||[]}catch(e){}
 function navSave(){try{sessionStorage.setItem('lci_nav',JSON.stringify(navStack.slice(-30)))}catch(e){}}
-function updNavBack(){$('#navBack').hidden=curScreen==='express'||curScreen==='demande'}
+function updNavBack(){$('#navBack').hidden=curScreen==='express'||curScreen==='demande'||curScreen==='entree'}
 function goBack(){let p;while(navStack.length&&(p=navStack.pop())===curScreen);navSave();_go(p&&p!==curScreen?p:'demande')}
 function go(s){if(curScreen&&curScreen!==s){navStack.push(curScreen);navSave()}_go(s)}
-function _go(s){curScreen=s;updNavBack();document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id==='s-'+s));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.s===s));LS.set('screen',s);window.scrollTo(0,0)}
+function _go(s){curScreen=s;updNavBack();document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id==='s-'+s));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.s===s));LS.set('screen',s);try{sessionStorage.setItem('lci_screen',s)}catch(e){}document.body.classList.toggle('entree',s==='entree');window.scrollTo(0,0)}
 window.go=go;
+document.querySelectorAll('.ecase').forEach(b=>b.onclick=()=>{try{sessionStorage.setItem('lci_foyer_session',b.dataset.foyer)}catch(e){}go('demande')});
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.s));
 $('#generate').onclick=generate;
 /* v1.22 : Liste désactivée → Entrée ne fait rien (pas de génération), simple fermeture du clavier */
@@ -571,7 +588,8 @@ const PROFIL_GENERIQUE={
 };
 try{localStorage.setItem(PF_GEN_KEY,JSON.stringify(PROFIL_GENERIQUE))}catch(e){}
 loadProfile();render();showStore();
-{const sc=LS.get('screen','demande');go(['demande','monprofil','express','apercu'].includes(sc)?sc:'demande')}
+/* v1.25 : nouveau lancement (session vide) = page d'entrée ; rechargement dans le même onglet = restauration de la vue et de la pile */
+{let sc=null;try{sc=sessionStorage.getItem('lci_screen')}catch(e){}if(['entree','demande','monprofil','express','apercu'].includes(sc))go(sc);else{navStack=[];navSave();go('entree')}}
 // Service worker : aucun n'est utilisé ; on désinscrit d'éventuels anciens SW pour éviter une version en cache.
 if('serviceWorker' in navigator&&navigator.serviceWorker.getRegistrations)navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});
 </script>
