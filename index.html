@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.53">
+<meta name="app-version" content="v1.54">
 <title>Liste de courses IA</title>
 <style>
 :root{--pf:#15803d;--pc:#e3f0e8;--pe:#116631;--pm:#96c6a8;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -257,7 +257,7 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.53</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
+<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.54</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <!-- PROFIL -->
@@ -385,6 +385,8 @@ nav button{min-width:0;font-size:.72rem}
  <div class="card spec" id="specAimes"><button type="button" class="ssum" data-k="specAimes" title="Mes aliments préférés"><svg class="sico" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M32 54S10 40 10 25c0-7 5-12 11-12 5 0 9 3 11 7 2-4 6-7 11-7 6 0 11 5 11 12 0 15-22 29-22 29z" fill="#e11d48"/><g class="spark" fill="#f59e0b"><path d="M8 8l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M54 4l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z"/><path d="M57 40l1.5 3.5 3.5 1.5-3.5 1.5-1.5 3.5-1.5-3.5-3.5-1.5 3.5-1.5z"/></g></svg><b>Mes aliments préférés</b><small>Aliments préférés pour ce profil</small></button><h3>Mes aliments préférés</h3><p class="ssub">Aliments que ce profil aime</p><div class="srow" id="aimRow" aria-label="Mes aliments préférés"></div></div>
  <!-- v1.47 : aliments à consommer davantage (lci_specificites_v1[profil].aConsommerPlus = []) -->
  <div class="card spec" id="specPlus"><button type="button" class="ssum" data-k="specPlus" title="Aliments à consommer davantage"><svg class="sico" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="28" cy="36" r="24" fill="#fff" stroke="#15803d" stroke-width="4"/><circle cx="28" cy="36" r="16" fill="#bbf7d0" stroke="#15803d" stroke-width="4"/><circle cx="28" cy="36" r="7" fill="#15803d"/><path d="M33 31L52 12" stroke="#374151" stroke-width="3" stroke-linecap="round"/><polygon points="28,36 36,34 30,28" fill="#374151"/><polygon points="50,14 57,14 61,10 54,10" fill="#ea580c"/><polygon points="50,14 50,7 54,3 54,10" fill="#ea580c"/></svg><b>Aliments à consommer davantage</b><small>Aliments à privilégier pour ce profil</small></button><h3>Aliments à consommer davantage</h3><p class="ssub">Aliments à privilégier pour ce profil</p><div class="srow" id="plusRow" aria-label="Aliments à consommer davantage"></div></div>
+ <!-- v1.54 : aliments à consommer moins souvent (lci_specificites_v1[profil].aConsommerMoins = []) -->
+ <div class="card spec" id="specMoins"><button type="button" class="ssum" data-k="specMoins" title="Aliments à consommer moins souvent"><svg class="sico" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="28" cy="30" r="22" fill="#fef3c7" stroke="#b45309" stroke-width="4"/><path d="M17 30h22" stroke="#b45309" stroke-width="5" stroke-linecap="round"/><path d="M54 36v20m-6-6l6 6 6-6" fill="none" stroke="#b45309" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg><b>Aliments à consommer moins souvent</b><small>Aliments à limiter pour ce profil</small></button><h3>Aliments à consommer moins souvent</h3><p class="ssub">Aliments à limiter pour ce profil</p><div class="srow" id="moinsRow" aria-label="Aliments à consommer moins souvent"></div></div>
  </div>
 </section>
 </main>
@@ -761,12 +763,12 @@ const SPEC_KEY='lci_specificites_v1';
 function specAll(){try{const o=JSON.parse(localStorage.getItem(SPEC_KEY));return o&&typeof o==='object'&&!Array.isArray(o)?o:{}}catch(e){return{}}}
 function specSave(o){try{localStorage.setItem(SPEC_KEY,JSON.stringify(o))}catch(e){}}
 let alK='allergies';// v1.44 : 'allergies' ou 'nAimePas'
-const ALT={allergies:{n:'Nouvelle allergie',m:'Modifier l\'allergie',l:'Nom de l\'allergie',p:'Ex. Arachides',d:'Cette allergie est déjà déclarée.',c:'l\'allergie',r:'#alRow'},nAimePas:{n:'Nouvel aliment',m:'Modifier l\'aliment',l:'Nom de l\'aliment',p:'Ex. Brocoli',d:'Cet aliment est déjà déclaré.',c:'l\'aliment',r:'#napRow'},aimes:{n:'Nouvel aliment préféré',m:'Modifier l\'aliment préféré',l:'Nom de l\'aliment',p:'Ex. Fraises',d:'Cet aliment est déjà dans vos préférés.',c:'l\'aliment préféré',r:'#aimRow'},aConsommerPlus:{n:'Nouvel aliment à privilégier',m:'Modifier l\'aliment à privilégier',l:'Nom de l\'aliment',p:'Ex. Légumineuses',d:'Cet aliment est déjà dans la liste.',c:'l\'aliment à privilégier',r:'#plusRow'}};
+const ALT={allergies:{n:'Nouvelle allergie',m:'Modifier l\'allergie',l:'Nom de l\'allergie',p:'Ex. Arachides',d:'Cette allergie est déjà déclarée.',c:'l\'allergie',r:'#alRow'},nAimePas:{n:'Nouvel aliment',m:'Modifier l\'aliment',l:'Nom de l\'aliment',p:'Ex. Brocoli',d:'Cet aliment est déjà déclaré.',c:'l\'aliment',r:'#napRow'},aimes:{n:'Nouvel aliment préféré',m:'Modifier l\'aliment préféré',l:'Nom de l\'aliment',p:'Ex. Fraises',d:'Cet aliment est déjà dans vos préférés.',c:'l\'aliment préféré',r:'#aimRow'},aConsommerPlus:{n:'Nouvel aliment à privilégier',m:'Modifier l\'aliment à privilégier',l:'Nom de l\'aliment',p:'Ex. Légumineuses',d:'Cet aliment est déjà dans la liste.',c:'l\'aliment à privilégier',r:'#plusRow'},aConsommerMoins:{n:'Nouvel aliment à limiter',m:'Modifier l\'aliment à limiter',l:'Nom de l\'aliment',p:'Ex. Charcuterie',d:'Cet aliment est déjà dans la liste.',c:'l\'aliment à limiter',r:'#moinsRow'}};
 function alGet(k){k=k||alK;const f=actGet();const o=specAll();return f&&o[f]&&Array.isArray(o[f][k])?o[f][k]:[]}
 function alSet(a){const f=actGet();if(!f)return;const o=specAll();o[f]=Object.assign({},o[f],{[alK]:a});specSave(o)}
 const PLUS='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" class="pfs" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
 function renderNap(){renderRow('nAimePas','#specNap','#napRow','napAdd')}
-function renderAimes(){renderRow('aimes','#specAimes','#aimRow','aimAdd');renderRow('aConsommerPlus','#specPlus','#plusRow','plusAdd')}
+function renderAimes(){renderRow('aimes','#specAimes','#aimRow','aimAdd');renderRow('aConsommerPlus','#specPlus','#plusRow','plusAdd');renderRow('aConsommerMoins','#specMoins','#moinsRow','moinsAdd')}
 function renderRow(k,sw,sr,ad){const w=$(sw);if(!w)return;w.hidden=!foyerLabel(actGet());const a=alGet(k);
  $(sr).innerHTML=(a.length?a.map((x,i)=>`<button type="button" class="schip" data-i="${i}" title="${esc(x)}">${esc(x)}</button>`).join(''):'<span class="sempty">Aucun aliment déclaré</span>')+`<button type="button" class="sadd" id="${ad}" aria-label="Ajouter un aliment" title="Ajouter un aliment">${PLUS}</button>`}
 function renderAllergies(){renderNap();renderAimes();const w=$('#specAllergies');if(!w)return;w.hidden=!foyerLabel(actGet());const a=alGet('allergies');
@@ -778,6 +780,7 @@ $('#alRow').onclick=e=>{if(e.target.closest('#alAdd')){openAl(null);return}const
 $('#napRow').onclick=e=>{if(e.target.closest('#napAdd')){openAl(null,'nAimePas');return}const c=e.target.closest('.schip');if(c)openAl(+c.dataset.i,'nAimePas')};
 $('#aimRow').onclick=e=>{if(e.target.closest('#aimAdd')){openAl(null,'aimes');return}const c=e.target.closest('.schip');if(c)openAl(+c.dataset.i,'aimes')};
 $('#plusRow').onclick=e=>{if(e.target.closest('#plusAdd')){openAl(null,'aConsommerPlus');return}const c=e.target.closest('.schip');if(c)openAl(+c.dataset.i,'aConsommerPlus')};
+$('#moinsRow').onclick=e=>{if(e.target.closest('#moinsAdd')){openAl(null,'aConsommerMoins');return}const c=e.target.closest('.schip');if(c)openAl(+c.dataset.i,'aConsommerMoins')};
 $('#aCancel').onclick=closeAl;$('#aForm').onclick=e=>{if(e.target.id==='aForm')closeAl()};
 $('#aFormF').onsubmit=e=>{e.preventDefault();const v=$('#aName').value.trim().replace(/\s+/g,' ');if(!v){$('#aErr').textContent='Veuillez saisir un nom.';$('#aName').focus();return}
  const a=alGet();const k=v.toLocaleLowerCase('fr');if(a.some((x,i)=>i!==alIdx&&x.toLocaleLowerCase('fr')===k)){$('#aErr').textContent=ALT[alK].d;$('#aName').focus();return}
@@ -786,7 +789,7 @@ $('#aDel').onclick=()=>{const a=alGet();if(alIdx==null||a[alIdx]==null)return;$(
 $('#aConfNo').onclick=()=>{$('#aConf').hidden=true};$('#aConf').onclick=e=>{if(e.target.id==='aConf')$('#aConf').hidden=true};
 $('#aConfYes').onclick=()=>{const a=alGet();if(alIdx!=null){a.splice(alIdx,1);alSet(a)}$('#aConf').hidden=true;closeAl();updFoyerBadge()};
 let specCur=null;
-function specHome(){if(!specCur)return;const c=$('#'+specCur);c.classList.remove('full');const a=$('#s-monprofil .spec:last-of-type'),order=['specAllergies','specNap','specAimes','specPlus'];
+function specHome(){if(!specCur)return;const c=$('#'+specCur);c.classList.remove('full');const a=$('#s-monprofil .spec:last-of-type'),order=['specAllergies','specNap','specAimes','specPlus','specMoins'];
  const nx=order.slice(order.indexOf(specCur)+1).map(x=>document.querySelector('#specGrid #'+x)).find(Boolean);if(nx)nx.before(c);else $('#specGrid').appendChild(c);specCur=null}
 function specOpen(id){specHome();const c=$('#'+id);if(!c)return;specCur=id;c.classList.add('full');$('#s-spec').appendChild(c);go('spec');scrollTo(0,0)}
 document.addEventListener('click',e=>{const b=e.target.closest('.ssum');if(b)specOpen(b.dataset.k)});
