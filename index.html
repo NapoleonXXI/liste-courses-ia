@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.66">
+<meta name="app-version" content="v1.67">
 <title>Liste de courses IA</title>
 <!-- v1.59 : police fun Fredoka (Google Fonts, display=swap) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -297,12 +297,12 @@ nav button{min-width:0;font-size:.72rem}
 .icard p{margin:0 0 6px;color:var(--mut);font-size:.9rem}
 .icard ul{margin:0;padding-left:18px;font-size:.9rem}.icard li{margin:1px 0}
 .iempty{text-align:center;color:var(--mut);margin:10px 0}
-/* v1.66 : questions Invités sur une seule page, rangées de bulles défilantes */
+/* v1.67 : questions Invités sur une seule page, rangées de bulles défilantes */
 .fqrow{margin:14px 0 4px}.fqrow h3{font-size:1.05rem;margin:0 0 8px}
 .fqrow .srow{padding:2px 2px 6px}
 .fqrow .schip{min-width:44px;text-align:center}
 .fqrow .schip[aria-pressed="true"]{background:var(--inv);border-color:var(--inv);color:#fdf6e3}
-/* v1.66 : entonnoir, propositions à cocher, Ma liste de courses */
+/* v1.67 : entonnoir, propositions à cocher, Ma liste de courses */
 #s-maliste{--inv:#9f1239;--invd:#4c0519;--invc:#fdf2f4}
 .fdots{display:flex;align-items:center;justify-content:center;gap:8px;margin:6px 0 12px}.fdots span{width:10px;height:10px;border-radius:50%;background:#ead1d8}.fdots span.done{background:var(--inv)}.fdots span.on{background:var(--inv);box-shadow:0 0 0 4px rgba(159,18,57,.18)}.fdots b{margin-left:6px;font-size:.85rem;color:var(--invd)}
 .fq h3{font-size:1.35rem;text-align:center;margin-bottom:14px}.fq.fin{animation:fqIn .28s ease}@keyframes fqIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
@@ -330,7 +330,7 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.66</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
+<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.67</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <!-- PROFIL -->
@@ -421,7 +421,7 @@ nav button{min-width:0;font-size:.72rem}
 <!-- PANIER -->
 
 <!-- v1.19 : vue dédiée Repas express (hors barre d'onglets). Clic sur un repas = saisie + Entrée. -->
-<!-- v1.66 : « Des invités ce soir » en entonnoir (4 questions, un toucher chacune), puis propositions à cocher -->
+<!-- v1.67 : « Des invités ce soir » en entonnoir (4 questions, un toucher chacune), puis propositions à cocher -->
 <section class="screen" id="s-invites">
  <h2 class="ftitle">Des invités ce soir</h2>
  <div id="funAll"></div>
@@ -435,7 +435,7 @@ nav button{min-width:0;font-size:.72rem}
  <button type="button" class="fskip" id="invMore">Autres idées</button>
  <div class="pbar"><button type="button" class="invgo" id="invList" disabled>Créer ma liste (0)</button></div>
 </section>
-<!-- v1.66 : onglet « Ma liste de courses » (listes créées, une par occasion, articles groupés par rayon) -->
+<!-- v1.67 : onglet « Ma liste de courses » (listes créées, une par occasion, articles groupés par rayon) -->
 <section class="screen" id="s-maliste">
  <h2 class="ftitle lt">Ma liste de courses</h2>
  <div id="lstAll"></div>
@@ -967,8 +967,25 @@ function flowSet(o){const f=$('#flow');if(!f)return;f.classList.toggle('open',o)
 $('#flowBtn').onclick=()=>flowSet(!$('#flow').classList.contains('open'));
 document.addEventListener('click',e=>{if($('#flow').classList.contains('open')&&!e.target.closest('#flowBtn,.fbub'))flowSet(false)});
 
-// v1.66 : « Des invités ce soir » en entonnoir (4 questions) + propositions à cocher + listes de courses. Base locale, aucun appel réseau.
+// v1.67 : « Des invités ce soir » en entonnoir (4 questions) + propositions à cocher + listes de courses. Base locale, aucun appel réseau.
 const IDEES_INV=[
+['plat','Pâtes carbonara','Lardons, œufs et parmesan, prêtes en 15 minutes','pk','G L O','Pâtes:100:g|Lardons:50:g|Œufs:1:|Parmesan:20:g'],
+['plat','Omelette aux champignons','Œufs battus, champignons poêlés et ciboulette','vk','O L','Œufs:2:|Champignons:60:g|Beurre:5:g|Ciboulette:0.1:'],
+['plat','Croque-monsieur et salade verte','Pain de mie, jambon, emmental, salade','pk','G L','Pain de mie:2:|Jambon:1:|Emmental:30:g|Salade:0.15:'],
+['plat','Riz sauté aux légumes et œuf','Riz, petits pois, carottes, œuf brouillé, sauce soja','vk','O S','Riz:80:g|Œufs:1:|Petits pois:50:g|Carottes:0.5:|Sauce soja:1:cl'],
+['plat','Wraps poulet crudités','Tortillas, poulet grillé, tomates et salade','k','G','Tortillas:2:|Poulet:100:g|Tomates:0.5:|Salade:0.1:'],
+['plat','Saumon poêlé et haricots verts','Pavé de saumon, haricots verts vapeur, citron','','P','Saumon:130:g|Haricots verts:150:g|Citron:0.25:'],
+['plat','Pâtes au pesto et tomates cerises','Pesto basilic, tomates cerises, parmesan','vk','G L','Pâtes:100:g|Pesto:25:g|Tomates cerises:80:g|Parmesan:10:g'],
+['plat','Salade de quinoa, feta et concombre','Quinoa, feta, concombre, menthe et citron','v','L','Quinoa:60:g|Feta:40:g|Concombre:0.25:|Menthe:0.1:|Citron:0.25:'],
+['plat','Steak haché et purée express','Steak poêlé, purée maison rapide','k','L','Bœuf haché:125:g|Pommes de terre:200:g|Lait:5:cl|Beurre:10:g'],
+['plat','Poulet et légumes rôtis au four','Courgettes, poivrons, oignon, filet de poulet','k','','Poulet:130:g|Courgettes:0.5:|Poivrons:0.5:|Oignon:0.5:|Huile d’olive:1:cl'],
+['plat','Buddha bowl lentilles et patate douce','Lentilles, patate douce rôtie, épinards, yaourt citronné','v','L','Lentilles:60:g|Patate douce:150:g|Épinards:50:g|Yaourt grec:40:g|Citron:0.25:'],
+['plat','Cabillaud vapeur, brocolis et riz complet','Poisson blanc, brocolis, riz complet et citron','','P','Cabillaud:140:g|Brocolis:150:g|Riz complet:60:g|Citron:0.25:'],
+['entree','Salade de lentilles et crudités','Lentilles, carottes râpées, échalote, vinaigrette','v','','Lentilles:40:g|Carottes:0.5:|Échalote:0.25:|Vinaigre balsamique:1:cl'],
+['dessert','Yaourt grec, fruits rouges et noix','Frais, peu sucré, prêt en 5 minutes','vk','L N','Yaourt grec:100:g|Fruits rouges:60:g|Noix:10:g|Miel:5:g'],
+['plat','Bœuf bourguignon','Bœuf mijoté au vin rouge, carottes, champignons, lardons','p','','Bœuf:200:g|Vin rouge:15:cl|Carottes:1:|Champignons:60:g|Lardons:30:g'],
+['plat','Blanquette de veau','Veau mijoté, sauce crème, champignons et riz','','L','Veau:180:g|Crème:5:cl|Champignons:60:g|Carottes:0.5:|Riz:70:g'],
+['dessert','Tarte au citron meringuée','Pâte sablée, crème citron, meringue dorée','v','G L O','Pâte brisée:0.15:|Citron:0.5:|Œufs:1:|Sucre:40:g|Beurre:15:g'],
 ['apero','Gougères au comté','Petits choux soufflés au fromage, tout chauds','vk','G L O','Comté:15:g|Farine:12:g|Œufs:0.5:|Beurre:10:g'],
 ['apero','Tapenade et gressins','Olives noires mixées, câpres et anchois','','G P','Olives noires:30:g|Anchois:5:g|Câpres:3:g|Gressins:4:'],
 ['apero','Houmous maison et crudités','Pois chiches, tahini, citron et bâtonnets de légumes','vk','Se','Pois chiches:50:g|Tahini:10:g|Carottes:0.5:|Concombre:0.25:'],
@@ -1032,54 +1049,87 @@ const IDEES_INV=[
 ['dessert','Tiramisu','Mascarpone, café et biscuits, à préparer la veille','vk','G L O','Mascarpone:60:g|Biscuits cuillère:4:|Café:5:cl|Œufs:0.5:'],
 ['dessert','Plateau de fromages affinés','Trois fromages, noix et raisins','v','L N','Fromages:80:g|Noix:10:g|Raisin:40:g|Pain:2:tranches']
 ].map(a=>({t:a[0],n:a[1],d:a[2],f:a[3],al:a[4]?a[4].split(' '):[],ing:a[5].split('|').map(x=>{const[n,q,u]=x.split(':');return{n,q:q?+q:0,u:u||''}})}));
-const INV_META={"Gougères au comté": "2 cf", "Tapenade et gressins": "1 dc", "Houmous maison et crudités": "1 dm", "Rillettes de saumon": "1 cf", "Planche charcuterie-fromages": "1 df", "Mini-quiches lorraines": "2 mf", "Guacamole et chips de maïs": "1 df", "Brochettes tomate-mozza": "1 dm", "Feuilletés aux saucisses": "1 mf", "Crevettes sautées ail-persil": "1 cf", "Cake olives-jambon": "2 dm", "Chips de légumes, dip yaourt": "2 dm", "Toasts chèvre-miel": "1 dc", "Amandes grillées au paprika": "1 d", "Bruschetta tomate-basilic": "1 df", "Velouté de potiron": "2 dm", "Salade de chèvre chaud": "1 dc", "Œufs mimosa": "1 dm", "Carpaccio de bœuf": "1 c", "Taboulé libanais": "2 df", "Poireaux vinaigrette": "2 d", "Gaspacho": "1 d", "Terrine de campagne": "1 dm", "Avocat-crevettes": "1 cf", "Salade de lentilles": "2 dm", "Bœuf bourguignon": "3 cm", "Blanquette de veau": "3 cm", "Lasagnes végétariennes": "2 mf", "Poulet rôti, pommes de terre": "2 dm", "Tartiflette": "2 mf", "Curry de légumes au coco": "2 df", "Saumon en papillote": "1 cd", "Risotto aux champignons": "2 cd", "Chili sin carne": "2 df", "Hachis parmentier": "2 m", "Paella": "3 f", "Gratin dauphinois et salade": "2 m", "Couscous poulet-légumes": "3 fm", "Quiche aux poireaux": "2 dm", "Soupe de poissons, rouille": "3 c", "Fajitas au poulet": "1 fm", "Mousse au chocolat": "1 mf", "Tarte Tatin": "2 cm", "Salade de fruits frais": "1 dm", "Fondant au chocolat": "1 cf", "Crème brûlée": "2 c", "Panna cotta aux fruits rouges": "1 cd", "Île flottante": "2 m", "Sorbet citron et tuiles": "1 c", "Riz au lait": "2 m", "Poires pochées au vin": "2 c", "Brownies aux noix": "1 fm", "Verrines avocat-saumon": "1 c", "Toasts de foie gras, chutney de figues": "1 cf", "Saint-Jacques snackées": "1 c", "Velouté de châtaignes": "2 c", "Magret de canard au miel": "1 cf", "Filet mignon en croûte": "3 c", "Pizzas maison à garnir": "2 fm", "Tiramisu": "2 fc", "Plateau de fromages affinés": "1 cd"};
+const INV_META={"Pâtes carbonara":"1 m","Omelette aux champignons":"1 m","Croque-monsieur et salade verte":"1 m","Riz sauté aux légumes et œuf":"1 m","Wraps poulet crudités":"1 dm","Saumon poêlé et haricots verts":"1 m","Pâtes au pesto et tomates cerises":"1 m","Salade de quinoa, feta et concombre":"1 dm","Steak haché et purée express":"1 m","Poulet et légumes rôtis au four":"2 m","Buddha bowl lentilles et patate douce":"2 m","Cabillaud vapeur, brocolis et riz complet":"2 mc","Salade de lentilles et crudités":"1 m","Yaourt grec, fruits rouges et noix":"1 m","Bœuf bourguignon":"3 mc","Blanquette de veau":"3 mc","Tarte au citron meringuée":"3 c","Gougères au comté": "2 cf", "Tapenade et gressins": "1 dc", "Houmous maison et crudités": "1 dm", "Rillettes de saumon": "1 cf", "Planche charcuterie-fromages": "1 df", "Mini-quiches lorraines": "2 mf", "Guacamole et chips de maïs": "1 df", "Brochettes tomate-mozza": "1 dm", "Feuilletés aux saucisses": "1 mf", "Crevettes sautées ail-persil": "1 cf", "Cake olives-jambon": "2 dm", "Chips de légumes, dip yaourt": "2 dm", "Toasts chèvre-miel": "1 dc", "Amandes grillées au paprika": "1 d", "Bruschetta tomate-basilic": "1 df", "Velouté de potiron": "2 dm", "Salade de chèvre chaud": "1 dc", "Œufs mimosa": "1 dm", "Carpaccio de bœuf": "1 c", "Taboulé libanais": "2 df", "Poireaux vinaigrette": "2 d", "Gaspacho": "1 d", "Terrine de campagne": "1 dm", "Avocat-crevettes": "1 cf", "Salade de lentilles": "2 dm", "Bœuf bourguignon": "3 cm", "Blanquette de veau": "3 cm", "Lasagnes végétariennes": "2 mf", "Poulet rôti, pommes de terre": "2 dm", "Tartiflette": "2 mf", "Curry de légumes au coco": "2 df", "Saumon en papillote": "1 cd", "Risotto aux champignons": "2 cd", "Chili sin carne": "2 df", "Hachis parmentier": "2 m", "Paella": "3 f", "Gratin dauphinois et salade": "2 m", "Couscous poulet-légumes": "3 fm", "Quiche aux poireaux": "2 dm", "Soupe de poissons, rouille": "3 c", "Fajitas au poulet": "1 fm", "Mousse au chocolat": "1 mf", "Tarte Tatin": "2 cm", "Salade de fruits frais": "1 dm", "Fondant au chocolat": "1 cf", "Crème brûlée": "2 c", "Panna cotta aux fruits rouges": "1 cd", "Île flottante": "2 m", "Sorbet citron et tuiles": "1 c", "Riz au lait": "2 m", "Poires pochées au vin": "2 c", "Brownies aux noix": "1 fm", "Verrines avocat-saumon": "1 c", "Toasts de foie gras, chutney de figues": "1 cf", "Saint-Jacques snackées": "1 c", "Velouté de châtaignes": "2 c", "Magret de canard au miel": "1 cf", "Filet mignon en croûte": "3 c", "Pizzas maison à garnir": "2 fm", "Tiramisu": "2 fc", "Plateau de fromages affinés": "1 cd"};
 IDEES_INV.forEach(it=>{const m=(INV_META[it.n]||'2 d').split(' ');it.tm=+m[0];it.st=m[1]||'d'});
 const INV_TYP={vin:'Boisson',apero:'Apéro',entree:'Entrée',plat:'Plat',dessert:'Dessert'};
 const INV_ALK=[[/gluten|ble|farine/,'G'],[/lactose|lait|fromage|creme|beurre/,'L'],[/oeuf/,'O'],[/fruits? a coque|noix|amande|noisette|pecan|pistache|cajou/,'N'],[/arachide|cacahuete/,'A'],[/poisson|saumon|thon|anchois/,'P'],[/crustace|crevette|crabe|homard/,'C'],[/soja/,'S'],[/sesame/,'Se'],[/moutarde/,'M'],[/celeri/,'Ce'],[/sulfite|vin/,'Su']];
 const invNorm=x=>String(x).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/œ/g,'oe').trim();
 const invShuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 // Entonnoir : 4 questions, un toucher chacune ; « def » = choix recommandé (mis en avant, utilisé par « Peu importe »)
-const FUN=[
- {id:'n',q:'Combien serez-vous à table ?',opts:()=>[['2','2'],['3','3'],['4','4'],['5','5'],['6','6'],['7','7'],['8','8'],['9','9'],['10','10'],['11','10 et plus']],def:()=>'4'},
+const FUNS={
+inv:[{id:'n',q:'Combien serez-vous à table ?',opts:()=>[['2','2'],['3','3'],['4','4'],['5','5'],['6','6'],['7','7'],['8','8'],['9','9'],['10','10'],['11','10 et plus']],def:()=>'4'},
  {id:'m',q:'Quel repas ?',opts:()=>[['epd','Entrée, plat, dessert'],['ep','Entrée, plat'],['pd','Plat, dessert'],['p','Juste un plat'],['ap','Apéro']],def:()=>'epd'},
  {id:'v',q:'Une bouteille de vin ?',opts:()=>[['o','Oui, avec du vin'],['n','Non, sans vin']],def:()=>'o'},
  {id:'s',q:'Quel genre de soirée ?',opts:()=>[['apero','Apéro entre amis'],['diner','Dîner convivial'],['chic','Dîner chic'],['dinatoire','Apéro-dînatoire']],def:()=>'diner'},
  {id:'t',q:'Combien de temps en cuisine ?',opts:()=>[['1','Moins de 30 min'],['2','Moins d’1 h'],['3','Pas pressé']],def:()=>'3'},
  {id:'g',q:'De gros mangeurs ?',opts:()=>[['n','Appétit normal'],['o','Oui, gros appétits']],def:()=>'n'},
  {id:'r',multi:1,q:'Des régimes à respecter ? (plusieurs possibles)',opts:()=>[['-','Aucun'],['v','Végétarien'],['p','Sans porc'],['G','Sans gluten'],['L','Sans lactose'],['A','Sans alcool']],def:()=>''},
- {id:'b',q:'Quel budget ?',opts:()=>[['1','Moins de 50 €'],['2','50 à 100 €'],['3','100 à 150 €'],['4','Plus de 150 €']],def:()=>'2'}
-];
-const FUN_KEY='lci_invites_v1';let funA={},funStep=0;
-try{const o=JSON.parse(localStorage.getItem(FUN_KEY));if(o&&o.a){funA=o.a;funStep=Math.min(+o.step||0,FUN.length-1)}}catch(e){}
-const funSave=()=>{try{localStorage.setItem(FUN_KEY,JSON.stringify({a:funA,step:funStep}))}catch(e){}};
+ {id:'b',q:'Quel budget par personne ?',opts:()=>[['10','Environ 10 €'],['20','Environ 20 €'],['30','Environ 30 €'],['100','Environ 100 €']],def:()=>'20'}],
+elab:[{id:'n',q:'Pour combien de personnes ?',opts:()=>[['1','1'],['2','2'],['3','3'],['4','4'],['5','5'],['6','6'],['8','8'],['11','Plus de 8']],def:()=>'2'},
+ {id:'l',q:'Quel niveau de difficulté ?',opts:()=>[['1','Facile mais soigné'],['2','Intermédiaire'],['3','Défi de chef']],def:()=>'2'},
+ {id:'t',q:'Combien de temps devant vous ?',opts:()=>[['2','Environ 1 h'],['3','2 h et plus']],def:()=>'3'},
+ {id:'m',q:'Quel repas ?',opts:()=>[['p','Un beau plat'],['pd','Plat, dessert'],['epd','Entrée, plat, dessert']],def:()=>'p'},
+ {id:'d',multi:1,q:'Ce que vous avez déjà sous la main ? (plusieurs possibles)',opts:()=>[['-','Rien de spécial'],['oeuf','Œufs'],['pate','Pâtes'],['riz','Riz'],['tomate','Tomates'],['poulet','Poulet'],['fromage|comte|emmental|parmesan|feta','Fromage'],['pomme de terre|pommes de terre','Pommes de terre'],['lardon','Lardons'],['carotte','Carottes']],def:()=>''},
+ {id:'r',multi:1,q:'Des régimes à respecter ? (plusieurs possibles)',opts:()=>[['-','Aucun'],['v','Végétarien'],['p','Sans porc'],['G','Sans gluten'],['L','Sans lactose'],['A','Sans alcool']],def:()=>''},
+ {id:'b',q:'Quel budget par personne ?',opts:()=>[['10','Environ 10 €'],['20','Environ 20 €'],['30','Environ 30 €'],['100','Environ 100 €']],def:()=>'20'}],
+rap:[{id:'n',q:'Pour combien de personnes ?',opts:()=>[['1','1'],['2','2'],['3','3'],['4','4'],['5','5'],['6','6'],['8','8'],['11','Plus de 8']],def:()=>'2'},
+ {id:'t',q:'Combien de temps maximum ?',opts:()=>[['1','15 min'],['1b','30 min']],def:()=>'1'},
+ {id:'m',q:'Quel repas ?',opts:()=>[['p','Juste un plat'],['pd','Plat, dessert']],def:()=>'p'},
+ {id:'d',multi:1,q:'Ce que vous avez déjà sous la main ? (plusieurs possibles)',opts:()=>[['-','Rien de spécial'],['oeuf','Œufs'],['pate','Pâtes'],['riz','Riz'],['tomate','Tomates'],['poulet','Poulet'],['fromage|comte|emmental|parmesan|feta','Fromage'],['pomme de terre|pommes de terre','Pommes de terre'],['lardon','Lardons'],['carotte','Carottes']],def:()=>''},
+ {id:'r',multi:1,q:'Des régimes à respecter ? (plusieurs possibles)',opts:()=>[['-','Aucun'],['v','Végétarien'],['p','Sans porc'],['G','Sans gluten'],['L','Sans lactose'],['A','Sans alcool']],def:()=>''},
+ {id:'b',q:'Quel budget par personne ?',opts:()=>[['10','Environ 10 €'],['20','Environ 20 €'],['30','Environ 30 €'],['100','Environ 100 €']],def:()=>'20'}],
+equi:[{id:'n',q:'Pour combien de personnes ?',opts:()=>[['1','1'],['2','2'],['3','3'],['4','4'],['5','5'],['6','6'],['8','8'],['11','Plus de 8']],def:()=>'2'},
+ {id:'o',multi:1,q:'Vos objectifs ? (plusieurs possibles)',opts:()=>[['-','Simplement équilibré'],['L','Plus de légumes'],['G','Moins gras'],['S','Moins sucré'],['P','Plus de protéines']],def:()=>''},
+ {id:'m',q:'Quel repas ?',opts:()=>[['p','Juste un plat'],['ep','Entrée, plat'],['pd','Plat, dessert'],['epd','Entrée, plat, dessert']],def:()=>'p'},
+ {id:'t',q:'Combien de temps en cuisine ?',opts:()=>[['1','Moins de 30 min'],['2','Moins d’1 h'],['3','Pas pressé']],def:()=>'2'},
+ {id:'d',multi:1,q:'Ce que vous avez déjà sous la main ? (plusieurs possibles)',opts:()=>[['-','Rien de spécial'],['oeuf','Œufs'],['pate','Pâtes'],['riz','Riz'],['tomate','Tomates'],['poulet','Poulet'],['fromage|comte|emmental|parmesan|feta','Fromage'],['pomme de terre|pommes de terre','Pommes de terre'],['lardon','Lardons'],['carotte','Carottes']],def:()=>''},
+ {id:'r',multi:1,q:'Des régimes à respecter ? (plusieurs possibles)',opts:()=>[['-','Aucun'],['v','Végétarien'],['p','Sans porc'],['G','Sans gluten'],['L','Sans lactose'],['A','Sans alcool']],def:()=>''},
+ {id:'b',q:'Quel budget par personne ?',opts:()=>[['10','Environ 10 €'],['20','Environ 20 €'],['30','Environ 30 €'],['100','Environ 100 €']],def:()=>'20'}]};
+let funMode='inv',FUN=FUNS.inv;
+const FUN_T={inv:['Des invités ce soir','Nos idées pour ce soir','Invités'],elab:['Une recette élaborée','Nos recettes à relever','Recette élaborée'],rap:['Un repas rapide','Vite fait, bien fait','Repas rapide'],equi:['Un repas équilibré','Nos idées équilibrées','Repas équilibré']};
+const FUN_KEY='lci_invites_v1';let funM={},funA={},funStep=0;
+try{const o=JSON.parse(localStorage.getItem(FUN_KEY));if(o&&o.m)funM=o.m;else if(o&&o.a)funM={inv:o.a};funA=funM.inv=funM.inv||{}}catch(e){}
+const funSave=()=>{try{localStorage.setItem(FUN_KEY,JSON.stringify({m:funM}))}catch(e){}};
 const fv=(x,A)=>typeof x==='function'?x(A):x;
 function funRender(){const A=funA;
- FUN.forEach(st=>{if(st.multi){if(typeof A[st.id]!=='string'||A[st.id]==='-')A[st.id]='';return}if(!st.opts(A).some(([v])=>v===A[st.id]))A[st.id]=st.def(A)});
- $('#funAll').innerHTML=FUN.map(st=>`<div class="fqrow"><h3 id="fq-${st.id}">${esc(fv(st.q,A))}</h3><div class="srow" role="group" aria-labelledby="fq-${st.id}">${st.opts(A).map(([v,l])=>`<button type="button" class="schip" data-q="${st.id}" data-v="${v}" aria-pressed="${st.multi?(v==='-'?!A[st.id]:A[st.id].includes(v)):A[st.id]===v}">${esc(l)}</button>`).join('')}</div></div>`).join('');
+ FUN.forEach(st=>{if(st.multi){if(typeof A[st.id]!=='string'||A[st.id]==='-')A[st.id]='';if(st.id==='r'&&A.r&&!A.r.includes(','))A.r=[...A.r].join(',');return}if(!st.opts(A).some(([v])=>v===A[st.id]))A[st.id]=st.def(A)});
+ $('#funAll').innerHTML=FUN.map(st=>`<div class="fqrow"><h3 id="fq-${st.id}">${esc(fv(st.q,A))}</h3><div class="srow" role="group" aria-labelledby="fq-${st.id}">${st.opts(A).map(([v,l])=>`<button type="button" class="schip" data-q="${st.id}" data-v="${v}" aria-pressed="${st.multi?(v==='-'?!A[st.id]:A[st.id].split(',').includes(v)):A[st.id]===v}">${esc(l)}</button>`).join('')}</div></div>`).join('');
  const al=alGet('allergies');const p=$('#invAlg');p.hidden=!al.length;p.textContent=al.length?'Allergies du profil exclues d’office : '+al.join(', ')+'.':''}
-$('#funAll').onclick=e=>{const b=e.target.closest('button[data-q]');if(!b)return;const q=b.dataset.q,v=b.dataset.v;if(q==='r'){let r=funA.r||'';r=v==='-'?'':(r.includes(v)?r.replace(v,''):r+v);funA.r=r;document.querySelectorAll('#funAll [data-q=r]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v==='-'?!r:r.includes(x.dataset.v)));funSave();return}funA[q]=v;funSave();
+$('#funAll').onclick=e=>{const b=e.target.closest('button[data-q]');if(!b)return;const q=b.dataset.q,v=b.dataset.v;const st=FUN.find(x=>x.id===q);if(st&&st.multi){let L=(funA[q]||'').split(',').filter(Boolean);L=v==='-'?[]:(L.includes(v)?L.filter(x=>x!==v):[...L,v]);funA[q]=L.join(',');document.querySelectorAll(`#funAll [data-q=${q}]`).forEach(x=>x.setAttribute('aria-pressed',x.dataset.v==='-'?!L.length:L.includes(x.dataset.v)));funSave();return}funA[q]=v;funSave();
  if(b.dataset.q==='s'){const sc=[...document.querySelectorAll('#funAll .srow')].map(r=>r.scrollLeft);funRender();document.querySelectorAll('#funAll .srow').forEach((r,i)=>r.scrollLeft=sc[i]||0)}
  else document.querySelectorAll(`#funAll button[data-q="${b.dataset.q}"]`).forEach(x=>x.setAttribute('aria-pressed',x===b))};
 $('#funGo').onclick=()=>{funSave();invLast=[];invPropose();go('idees')};
-function invOpen(){flowSet(false);funRender();go('invites')}
+function funOpen(m){funMode=m;FUN=FUNS[m];funA=funM[m]=funM[m]||{};$('#s-invites .ftitle').textContent=FUN_T[m][0];$('#s-idees .ftitle').textContent=FUN_T[m][1];flowSet(false);funRender();go('invites')}
+function invOpen(){funOpen('inv')}
 // Filtrage dur AVANT affichage : régime + allergies du profil ; puis score (style, temps)
-function invOk(it){const r=funA.r||'';if(r.includes('v')&&!it.f.includes('v'))return false;if(r.includes('p')&&it.f.includes('p'))return false;if([...'GL'].some(k=>r.includes(k)&&it.al.includes(k)))return false;
+function invOk(it){const r=(funA.r||'').split(',');if(r.includes('v')&&!it.f.includes('v'))return false;if(r.includes('p')&&it.f.includes('p'))return false;if([...'GL'].some(k=>r.includes(k)&&it.al.includes(k)))return false;
  for(const a of alGet('allergies')){const w=invNorm(a);if(!w)continue;const m=INV_ALK.find(([x])=>x.test(w));if(m&&it.al.includes(m[1]))return false;if(it.ing.some(g=>{const x=invNorm(g.n);return x.includes(w)||w.includes(x)}))return false}return true}
 const INV_STY={apero:'d',diner:'m',chic:'c',dinatoire:'f'},INV_PLAN={apero:['apero','apero','apero'],diner:['entree','plat','dessert'],chic:['entree','plat','dessert'],dinatoire:['apero','apero','plat']};
 let invLast=[],invSel=[];
-function invScore(it){const sty=INV_STY[funA.s]||'d',t=+funA.t||3;return (it.st.includes(sty)?3:0)+(sty==='m'&&it.f.includes('k')?1:0)+(it.tm<=t?2:-4)+Math.random()*2.5}
-function invPropose(){const pool=IDEES_INV.filter(invOk);const plan=({epd:['entree','plat','dessert'],ep:['entree','plat'],pd:['plat','dessert'],p:['plat'],ap:['apero','apero','apero']})[funA.m]||['entree','plat','dessert'];const out=[];
+const INV_RX={fat:/beurre|crème|creme|lardon|fromage|comté|emmental|reblochon|chorizo|saucisson|foie gras|mascarpone|mayonnaise|chips|pâte feuilletée|pâte brisée|jambon cru|terrine/i,sug:/sucre|chocolat|miel|biscuit|sorbet|tuile|pain d’épices/i,veg:/légume|carotte|courgette|poivron|tomate|épinard|brocoli|haricot|salade|concombre|champignon|potiron|fenouil|betterave|poireau|lentille|pois chiche|roquette|avocat|patate/i,pro:/poulet|poisson|saumon|cabillaud|œuf|lentille|pois chiche|bœuf|veau|yaourt|quinoa|crevette/i,cher:/foie gras|saint-jacques|magret|filet mignon|bœuf|veau|saumon|crevette/i};
+const invCnt=(it,k)=>it.ing.filter(g=>INV_RX[k].test(g.n)).length;
+const invDispo=()=>(funA.d||'').split(',').filter(Boolean).map(x=>new RegExp(x,'i'));
+const invHas=(g,D)=>D.some(r=>r.test(invNorm(g.n))||r.test(g.n));
+function invScore(it){const t=funA.t==='1b'?1.5:(+funA.t||3);let sc=(it.tm<=t?2:(funMode==='rap'?-12:-4))+Math.random()*2.5;
+ if(funMode==='inv'){const sty=INV_STY[funA.s]||'d';sc+=(it.st.includes(sty)?3:0)+(sty==='m'&&it.f.includes('k')?1:0)}
+ if(funMode==='elab'){const l=+funA.l||2;sc+=it.tm*(l>1?2:1)+(l===3&&it.st.includes('c')?3:0)}
+ if(funMode==='rap')sc+=(2-it.tm)*2+(it.ing.length<=4?1:0);
+ if(funMode==='equi'){const o=(funA.o||'').split(',');sc+=invCnt(it,'veg')*(o.includes('L')?2:1)-invCnt(it,'fat')*(o.includes('G')?3:1.5)-invCnt(it,'sug')*(o.includes('S')?3:1)+(o.includes('P')?invCnt(it,'pro')*2:invCnt(it,'pro')*.5)}
+ const D=invDispo();if(D.length)sc+=it.ing.filter(g=>invHas(g,D)).length*2.5;
+ const b=+funA.b||0,c=invCnt(it,'cher');if(b===10)sc-=c*3;else if(b===20)sc-=c;else if(b>=100)sc+=c*1.5;
+ return sc}
+function invPropose(){const pool=IDEES_INV.filter(invOk);const plan=({epd:['entree','plat','dessert'],ep:['entree','plat'],pd:['plat','dessert'],p:funMode==='inv'?['plat']:['plat','plat','plat'],ap:['apero','apero','apero']})[funA.m]||['entree','plat','dessert'];const out=[];
  for(const t of plan){const c=pool.filter(x=>x.t===t&&!out.includes(x)).map(x=>({x,s:invScore(x)-(invLast.includes(x.n)?3:0)})).sort((a,b)=>b.s-a.s);if(c[0])out.push(c[0].x)}
- if(funA.v==='o'&&!(funA.r||'').includes('A'))out.push(INV_VIN);invLast=out.map(x=>x.n);invSel=out.map(x=>({it:x,on:true,ing:x.ing.map(()=>true)}));invRenderP()}
+ if(funMode==='inv'&&funA.v==='o'&&!(funA.r||'').split(',').includes('A'))out.push(INV_VIN);invLast=out.map(x=>x.n);invSel=out.map(x=>{const D=invDispo();return {it:x,on:true,ing:x.ing.map(g=>!invHas(g,D))}});invRenderP()}
 const invN=()=>Math.min(+funA.n||4,12)*(funA.g==='o'?1.4:1);
 const INV_VIN={n:'Du vin pour la soirée',t:'vin',d:'Environ une bouteille pour trois convives.',f:'vp',al:[],st:'dmcf',tm:0,ing:[{n:'Bouteille de vin',q:0.34,u:'bouteille(s)'}]};
 function invQ(g){if(!g.q)return {q:0,u:''};let q=g.q*invN(),u=g.u;if(u==='g'){if(q>=1000){q=Math.round(q/100)/10;u='kg'}else q=Math.round(q/5)*5||5}else if(u==='cl'){if(q>=100){q=Math.round(q/10)/10;u='L'}else q=Math.round(q)}else q=Math.ceil(q);return {q,u}}
 const fmtQ=(q,u)=>q?String(q).replace('.',',')+(u?' '+u:''):'';
 function invCount(){return invSel.reduce((a,s)=>a+(s.on?s.ing.filter(Boolean).length:0),0)}
-const INV_EMO=[['saint-jacques|crevette','🦐'],['saumon|poisson|anchois','🐟'],['bœuf|veau|filet mignon|magret|chipolata','🥩'],['poulet','🍗'],['jambon|lardon|chorizo|saucisson|terrine|foie gras','🥓'],['œuf','🥚'],['comté|emmental|chèvre|reblochon|parmesan|mozzarella|fromage|mascarpone','🧀'],['tomate','🍅'],['avocat','🥑'],['carotte','🥕'],['concombre|courgette','🥒'],['champignon','🍄'],['poivron|paprika','🫑'],['pommes? de terre|patate','🥔'],['maïs|chips de maïs','🌽'],['olive|huile d','🫒'],['ail|oignon|échalote|poireau','🧅'],['citron','🍋'],['pomme(?!s? de terre)','🍎'],['poire','🍐'],['raisin','🍇'],['fruits rouges','🍓'],['fruits de saison','🍑'],['châtaigne|noix|noisette|amande|pécan','🌰'],['chocolat','🍫'],['café','☕'],['miel','🍯'],['lait de coco','🥥'],['lait|crème|yaourt','🥛'],['beurre','🧈'],['pain|gressins|croûton|tortilla','🥖'],['pâte|farine','🥐'],['riz|semoule|boulgour','🍚'],['pâtes à lasagnes','🍝'],['salade|roquette|épinard|basilic|persil|menthe|aneth|ciboulette|thym','🌿'],['potiron','🎃'],['betterave|haricots|lentilles|pois chiches','🫘'],['sorbet|sucre|vanille|biscuit|tuile|pain d’épices','🍰'],['vin','🍷']].map(([k,e])=>[new RegExp(k,'i'),e]);
+const INV_EMO=[['saint-jacques|crevette','🦐'],['saumon|poisson|anchois','🐟'],['bœuf|veau|filet mignon|magret|chipolata','🥩'],['poulet','🍗'],['jambon|lardon|chorizo|saucisson|terrine|foie gras','🥓'],['œuf','🥚'],['comté|emmental|chèvre|reblochon|parmesan|mozzarella|fromage|mascarpone','🧀'],['tomate','🍅'],['brocoli|haricots verts|petits pois','🥦'],['pesto','🌿'],['cabillaud','🐟'],['feta','🧀'],['soja','🫙'],['avocat','🥑'],['carotte','🥕'],['concombre|courgette','🥒'],['champignon','🍄'],['poivron|paprika','🫑'],['pommes? de terre|patate','🥔'],['maïs|chips de maïs','🌽'],['olive|huile d','🫒'],['ail|oignon|échalote|poireau','🧅'],['citron','🍋'],['pomme(?!s? de terre)','🍎'],['poire','🍐'],['raisin','🍇'],['fruits rouges','🍓'],['fruits de saison','🍑'],['châtaigne|noix|noisette|amande|pécan','🌰'],['chocolat','🍫'],['café','☕'],['miel','🍯'],['lait de coco','🥥'],['lait|crème|yaourt','🥛'],['beurre','🧈'],['pain|gressins|croûton|tortilla','🥖'],['pâte|farine','🥐'],['riz|semoule|boulgour|quinoa','🍚'],['pâtes à lasagnes','🍝'],['salade|roquette|épinard|basilic|persil|menthe|aneth|ciboulette|thym','🌿'],['potiron','🎃'],['betterave|haricots|lentilles|pois chiches','🫘'],['sorbet|sucre|vanille|biscuit|tuile|pain d’épices','🍰'],['vin','🍷']].map(([k,e])=>[new RegExp(k,'i'),e]);
 function invVis(it){const seen=[];for(const g of it.ing){const m=INV_EMO.find(([r])=>r.test(g.n));if(m&&!seen.some(x=>x[0]===m[1]))seen.push([m[1],g.n])}return `<div class="pvis" aria-hidden="true">${seen.slice(0,5).map(([e,n])=>`<span><b>${e}</b><i>${esc(n)}</i></span>`).join('')}</div>`}
 function invRenderP(){const S={apero:'Apéro décontracté',diner:'Dîner convivial',chic:'Dîner chic',dinatoire:'Apéro dînatoire festif'};
- $('#ideesSum').textContent=(+funA.n>10?'10 et plus':funA.n)+' personnes · '+({epd:'Entrée, plat, dessert',ep:'Entrée, plat',pd:'Plat, dessert',p:'Juste un plat',ap:'Apéro'}[funA.m]||'')+' · '+({apero:'Apéro entre amis',diner:'Dîner convivial',chic:'Dîner chic',dinatoire:'Apéro-dînatoire'}[funA.s]||'')+(funA.v==='o'?' · Avec vin':'')+(funA.g==='o'?' · Gros appétits':'')+(' · Budget '+({1:'moins de 50 €',2:'50 à 100 €',3:'100 à 150 €',4:'plus de 150 €'}[funA.b]||''))+[...(funA.r||'')].map(k=>' · '+{v:'Végétarien',p:'Sans porc',G:'Sans gluten',L:'Sans lactose',A:'Sans alcool'}[k]).join('');
+ $('#ideesSum').textContent=FUN.filter(st=>funA[st.id]&&funA[st.id]!=='-').map(st=>{const v=String(funA[st.id]).split(',');const L=st.opts(funA).filter(([k])=>v.includes(k)).map(x=>x[1]);return st.id==='n'?L[0]+' pers.':st.id==='b'?L[0]+' / pers.':L.join(', ')}).join(' · ');
  $('#ideesList').innerHTML=invSel.map((s,i)=>{const it=s.it;return `<article class="icard pcard${s.on?'':' off'}" data-i="${i}">${invVis(it)}<div class="phead"><label class="pchk"><input type="checkbox" data-d="${i}" ${s.on?'checked':''} aria-label="Garder ${esc(it.n)}"></label><button type="button" class="ptog" data-t="${i}" aria-expanded="false"><span class="ityp">${INV_TYP[it.t]}</span><h3>${esc(it.n)}</h3><p>${esc(it.d)}</p><small class="pmore">Voir les ingrédients (${it.ing.length}) ▾</small></button></div><ul class="ping" hidden>${it.ing.map((g,j)=>{const z=invQ(g);return `<li><label><input type="checkbox" data-d="${i}" data-g="${j}" ${s.ing[j]?'checked':''}><span>${esc(g.n)}</span><em>${fmtQ(z.q,z.u)}</em></label></li>`}).join('')}</ul></article>`}).join('');
  $('#ideesEmpty').hidden=invSel.length>0;invUpdBtn()}
 function invUpdBtn(){const n=invCount();const b=$('#invList');b.textContent='Créer ma liste ('+n+')';b.disabled=!n}
@@ -1094,7 +1144,7 @@ const RAYONS=[['Fruits et légumes',/avocat|tomate|carotte|concombre|citron|basi
 const rayonOf=n=>{const x=invNorm(n);const r=RAYONS.find(([,re])=>re.test(x));return r?r[0]:'Épicerie'};
 const RORD=RAYONS.map(r=>r[0]).concat('Épicerie');
 $('#invList').onclick=()=>{const m=new Map();invSel.forEach(s=>{if(!s.on)return;s.it.ing.forEach((g,j)=>{if(!s.ing[j])return;const z=invQ(g);const k=invNorm(g.n)+'|'+z.u;const e=m.get(k);if(e)e.q=Math.round((e.q+z.q)*10)/10;else m.set(k,{n:g.n,q:z.q,u:z.u,r:rayonOf(g.n),ok:false})})});
- if(!m.size)return;const d=new Date(),dd=String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');const L=lstGet();let nom='Invités – '+dd,k=2;while(L.some(x=>x.nom===nom))nom='Invités – '+dd+' ('+(k++)+')';
+ if(!m.size)return;const d=new Date(),dd=String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');const L=lstGet();const P=FUN_T[funMode][2];let nom=P+' – '+dd,k=2;while(L.some(x=>x.nom===nom))nom=P+' – '+dd+' ('+(k++)+')';
  L.unshift({id:Date.now().toString(36),nom,cree:d.toISOString(),items:[...m.values()]});lstSet(L);go('maliste')};
 let lstDel=null,lstDelT=0;
 function lstRender(){const L=lstGet();$('#lstEmpty').hidden=L.length>0;
@@ -1107,7 +1157,7 @@ $('#lstAll').onclick=e=>{const c=e.target.closest('.lcard');if(!c)return;const L
  const it=e.target.closest('.litem');if(it){const o=l.items[+it.dataset.i];o.ok=!o.ok;lstSet(L);lstRender()}};
 let lstWake=null;function lstWakeSet(on){try{if(on&&!lstWake&&navigator.wakeLock)navigator.wakeLock.request('screen').then(w=>{lstWake=w;w.addEventListener('release',()=>{lstWake=null})}).catch(()=>{});else if(!on&&lstWake){lstWake.release();lstWake=null}}catch(e){}}
 $('#invitesBtn').onclick=invOpen;
-$('#expressBtn').onclick=()=>{flowSet(false);go('express')};$('#navBack').onclick=()=>goBack();
+$('#expressBtn').onclick=()=>funOpen('rap');$('#elaboreeBtn').onclick=()=>funOpen('elab');$('#repasBtn').onclick=()=>funOpen('equi');$('#navBack').onclick=()=>goBack();
 /* v1.22 : clic sur un plat = vue aperçu (titre + cases d'ingrédients non cliquables, sans quantités ni prix) */
 function showApercu(i){const x=EXPRESS[i];if(!x)return;LS.set('apercu',i);$('#apTitle').textContent=x.n;$('#apGrid').innerHTML=x.ing.map(g=>`<div class="pill apcase">${esc(g)}</div>`).join('')}
 $('#expressPanel').onclick=e=>{const b=e.target.closest('.xopt');if(!b)return;showApercu(+b.dataset.i);go('apercu')};
