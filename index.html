@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.62">
+<meta name="app-version" content="v1.63">
 <title>Liste de courses IA</title>
 <!-- v1.59 : police fun Fredoka (Google Fonts, display=swap) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -297,7 +297,12 @@ nav button{min-width:0;font-size:.72rem}
 .icard p{margin:0 0 6px;color:var(--mut);font-size:.9rem}
 .icard ul{margin:0;padding-left:18px;font-size:.9rem}.icard li{margin:1px 0}
 .iempty{text-align:center;color:var(--mut);margin:10px 0}
-/* v1.62 : entonnoir, propositions à cocher, Ma liste de courses */
+/* v1.63 : questions Invités sur une seule page, rangées de bulles défilantes */
+.fqrow{margin:14px 0 4px}.fqrow h3{font-size:1.05rem;margin:0 0 8px}
+.fqrow .srow{padding:2px 2px 6px}
+.fqrow .schip{min-width:44px;text-align:center}
+.fqrow .schip[aria-pressed="true"]{background:var(--inv);border-color:var(--inv);color:#fdf6e3}
+/* v1.63 : entonnoir, propositions à cocher, Ma liste de courses */
 #s-maliste{--inv:#9f1239;--invd:#4c0519;--invc:#fdf2f4}
 .fdots{display:flex;align-items:center;justify-content:center;gap:8px;margin:6px 0 12px}.fdots span{width:10px;height:10px;border-radius:50%;background:#ead1d8}.fdots span.done{background:var(--inv)}.fdots span.on{background:var(--inv);box-shadow:0 0 0 4px rgba(159,18,57,.18)}.fdots b{margin-left:6px;font-size:.85rem;color:var(--invd)}
 .fq h3{font-size:1.35rem;text-align:center;margin-bottom:14px}.fq.fin{animation:fqIn .28s ease}@keyframes fqIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
@@ -325,7 +330,7 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.62</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
+<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.63</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <!-- PROFIL -->
@@ -416,13 +421,12 @@ nav button{min-width:0;font-size:.72rem}
 <!-- PANIER -->
 
 <!-- v1.19 : vue dédiée Repas express (hors barre d'onglets). Clic sur un repas = saisie + Entrée. -->
-<!-- v1.62 : « Des invités ce soir » en entonnoir (4 questions, un toucher chacune), puis propositions à cocher -->
+<!-- v1.63 : « Des invités ce soir » en entonnoir (4 questions, un toucher chacune), puis propositions à cocher -->
 <section class="screen" id="s-invites">
  <h2 class="ftitle">Des invités ce soir</h2>
- <div class="fdots" id="funDots" aria-label="Progression"></div>
- <div class="iq fq" id="funCard"><h3 id="funQ"></h3><div class="ichips fopts" id="funOpts" role="group" aria-labelledby="funQ"></div>
- <button type="button" class="fskip" id="funSkip">Peu importe</button></div>
+ <div id="funAll"></div>
  <p class="ialg" id="invAlg" hidden></p>
+ <div class="pbar"><button type="button" class="invgo" id="funGo">Voir les idées</button></div>
 </section>
 <section class="screen" id="s-idees">
  <h2 class="ftitle">Nos idées pour ce soir</h2><p class="fsub" id="ideesSum"></p>
@@ -431,7 +435,7 @@ nav button{min-width:0;font-size:.72rem}
  <button type="button" class="fskip" id="invMore">Autres idées</button>
  <div class="pbar"><button type="button" class="invgo" id="invList" disabled>Créer ma liste (0)</button></div>
 </section>
-<!-- v1.62 : onglet « Ma liste de courses » (listes créées, une par occasion, articles groupés par rayon) -->
+<!-- v1.63 : onglet « Ma liste de courses » (listes créées, une par occasion, articles groupés par rayon) -->
 <section class="screen" id="s-maliste">
  <h2 class="ftitle lt">Ma liste de courses</h2>
  <div id="lstAll"></div>
@@ -963,7 +967,7 @@ function flowSet(o){const f=$('#flow');if(!f)return;f.classList.toggle('open',o)
 $('#flowBtn').onclick=()=>flowSet(!$('#flow').classList.contains('open'));
 document.addEventListener('click',e=>{if($('#flow').classList.contains('open')&&!e.target.closest('#flowBtn,.fbub'))flowSet(false)});
 
-// v1.62 : « Des invités ce soir » en entonnoir (4 questions) + propositions à cocher + listes de courses. Base locale, aucun appel réseau.
+// v1.63 : « Des invités ce soir » en entonnoir (4 questions) + propositions à cocher + listes de courses. Base locale, aucun appel réseau.
 const IDEES_INV=[
 ['apero','Gougères au comté','Petits choux soufflés au fromage, tout chauds','vk','G L O','Comté:15:g|Farine:12:g|Œufs:0.5:|Beurre:10:g'],
 ['apero','Tapenade et gressins','Olives noires mixées, câpres et anchois','','G P','Olives noires:30:g|Anchois:5:g|Câpres:3:g|Gressins:4:'],
@@ -1045,16 +1049,15 @@ const FUN_KEY='lci_invites_v1';let funA={},funStep=0;
 try{const o=JSON.parse(localStorage.getItem(FUN_KEY));if(o&&o.a){funA=o.a;funStep=Math.min(+o.step||0,FUN.length-1)}}catch(e){}
 const funSave=()=>{try{localStorage.setItem(FUN_KEY,JSON.stringify({a:funA,step:funStep}))}catch(e){}};
 const fv=(x,A)=>typeof x==='function'?x(A):x;
-function funRender(){const st=FUN[funStep],A=funA,def=st.def(A),cur=A[st.id];
- $('#funDots').innerHTML=FUN.map((_,i)=>`<span class="${i<funStep?'done':i===funStep?'on':''}"></span>`).join('')+`<b>${funStep+1}/${FUN.length}</b>`;
- $('#funQ').textContent=fv(st.q,A);
- $('#funOpts').innerHTML=st.opts(A).map(([v,l])=>`<button type="button" data-v="${v}" class="${v===def?'rec':''}" aria-pressed="${cur===v}">${esc(l)}${v===def?'<small>conseillé</small>':''}</button>`).join('');
- const al=alGet('allergies');const p=$('#invAlg');p.hidden=!(st.id==='r'&&al.length);p.textContent=al.length?'Allergies du profil exclues d’office : '+al.join(', ')+'.':'';
- const c=$('#funCard');c.classList.remove('fin');void c.offsetWidth;c.classList.add('fin')}
-function funAnswer(v){funA[FUN[funStep].id]=v;if(funStep<FUN.length-1){funStep++;funSave();funRender()}else{funSave();invLast=[];invPropose();go('idees')}}
-$('#funOpts').onclick=e=>{const b=e.target.closest('button');if(b)funAnswer(b.dataset.v)};
-$('#funSkip').onclick=()=>funAnswer(FUN[funStep].def(funA));
-function invOpen(){flowSet(false);funStep=0;funSave();funRender();go('invites')}
+function funRender(){const A=funA;
+ FUN.forEach(st=>{if(!st.opts(A).some(([v])=>v===A[st.id]))A[st.id]=st.def(A)});
+ $('#funAll').innerHTML=FUN.map(st=>`<div class="fqrow"><h3 id="fq-${st.id}">${esc(fv(st.q,A))}</h3><div class="srow" role="group" aria-labelledby="fq-${st.id}">${st.opts(A).map(([v,l])=>`<button type="button" class="schip" data-q="${st.id}" data-v="${v}" aria-pressed="${A[st.id]===v}">${esc(l)}</button>`).join('')}</div></div>`).join('');
+ const al=alGet('allergies');const p=$('#invAlg');p.hidden=!al.length;p.textContent=al.length?'Allergies du profil exclues d’office : '+al.join(', ')+'.':''}
+$('#funAll').onclick=e=>{const b=e.target.closest('button[data-q]');if(!b)return;funA[b.dataset.q]=b.dataset.v;funSave();
+ if(b.dataset.q==='s'){const sc=[...document.querySelectorAll('#funAll .srow')].map(r=>r.scrollLeft);funRender();document.querySelectorAll('#funAll .srow').forEach((r,i)=>r.scrollLeft=sc[i]||0)}
+ else document.querySelectorAll(`#funAll button[data-q="${b.dataset.q}"]`).forEach(x=>x.setAttribute('aria-pressed',x===b))};
+$('#funGo').onclick=()=>{funSave();invLast=[];invPropose();go('idees')};
+function invOpen(){flowSet(false);funRender();go('invites')}
 // Filtrage dur AVANT affichage : régime + allergies du profil ; puis score (style, temps)
 function invOk(it){const r=funA.r;if(r==='v'&&!it.f.includes('v'))return false;if(r==='p'&&it.f.includes('p'))return false;if((r==='G'||r==='L')&&it.al.includes(r))return false;
  for(const a of alGet('allergies')){const w=invNorm(a);if(!w)continue;const m=INV_ALK.find(([x])=>x.test(w));if(m&&it.al.includes(m[1]))return false;if(it.ing.some(g=>{const x=invNorm(g.n);return x.includes(w)||w.includes(x)}))return false}return true}
@@ -1097,7 +1100,7 @@ $('#lstAll').onclick=e=>{const c=e.target.closest('.lcard');if(!c)return;const L
  const it=e.target.closest('.litem');if(it){const o=l.items[+it.dataset.i];o.ok=!o.ok;lstSet(L);lstRender()}};
 let lstWake=null;function lstWakeSet(on){try{if(on&&!lstWake&&navigator.wakeLock)navigator.wakeLock.request('screen').then(w=>{lstWake=w;w.addEventListener('release',()=>{lstWake=null})}).catch(()=>{});else if(!on&&lstWake){lstWake.release();lstWake=null}}catch(e){}}
 $('#invitesBtn').onclick=invOpen;
-$('#expressBtn').onclick=()=>{flowSet(false);go('express')};$('#navBack').onclick=()=>{if(curScreen==='invites'&&funStep>0){funStep--;funSave();funRender()}else goBack()};
+$('#expressBtn').onclick=()=>{flowSet(false);go('express')};$('#navBack').onclick=()=>goBack();
 /* v1.22 : clic sur un plat = vue aperçu (titre + cases d'ingrédients non cliquables, sans quantités ni prix) */
 function showApercu(i){const x=EXPRESS[i];if(!x)return;LS.set('apercu',i);$('#apTitle').textContent=x.n;$('#apGrid').innerHTML=x.ing.map(g=>`<div class="pill apcase">${esc(g)}</div>`).join('')}
 $('#expressPanel').onclick=e=>{const b=e.target.closest('.xopt');if(!b)return;showApercu(+b.dataset.i);go('apercu')};
