@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.22">
+<meta name="app-version" content="v1.23">
 <title>Liste de courses IA</title>
 <style>
 :root{--acc:#16a34a;--acc2:#dcfce7;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -106,7 +106,7 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.22</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
+<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.23</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <button type="button" class="xback" id="navBack" hidden style="margin-bottom:10px" aria-label="Retour à la vue précédente">← Retour</button>
@@ -524,7 +524,7 @@ $('#changeStore').onclick=()=>{status('Choisissez un autre magasin : localisez-v
 /* v1.20-1.21 : bouton Retour unique ; historique simple (pile, sessionStorage). go(s) empile la vue courante ; goBack() dépile, repli Demande. */
 let curScreen=null,navStack=[];try{navStack=JSON.parse(sessionStorage.getItem('lci_nav'))||[]}catch(e){}
 function navSave(){try{sessionStorage.setItem('lci_nav',JSON.stringify(navStack.slice(-30)))}catch(e){}}
-function updNavBack(){$('#navBack').hidden=curScreen==='express'||(curScreen==='demande'&&!navStack.length)}
+function updNavBack(){$('#navBack').hidden=curScreen==='express'||curScreen==='demande'}
 function goBack(){let p;while(navStack.length&&(p=navStack.pop())===curScreen);navSave();_go(p&&p!==curScreen?p:'demande')}
 function go(s){if(curScreen&&curScreen!==s){navStack.push(curScreen);navSave()}_go(s)}
 function _go(s){curScreen=s;updNavBack();document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id==='s-'+s));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.s===s));LS.set('screen',s);window.scrollTo(0,0)}
