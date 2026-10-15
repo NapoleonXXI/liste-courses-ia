@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.23">
+<meta name="app-version" content="v1.24">
 <title>Liste de courses IA</title>
 <style>
 :root{--acc:#16a34a;--acc2:#dcfce7;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -106,7 +106,7 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.23</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
+<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.24</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <button type="button" class="xback" id="navBack" hidden style="margin-bottom:10px" aria-label="Retour à la vue précédente">← Retour</button>
@@ -541,7 +541,7 @@ const EXPRESS=[
  {n:'Wraps poulet-crudités',d:'Tortillas garnies de poulet, salade, tomate, carotte.',t:15,q:'Wraps',ing:['tortillas de blé','blancs de poulet','salade','tomates','carotte','concombre','fromage blanc','citron','huile d\'olive','sel','poivre']},
  {n:'Riz sauté aux légumes et œuf',d:'Riz, petits pois, carotte, œuf brouillé, sauce soja.',t:20,q:'Riz sauté',ing:['riz','œufs','petits pois','carottes','oignon','ail','sauce soja','huile','ciboule']},
  {n:'Salade niçoise au thon',d:'Salade, tomate, thon, œuf dur, haricots verts.',t:15,q:'Salade niçoise',ing:['salade','tomates','thon en boîte','œufs','haricots verts','pommes de terre','olives noires','oignon rouge','huile d\'olive','vinaigre','sel','poivre']}];
-$('#expressPanel').innerHTML=EXPRESS.map((x,i)=>`<button type="button" class="xopt" data-i="${i}"><span class="xt">⏱ ${x.t} min</span><b>${esc(x.n)}</b><small>${esc(x.d)}</small></button>`).join('');
+$('#expressPanel').innerHTML=EXPRESS.map((x,i)=>`<button type="button" class="xopt" data-i="${i}"><b>${esc(x.n)}</b></button>`).join('');
 $('#expressBtn').onclick=()=>go('express');$('#expressBack').onclick=goBack;$('#navBack').onclick=goBack;
 /* v1.22 : clic sur un plat = vue aperçu (titre + cases d'ingrédients non cliquables, sans quantités ni prix) */
 function showApercu(i){const x=EXPRESS[i];if(!x)return;LS.set('apercu',i);$('#apTitle').textContent=x.n;$('#apGrid').innerHTML=x.ing.map(g=>`<div class="pill apcase">${esc(g)}</div>`).join('')}
