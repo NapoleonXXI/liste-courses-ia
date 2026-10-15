@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.19">
+<meta name="app-version" content="v1.20">
 <title>Liste de courses IA</title>
 <style>
 :root{--acc:#16a34a;--acc2:#dcfce7;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -86,6 +86,7 @@ details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;alig
 @keyframes s{to{transform:rotate(360deg)}}
 
 /* v1.18-1.19 Repas express : classes propres (pas de .chip), déclarées après .pill */
+#navBack[hidden],#listBackExpress[hidden]{display:none!important}
 .xhead{display:flex;align-items:center;gap:10px;margin-bottom:6px}.xhead h2{margin:0;font-size:1.25rem}
 .xback{min-height:44px;padding:8px 14px;border:1px solid var(--acc);border-radius:999px;background:var(--acc2);color:#14532d;font-weight:700;cursor:pointer}
 .xpanel{width:100%;margin-top:12px;display:grid;gap:8px}
@@ -103,8 +104,10 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.19</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
+<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.20</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
 <main>
+<!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
+<button type="button" class="xback" id="navBack" hidden style="margin-bottom:10px" aria-label="Retour à la vue précédente">← Retour</button>
 <!-- PROFIL -->
 
 <!-- DEMANDE -->
@@ -164,6 +167,7 @@ nav button{min-width:0;font-size:.72rem}
 </section>
 <!-- LISTE -->
 <section class="screen" id="s-liste">
+ <button type="button" class="xback" id="listBackExpress" hidden style="margin-bottom:10px">← Repas express</button>
  <div class="card"><h2 id="listTitle">Ma liste</h2>
   <div class="prog"><div id="progBar"></div></div>
   <div class="stats">
@@ -419,7 +423,7 @@ function renderGen(){
  h+=budgetMsg(tot)+`<button class="btn" onclick="go('liste')">Voir ma liste →</button></div>`;el.innerHTML=h;
 }
 function render(){
- renderGen();
+ renderGen();showListBack();
  $('#listTitle').textContent=list.title?'Ma liste : '+list.title:'Ma liste';
  const body=$('#listBody');
  if(!list.items.length){body.innerHTML='<div class="card empty">Votre liste est vide.<br>Allez dans « Demande » pour la générer ✨</div>';updateStats();return}
@@ -456,7 +460,7 @@ $('#finish').onclick=()=>{const s=totals();if(!s.t){toast('Liste vide');return}
  if(!confirm(`Terminer les courses ? Total estimé : ${eur(s.cart)}. Les articles cochés seront retirés de la liste.`))return;
  const hist=LS.get('history',[]);hist.push({date:new Date().toISOString(),title:list.title,total:s.cart});LS.set('history',hist.slice(-50));
  list.items=list.items.filter(i=>!i.checked);if(!list.items.length)list.title='';save();render();toast('Courses terminées 🎉');};
-$('#reset').onclick=()=>{if(!confirm('Vider complètement la liste ?'))return;list={title:'',items:[]};save();render();$('#genResult').innerHTML='';toast('Liste vidée')};
+$('#reset').onclick=()=>{if(!confirm('Vider complètement la liste ?'))return;list={title:'',items:[]};save();LS.set('listOrigin','');render();showListBack();$('#genResult').innerHTML='';toast('Liste vidée')};
 
 /* ---- Profil désactivé (voir profil-desactive.js) : valeurs neutres ---- */
 function loadProfile(){
@@ -591,11 +595,20 @@ $('#forgetStore').onclick=()=>{store=null;LS.set('store',null);showStore();rende
 $('#changeStore').onclick=()=>{status('Choisissez un autre magasin : localisez-vous ou saisissez une ville.');$('#cityBox').hidden=false;$('#locate').hidden=false;$('#changeStore').hidden=true};
 
 /* ---- Navigation ---- */
-function go(s){document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id==='s-'+s));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.s===s));LS.set('screen',s);window.scrollTo(0,0)}
+/* v1.20 : historique simple (pile, sessionStorage). go(s) empile la vue courante ; goBack() dépile, repli Demande. */
+let curScreen=null,navStack=[];try{navStack=JSON.parse(sessionStorage.getItem('lci_nav'))||[]}catch(e){}
+function navSave(){try{sessionStorage.setItem('lci_nav',JSON.stringify(navStack.slice(-30)))}catch(e){}}
+function updNavBack(){$('#navBack').hidden=curScreen==='express'||(curScreen==='demande'&&!navStack.length)}
+function goBack(){let p;while(navStack.length&&(p=navStack.pop())===curScreen);navSave();_go(p&&p!==curScreen?p:'demande')}
+function go(s){if(curScreen&&curScreen!==s){navStack.push(curScreen);navSave()}_go(s)}
+function _go(s){curScreen=s;updNavBack();document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id==='s-'+s));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.s===s));LS.set('screen',s);window.scrollTo(0,0)}
 window.go=go;
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.s));
 $('#generate').onclick=generate;
-$('#searchForm').addEventListener('submit',async e=>{e.preventDefault();if(!$('#request').value.trim())return;$('#request').blur();await generate();if(list.items.length)go('liste')});
+/* v1.20 : origine de la liste ('express' ou '') mémorisée dans LS 'listOrigin' */
+let fromExpress=false;
+function showListBack(){$('#listBackExpress').hidden=!(LS.get('listOrigin','')==='express'&&list.items.length)}
+$('#searchForm').addEventListener('submit',async e=>{e.preventDefault();const fx=fromExpress;fromExpress=false;if(!$('#request').value.trim())return;$('#request').blur();await generate();LS.set('listOrigin',fx&&list.items.length?'express':'');showListBack();if(list.items.length)go('liste')});
 $('#suggest').innerHTML=['Pâtes carbonara','Ratatouille','Poulet rôti','Curry de légumes','Crêpes','Poke bowl'].map(s=>`<button type="button" class="chip" data-v="${s}">${s}</button>`).join('');
 /* v1.18 Repas express : 5 options (sans profil). q = texte envoyé au flux existant */
 const EXPRESS=[
@@ -605,8 +618,8 @@ const EXPRESS=[
  {n:'Riz sauté aux légumes et œuf',d:'Riz, petits pois, carotte, œuf brouillé, sauce soja.',t:20,q:'Riz sauté'},
  {n:'Salade niçoise au thon',d:'Salade, tomate, thon, œuf dur, haricots verts.',t:15,q:'Salade niçoise'}];
 $('#expressPanel').innerHTML=EXPRESS.map((x,i)=>`<button type="button" class="xopt" data-i="${i}"><span class="xt">⏱ ${x.t} min</span><b>${esc(x.n)}</b><small>${esc(x.d)}</small></button>`).join('');
-$('#expressBtn').onclick=()=>go('express');$('#expressBack').onclick=()=>go('demande');
-$('#expressPanel').onclick=e=>{const b=e.target.closest('.xopt');if(!b)return;$('#request').value=EXPRESS[+b.dataset.i].q;$('#searchForm').requestSubmit()};
+$('#expressBtn').onclick=()=>go('express');$('#expressBack').onclick=goBack;$('#navBack').onclick=goBack;$('#listBackExpress').onclick=()=>go('express');showListBack();
+$('#expressPanel').onclick=e=>{const b=e.target.closest('.xopt');if(!b)return;$('#request').value=EXPRESS[+b.dataset.i].q;fromExpress=true;$('#searchForm').requestSubmit()};
 $('#suggest').onclick=e=>{const b=e.target.closest('.chip');if(b)$('#request').value=b.dataset.v};
 $('#appendMode').checked=false;
 
