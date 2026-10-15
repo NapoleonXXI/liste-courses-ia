@@ -7,13 +7,13 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.37">
+<meta name="app-version" content="v1.38">
 <title>Liste de courses IA</title>
 <style>
-:root{--pf:#15803d;--pc:#e3f0e8;--pe:#116631;--pm:#96c6a8;--alg:#b45309;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
+:root{--pf:#15803d;--pc:#e3f0e8;--pe:#116631;--pm:#96c6a8;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
 [hidden]{display:none!important}
 /* v1.37 : thème par profil actif (DESIGN-couleurs-profils.md) : body[data-pc] (profil actif) ou [data-pcx] (ligne d'un autre profil) ; 8 couleurs.
-   Restent inchangés : pastilles .pill (options de Demande, aperçu), pastilles d'allergies, rouge de suppression, textes courants, bouton violet, marqueur ambre. */
+   Restent inchangés : pastilles .pill (options de Demande, aperçu), pastilles d'allergies, rouge de suppression, textes courants, bouton violet. (v1.38 : marqueur « ! » des profils allergiques supprimé ; mentions « ⚠ allergies » conservées.) */
 body[data-pc=vert],[data-pcx=vert]{--pf:#15803d;--pc:#e3f0e8;--pe:#116631;--pm:#96c6a8}
 body[data-pc=bleu],[data-pcx=bleu]{--pf:#1d4ed8;--pc:#e4eafa;--pe:#173ead;--pm:#99afed}
 body[data-pc=orange],[data-pcx=orange]{--pf:#c2410c;--pc:#f8e8e2;--pe:#9b340a;--pm:#e4aa92}
@@ -25,8 +25,6 @@ body[data-pc=moutarde],[data-pcx=moutarde]{--pf:#8a6400;--pc:#f1ece0;--pe:#6e500
 .pill{--pf:#16a34a;--pc:#dcfce7;--pe:#14532d}
 .pfi{fill:var(--pf)}.pfs{stroke:var(--pf)}
 :focus-visible{outline:3px solid var(--pf);outline-offset:2px}
-.algm{position:absolute;right:-4px;bottom:-4px;width:15px;height:15px;border-radius:50%;background:#fff;border:2px solid var(--alg);color:var(--alg);font-size:9px;font-weight:900;line-height:1;display:flex;align-items:center;justify-content:center;pointer-events:none;font-style:normal}
-.avatar .algm{width:20px;height:20px;font-size:12px;right:-2px;bottom:-2px}
 #hdrProf{display:block;opacity:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ccol{display:flex;flex-wrap:wrap;gap:8px}.ccol button{width:34px;height:34px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #d1d5db;background:var(--pf);color:#fff;font-weight:900;cursor:pointer;padding:0}.ccol button[aria-checked=true]{box-shadow:0 0 0 3px var(--pf)}
 .cnote{font-size:.8rem;color:var(--mut);min-height:1em;margin:-4px 0 0}
@@ -235,7 +233,7 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.37</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
+<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.38</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <button type="button" class="xback" id="navBack" hidden style="margin-bottom:10px" aria-label="Retour à la vue précédente">← Retour</button>
@@ -709,7 +707,6 @@ function couleurLibre(a,exceptId){const used=a.filter(x=>x.id!==exceptId).map(x=
 (function(){const a=persoGet();let ch=false;a.forEach(p=>{if(!PAL[p.couleur]){p.couleur=couleurLibre(a.filter(x=>PAL[x.couleur]),p.id);ch=true}});if(ch)persoSet(a)})();
 function couleurDe(f){if(PAL_FIXE[f])return PAL_FIXE[f];if(f&&f.startsWith('perso:')){const p=persoGet().find(x=>x.id===f.slice(6));if(p&&PAL[p.couleur])return p.couleur}return null}
 function aAllergies(f){try{const o=JSON.parse(localStorage.getItem('lci_specificites_v1'))||{};return !!(f&&o[f]&&Array.isArray(o[f].allergies)&&o[f].allergies.length)}catch(e){return false}}
-const ALGM='<i class="algm" aria-hidden="true">!</i>';
 function foyerLabel(f){if(['solo','duo','groupe'].includes(f))return f;if(f&&f.startsWith('perso:')){const p=persoGet().find(x=>x.id===f.slice(6));return p?p.nom:null}return null}
 /* v1.32 : profil actif persistant (localStorage lci_profil_actif_v1) ; remplace lci_foyer_session (migré) */
 const ACT_KEY='lci_profil_actif_v1';
@@ -723,7 +720,7 @@ function renderMonProfil(){const f=actGet(),nm=foyerLabel(f);const av=$('#pfAv')
  if(!nm){$('#pfName').textContent='Aucun profil connecté';$('#pfType').textContent='';$('#pfNb').textContent='';av.innerHTML=O;return}
  const D={solo:['Solo','1 personne'],duo:['Duo','2 personnes'],groupe:['Groupe','Plusieurs personnes']};let n,t,nb;
  if(D[f]){[n,nb]=D[f];t='Profil par défaut'}else{const p=persoGet().find(x=>'perso:'+x.id===f);n=p.nom;t='Profil personnalisé';nb=p.nb+(p.nb>1?' personnes':' personne')}
- $('#pfName').textContent=n;$('#pfType').textContent=t+' · couleur '+PAL[couleurDe(f)]+(aAllergies(f)?' · ⚠ allergies':'');$('#pfNb').textContent='Nombre de personnes : '+nb.replace(/ personnes?$/,'').replace('Plusieurs','plusieurs');av.innerHTML=(f==='groupe'?G:O)+(aAllergies(f)?ALGM:'')}
+ $('#pfName').textContent=n;$('#pfType').textContent=t+' · couleur '+PAL[couleurDe(f)]+(aAllergies(f)?' · ⚠ allergies':'');$('#pfNb').textContent='Nombre de personnes : '+nb.replace(/ personnes?$/,'').replace('Plusieurs','plusieurs');av.innerHTML=f==='groupe'?G:O}
 /* v1.36 : spécificités par profil (lecture/écriture, sans influence sur le reste de l'app) */
 const SPEC_KEY='lci_specificites_v1';
 function specAll(){try{const o=JSON.parse(localStorage.getItem(SPEC_KEY));return o&&typeof o==='object'&&!Array.isArray(o)?o:{}}catch(e){return{}}}
@@ -746,13 +743,12 @@ $('#aConfNo').onclick=()=>{$('#aConf').hidden=true};$('#aConf').onclick=e=>{if(e
 $('#aConfYes').onclick=()=>{const a=alGet();if(alIdx!=null){a.splice(alIdx,1);alSet(a)}$('#aConf').hidden=true;closeAl();updFoyerBadge()};
 function updFoyerBadge(){renderMonProfil();renderAllergies();const fa=actGet();let f=fa;const lb=foyerLabel(f);const ok=!!lb;f=lb;const b=$('#foyerBadge');b.hidden=!ok||curScreen==='entree';
  const c=ok?couleurDe(fa):null;if(c)document.body.dataset.pc=c;else delete document.body.dataset.pc;const al=ok&&aAllergies(fa);
- const mk=$('#foyerBadge .bcirc .algm');if(al&&!mk)$('#foyerBadge .bcirc').insertAdjacentHTML('beforeend',ALGM);if(!al&&mk)mk.remove();
  const hp=$('#hdrProf');hp.hidden=!ok;hp.textContent=ok?'Profil : '+lb+(al?' · ⚠ allergies':''):'';
  if(ok){$('#foyerLbl').textContent=f;$('#foyerLbl').title=f;b.setAttribute('aria-label','Profil actif : '+f+', couleur '+PAL[c]+(al?', allergies déclarées':'')+'. Menu du profil')}
  const tc=document.querySelector('meta[name=theme-color]');if(tc)tc.content=getComputedStyle(document.body).getPropertyValue('--pf').trim()||'#15803d'}
 const ICO1='<svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg>';
 function profilsAll(){return[{f:'solo',nm:'Solo',np:'1 pers.'},{f:'duo',nm:'Duo',np:'2 pers.'},{f:'groupe',nm:'Groupe',np:'3+ pers.'}].concat(persoGet().map(p=>({f:'perso:'+p.id,nm:p.nom,np:p.nb+' pers.'})))}
-function openPMenu(){const a=actGet();const L=profilsAll();L.sort((x,y)=>(y.f===a)-(x.f===a));$('#pmList').innerHTML=L.map(p=>`<button type="button" class="pmrow${p.f===a?' on':''}" data-f="${esc(p.f)}" data-pcx="${couleurDe(p.f)}" title="${esc(p.nm)} · ${esc(p.np)}"${p.f===a?' aria-current="true"':''}><span class="sc">${ICO1}${aAllergies(p.f)?ALGM:''}</span><span class="nm">${esc(p.nm)}</span></button>`).join('')+`<button type="button" class="pmplus" id="pmNew" aria-label="Créer un profil" title="Créer un profil"><span class="sc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" class="pfs" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Créer</button><button type="button" class="pmplus pmgest" id="pmGest" aria-label="Gérer les profils" title="Gérer les profils"><span class="sc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" class="pfs" stroke-width="2.6" stroke-linecap="round"><path d="M5 7h14M5 12h14M5 17h14"/></svg></span>Gérer</button>`;$('#pmList').scrollLeft=0;$('#pMenu').hidden=false}
+function openPMenu(){const a=actGet();const L=profilsAll();L.sort((x,y)=>(y.f===a)-(x.f===a));$('#pmList').innerHTML=L.map(p=>`<button type="button" class="pmrow${p.f===a?' on':''}" data-f="${esc(p.f)}" data-pcx="${couleurDe(p.f)}" title="${esc(p.nm)} · ${esc(p.np)}"${p.f===a?' aria-current="true"':''}><span class="sc">${ICO1}</span><span class="nm">${esc(p.nm)}</span></button>`).join('')+`<button type="button" class="pmplus" id="pmNew" aria-label="Créer un profil" title="Créer un profil"><span class="sc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" class="pfs" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Créer</button><button type="button" class="pmplus pmgest" id="pmGest" aria-label="Gérer les profils" title="Gérer les profils"><span class="sc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" class="pfs" stroke-width="2.6" stroke-linecap="round"><path d="M5 7h14M5 12h14M5 17h14"/></svg></span>Gérer</button>`;$('#pmList').scrollLeft=0;$('#pMenu').hidden=false}
 const closePMenu=()=>{$('#pMenu').hidden=true};
 $('#foyerBadge').onclick=openPMenu;
 $('#pMenu').onclick=e=>{if(e.target.id==='pMenu'||e.target.classList.contains('pmbox')){closePMenu();return}if(e.target.closest('#pmGest')){closePMenu();openGest();return}if(e.target.closest('#pmNew')){closePMenu();formFromMenu=true;openForm(null);return}const r=e.target.closest('#pmList .pmrow');if(r){actSet(r.dataset.f);closePMenu();updFoyerBadge()}};
@@ -761,7 +757,7 @@ let formFromMenu=false;
 function chooseFoyer(f){actSet(f);go('demande')}
 document.querySelectorAll('.ecase').forEach(b=>b.onclick=()=>chooseFoyer(b.dataset.foyer));
 /* v1.28 : profils perso */
-function renderPerso(){$('#ePerso').innerHTML=persoGet().map(p=>`<div class="erow epwrap"><button type="button" class="eperso" data-id="${esc(p.id)}"><span class="sc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg>${aAllergies('perso:'+p.id)?ALGM:''}</span><span class="nm">${esc(p.nom)}</span><span class="np">${p.nb} pers.</span></button><button type="button" class="eact eedit" data-id="${esc(p.id)}" aria-label="Modifier" title="Modifier"><span class="bdg"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" class="pfs" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></span></button><button type="button" class="eact edel" data-id="${esc(p.id)}" aria-label="Supprimer" title="Supprimer"><span class="bdg"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"><path d="M6 12h12"/></svg></span></button></div>`).join('')}
+function renderPerso(){$('#ePerso').innerHTML=persoGet().map(p=>`<div class="erow epwrap"><button type="button" class="eperso" data-id="${esc(p.id)}"><span class="sc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span class="nm">${esc(p.nom)}</span><span class="np">${p.nb} pers.</span></button><button type="button" class="eact eedit" data-id="${esc(p.id)}" aria-label="Modifier" title="Modifier"><span class="bdg"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" class="pfs" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></span></button><button type="button" class="eact edel" data-id="${esc(p.id)}" aria-label="Supprimer" title="Supprimer"><span class="bdg"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"><path d="M6 12h12"/></svg></span></button></div>`).join('')}
 let editId=null,delId=null;const curFoyer=actGet;
 $('#ePerso').onclick=e=>{const ed=e.target.closest('.eedit'),dl=e.target.closest('.edel');
  if(ed){e.stopPropagation();closeEdit();const p=persoGet().find(x=>x.id===ed.dataset.id);if(p)openForm(p);return}
@@ -780,7 +776,7 @@ $('#ePerso').addEventListener('pointermove',e=>{if(lpT&&Math.hypot(e.clientX-lpX
 document.addEventListener('pointerdown',e=>{const r=editRow();if(!r||!$('#eForm').hidden||!$('#eConf').hidden)return;if(r.contains(e.target)&&e.target.closest('.eact'))return;closeEdit();swallow=true;setTimeout(()=>{swallow=false},600)},true);
 document.addEventListener('click',e=>{if(lpFired&&e.target.closest('.eperso')){lpFired=false;e.stopPropagation();e.preventDefault();return}if(swallow){swallow=false;e.stopPropagation();e.preventDefault()}},true);
 /* v1.33 : Gérer les profils */
-function renderGest(){const a=actGet();const row=(p,perso)=>`<div class="grow${p.f===a?' on':''}" data-pcx="${couleurDe(p.f)}"><button type="button" class="gsel" data-f="${esc(p.f)}"${p.f===a?' aria-current="true"':''}><span class="sc">${ICO1}${aAllergies(p.f)?ALGM:''}</span><span class="gtx"><b>${esc(p.nm)}</b><small>${p.f===a?'Actif · ':''}${esc(p.np)} · ${PAL[couleurDe(p.f)]}${aAllergies(p.f)?' · ⚠ allergies':''}${perso?'':' · par défaut, non modifiable'}</small></span></button>${perso?`<button type="button" class="gbtn gedit" data-id="${esc(p.f.slice(6))}">Modifier</button><button type="button" class="gbtn gdel" data-id="${esc(p.f.slice(6))}">Supprimer</button>`:''}</div>`;
+function renderGest(){const a=actGet();const row=(p,perso)=>`<div class="grow${p.f===a?' on':''}" data-pcx="${couleurDe(p.f)}"><button type="button" class="gsel" data-f="${esc(p.f)}"${p.f===a?' aria-current="true"':''}><span class="sc">${ICO1}</span><span class="gtx"><b>${esc(p.nm)}</b><small>${p.f===a?'Actif · ':''}${esc(p.np)} · ${PAL[couleurDe(p.f)]}${aAllergies(p.f)?' · ⚠ allergies':''}${perso?'':' · par défaut, non modifiable'}</small></span></button>${perso?`<button type="button" class="gbtn gedit" data-id="${esc(p.f.slice(6))}">Modifier</button><button type="button" class="gbtn gdel" data-id="${esc(p.f.slice(6))}">Supprimer</button>`:''}</div>`;
  const L=profilsAll(),d=L.slice(0,3),pp=L.slice(3);$('#gList').innerHTML='<p class="gsec">Par défaut</p>'+d.map(p=>row(p,false)).join('')+'<p class="gsec">Profils personnalisés</p>'+(pp.length?pp.map(p=>row(p,true)).join(''):'<p class="gsec" style="text-transform:none;font-weight:400">Aucun profil personnalisé.</p>')}
 function openGest(){renderGest();$('#pGest').hidden=false}
 const closeGest=()=>{$('#pGest').hidden=true};
