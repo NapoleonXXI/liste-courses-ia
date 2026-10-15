@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.28">
+<meta name="app-version" content="v1.29">
 <title>Liste de courses IA</title>
 <style>
 :root{--acc:#16a34a;--acc2:#dcfce7;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -58,6 +58,16 @@ body.entree nav{display:none}body.entree main{padding-bottom:calc(16px + env(saf
 .erow .sc{display:flex;align-items:center;justify-content:center;flex:0 0 36px;width:36px;height:36px;border-radius:50%;background:#fff;border:2px solid var(--acc)}.erow .sc svg{width:20px;height:20px}
 .erow .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.erow .np{flex:0 0 auto;font-size:.85rem;font-weight:600;color:#15803d}
 #eNew{background:#fff;border-style:dashed}
+/* v1.29 : rangée perso = bouton de sélection + actions Modifier / Supprimer */
+.epwrap{padding:4px 4px 4px 0;gap:2px;cursor:default}
+.epwrap .eperso{flex:1;min-width:0;display:flex;align-items:center;gap:12px;min-height:44px;padding:0 6px 0 14px;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.eact{flex:0 0 40px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:0;border-radius:10px;background:none;cursor:pointer;padding:0}
+.eact:active{background:rgba(22,163,74,.15)}.eact svg{width:20px;height:20px}
+#eConf{position:fixed;inset:0;z-index:21;background:rgba(17,24,39,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+#eConf .cbox{width:100%;max-width:420px;background:#fff;border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+#eConf p{margin:0;font-weight:700;font-size:1.05rem;color:var(--txt);overflow-wrap:anywhere}
+#eConf .fbtns{display:flex;gap:10px}#eConf .fbtns button{flex:1;min-height:48px;border-radius:999px;font:inherit;font-weight:700;cursor:pointer}
+#eConfNo{background:#fff;border:1px solid #d1d5db;color:var(--txt)}#eConfYes{background:var(--err);border:1px solid var(--err);color:#fff}
 #eForm{position:fixed;inset:0;z-index:20;background:rgba(17,24,39,.45);display:flex;align-items:center;justify-content:center;padding:16px}
 #eForm form{width:100%;max-width:420px;background:#fff;border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
 #eForm h2{margin:0;font-size:1.15rem;color:#14532d}#eForm label{font-weight:600;font-size:.95rem;display:flex;flex-direction:column;gap:6px}
@@ -137,7 +147,7 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.28</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small></header>
+<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.29</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <button type="button" class="xback" id="navBack" hidden style="margin-bottom:10px" aria-label="Retour à la vue précédente">← Retour</button>
@@ -160,6 +170,7 @@ nav button{min-width:0;font-size:.72rem}
   <div class="stepper"><span>Nombre de personnes</span><button type="button" id="eMinus" aria-label="Moins">−</button><output id="eNb">2</output><button type="button" id="ePlus" aria-label="Plus">+</button></div>
   <div class="fbtns"><button type="button" id="eCancel">Annuler</button><button type="submit" id="eOk">Valider</button></div>
  </form></div>
+ <div id="eConf" hidden role="alertdialog" aria-modal="true" aria-labelledby="eConfT"><div class="cbox"><p id="eConfT"></p><div class="fbtns"><button type="button" id="eConfNo">Annuler</button><button type="button" id="eConfYes">Supprimer</button></div></div></div>
 </section>
 <!-- DEMANDE -->
 <section class="screen" id="s-demande">
@@ -587,15 +598,23 @@ $('#foyerBadge').onclick=()=>go('entree');
 function chooseFoyer(f){try{sessionStorage.setItem('lci_foyer_session',f)}catch(e){}go('demande')}
 document.querySelectorAll('.ecase').forEach(b=>b.onclick=()=>chooseFoyer(b.dataset.foyer));
 /* v1.28 : profils perso */
-function renderPerso(){$('#ePerso').innerHTML=persoGet().map(p=>`<button type="button" class="erow eperso" data-id="${esc(p.id)}"><span class="sc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span class="nm">${esc(p.nom)}</span><span class="np">${p.nb} pers.</span></button>`).join('')}
-$('#ePerso').onclick=e=>{const b=e.target.closest('.eperso');if(b)chooseFoyer('perso:'+b.dataset.id)};
+function renderPerso(){$('#ePerso').innerHTML=persoGet().map(p=>`<div class="erow epwrap"><button type="button" class="eperso" data-id="${esc(p.id)}"><span class="sc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span class="nm">${esc(p.nom)}</span><span class="np">${p.nb} pers.</span></button><button type="button" class="eact eedit" data-id="${esc(p.id)}" aria-label="Modifier" title="Modifier"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#15803d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button type="button" class="eact edel" data-id="${esc(p.id)}" aria-label="Supprimer" title="Supprimer"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#b91c1c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button></div>`).join('')}
+let editId=null,delId=null;const curFoyer=()=>{try{return sessionStorage.getItem('lci_foyer_session')}catch(e){return null}};
+$('#ePerso').onclick=e=>{const ed=e.target.closest('.eedit'),dl=e.target.closest('.edel');
+ if(ed){e.stopPropagation();const p=persoGet().find(x=>x.id===ed.dataset.id);if(p)openForm(p);return}
+ if(dl){e.stopPropagation();const p=persoGet().find(x=>x.id===dl.dataset.id);if(!p)return;delId=p.id;$('#eConfT').textContent='Supprimer le profil « '+p.nom+' » ?';$('#eConf').hidden=false;$('#eConfNo').focus();return}
+ const b=e.target.closest('.eperso');if(b)chooseFoyer('perso:'+b.dataset.id)};
+$('#eConfNo').onclick=()=>{$('#eConf').hidden=true;delId=null};$('#eConf').onclick=e=>{if(e.target.id==='eConf'){$('#eConf').hidden=true;delId=null}};
+$('#eConfYes').onclick=()=>{if(delId){persoSet(persoGet().filter(x=>x.id!==delId));if(curFoyer()==='perso:'+delId){try{sessionStorage.removeItem('lci_foyer_session')}catch(e){}}renderPerso();updFoyerBadge()}$('#eConf').hidden=true;delId=null};
 let eNb=2;const setNb=n=>{eNb=Math.max(1,Math.min(12,n));$('#eNb').textContent=eNb;$('#eMinus').disabled=eNb<=1;$('#ePlus').disabled=eNb>=12};
 $('#eMinus').onclick=()=>setNb(eNb-1);$('#ePlus').onclick=()=>setNb(eNb+1);
 const closeForm=()=>{$('#eForm').hidden=true};
-$('#eNew').onclick=()=>{$('#eName').value='';$('#eErr').textContent='';setNb(2);$('#eForm').hidden=false;$('#eName').focus()};
+function openForm(p){editId=p?p.id:null;$('#eFormT').textContent=p?'Modifier le profil':'Nouveau profil';$('#eName').value=p?p.nom:'';$('#eErr').textContent='';setNb(p?p.nb:2);$('#eForm').hidden=false;$('#eName').focus()}
+$('#eNew').onclick=()=>openForm(null);
 $('#eCancel').onclick=closeForm;$('#eForm').onclick=e=>{if(e.target.id==='eForm')closeForm()};
 $('#eFormF').onsubmit=e=>{e.preventDefault();const nom=$('#eName').value.trim().replace(/\s+/g,' ');if(!nom){$('#eErr').textContent='Veuillez saisir un nom de profil.';$('#eName').focus();return}
-const a=persoGet();a.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),nom:nom.slice(0,30),nb:eNb});persoSet(a);renderPerso();closeForm();const l=$('#ePerso');l.scrollTop=l.scrollHeight};
+const a=persoGet();if(editId){const p=a.find(x=>x.id===editId);if(p){p.nom=nom.slice(0,30);p.nb=eNb}persoSet(a);renderPerso();closeForm();editId=null;updFoyerBadge();return}
+a.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),nom:nom.slice(0,30),nb:eNb});persoSet(a);renderPerso();closeForm();const l=$('#ePerso');l.scrollTop=l.scrollHeight};
 renderPerso();
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.s));
 $('#generate').onclick=generate;
@@ -640,7 +659,7 @@ const PROFIL_GENERIQUE={
 try{localStorage.setItem(PF_GEN_KEY,JSON.stringify(PROFIL_GENERIQUE))}catch(e){}
 loadProfile();render();showStore();
 /* v1.27 : l'écran initial est TOUJOURS la page d'entrée (lancement, rechargement, retour via cache bfcache) ; pile vidée. lci_foyer_session reste mémorisé. */
-function startEntree(){navStack=[];navSave();try{sessionStorage.removeItem('lci_screen')}catch(e){}curScreen=null;$('#eForm').hidden=true;renderPerso();go('entree')}
+function startEntree(){navStack=[];navSave();try{sessionStorage.removeItem('lci_screen')}catch(e){}curScreen=null;$('#eForm').hidden=true;$('#eConf').hidden=true;renderPerso();go('entree')}
 startEntree();window.addEventListener('pageshow',e=>{if(e.persisted)startEntree()});
 // Service worker : aucun n'est utilisé ; on désinscrit d'éventuels anciens SW pour éviter une version en cache.
 if('serviceWorker' in navigator&&navigator.serviceWorker.getRegistrations)navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});
