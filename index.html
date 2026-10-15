@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.45">
+<meta name="app-version" content="v1.46">
 <title>Liste de courses IA</title>
 <style>
 :root{--pf:#15803d;--pc:#e3f0e8;--pe:#116631;--pm:#96c6a8;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -152,6 +152,11 @@ body.entree nav{display:none}body.entree main{padding-bottom:calc(16px + env(saf
 #aForm .fbtns{display:flex;gap:10px}#aForm .fbtns button{flex:1;min-height:48px;border-radius:999px;font:inherit;font-weight:700;cursor:pointer}
 #aCancel{background:#fff;border:1px solid #d1d5db;color:var(--txt)}#aOk{background:var(--pf);border:1px solid var(--pf);color:#fff}
 /* v1.36 : rangées de spécificités (Mon profil) : style minimaliste */
+/* v1.46 : résumé par défaut, détail sur page dédiée */
+.ssum{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:600;color:var(--txt)}.ssum span{min-width:0}
+.sopen{flex:0 0 32px;width:32px;height:32px;border-radius:50%;border:1px solid var(--pm);background:var(--pc);color:var(--pe);font:inherit;font-size:1.2rem;font-weight:700;line-height:1;cursor:pointer;padding:0}
+.spec:not(.full)>h3,.spec:not(.full)>.ssub,.spec:not(.full)>.srow{display:none}.spec.full>.ssum{display:none}
+.spec.full{margin-top:0}.spec.full>h3{font-size:1.3rem}.spec.full>.srow{flex-wrap:wrap;overflow:visible}
 .spec{margin-top:12px}.spec h3{margin:0;font-size:1.05rem;color:var(--pe)}.spec .ssub{margin:2px 0 8px;font-size:.82rem;color:#6b7280}
 .srow{display:flex;gap:8px;align-items:center;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:2px 0}.srow::-webkit-scrollbar{display:none}
 .schip{flex:0 0 auto;max-width:180px;min-height:40px;padding:0 14px;border:1px solid #d1d5db;border-radius:999px;background:#fff;color:var(--txt);font:inherit;font-size:.9rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
@@ -233,7 +238,7 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.45</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
+<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.46</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <button type="button" class="xback" id="navBack" hidden style="margin-bottom:10px" aria-label="Retour à la vue précédente">← Retour</button>
@@ -337,15 +342,7 @@ nav button{min-width:0;font-size:.72rem}
  <h2 id="apTitle" class="aptitle"></h2>
  <div class="pillgrid" id="apGrid"></div>
 </section>
-<section class="screen" id="s-monprofil">
- <div class="card pfhead" id="pfHeader"><div class="avatar" id="pfAv" aria-hidden="true"></div><div class="pfid"><div class="pfname" id="pfName">Aucun profil connecté</div><div class="note" id="pfType"></div><div class="note" id="pfNb"></div></div></div>
- <!-- v1.35 : en-tête relié au profil actif (lci_profil_actif_v1), lecture seule -->
- <!-- v1.36 : rangées de spécificités (localStorage lci_specificites_v1 {profilId:{allergies:[]}}) ; seule spécificité : Allergies -->
- <div class="card spec" id="specAllergies"><h3>Allergies</h3><p class="ssub">Ingrédients à éviter pour ce profil</p><div class="srow" id="alRow" aria-label="Allergies"></div></div>
- <!-- v1.44 : aliments non aimés (lci_specificites_v1[profil].nAimePas = []), même modèle que Allergies, réutilise #aForm/#aConf -->
- <div class="card spec" id="specNap"><h3>Aliments que je n'aime pas</h3><p class="ssub">Aliments à éviter pour ce profil</p><div class="srow" id="napRow" aria-label="Aliments que je n'aime pas"></div></div>
- <!-- v1.45 : aliments préférés (lci_specificites_v1[profil].aimes = []), miroir de « Aliments que je n'aime pas » -->
- <div class="card spec" id="specAimes"><h3>Mes aliments préférés</h3><p class="ssub">Aliments que ce profil aime</p><div class="srow" id="aimRow" aria-label="Mes aliments préférés"></div></div>
+<!-- v1.46 : dialogues des spécificités sortis de #s-monprofil pour s'afficher aussi sur #s-spec -->
  <div id="aForm" hidden role="dialog" aria-modal="true" aria-labelledby="aFormT"><form id="aFormF" novalidate>
   <h2 id="aFormT">Nouvelle allergie</h2>
   <label>Nom de l'allergie<input type="text" id="aName" maxlength="40" autocomplete="off" placeholder="Ex. Arachides"></label>
@@ -354,6 +351,17 @@ nav button{min-width:0;font-size:.72rem}
   <div class="fbtns"><button type="button" id="aCancel">Annuler</button><button type="submit" id="aOk">Valider</button></div>
  </form></div>
  <div id="aConf" hidden role="alertdialog" aria-modal="true" aria-labelledby="aConfT"><div class="cbox"><p id="aConfT"></p><div class="fbtns"><button type="button" id="aConfNo">Annuler</button><button type="button" id="aConfYes">Supprimer</button></div></div></div>
+<!-- v1.46 : page de détail d'une spécificité (la carte de Mon profil y est déplacée, classe .full) -->
+<section class="screen" id="s-spec"></section>
+<section class="screen" id="s-monprofil">
+ <div class="card pfhead" id="pfHeader"><div class="avatar" id="pfAv" aria-hidden="true"></div><div class="pfid"><div class="pfname" id="pfName">Aucun profil connecté</div><div class="note" id="pfType"></div><div class="note" id="pfNb"></div></div></div>
+ <!-- v1.35 : en-tête relié au profil actif (lci_profil_actif_v1), lecture seule -->
+ <!-- v1.36 : rangées de spécificités (localStorage lci_specificites_v1 {profilId:{allergies:[]}}) ; seule spécificité : Allergies -->
+ <div class="card spec" id="specAllergies"><div class="ssum"><span>Ingrédients à éviter pour ce profil</span><button type="button" class="sopen" data-k="specAllergies" aria-label="Voir et modifier les allergies">›</button></div><h3>Allergies</h3><p class="ssub">Ingrédients à éviter pour ce profil</p><div class="srow" id="alRow" aria-label="Allergies"></div></div>
+ <!-- v1.44 : aliments non aimés (lci_specificites_v1[profil].nAimePas = []), même modèle que Allergies, réutilise #aForm/#aConf -->
+ <div class="card spec" id="specNap"><div class="ssum"><span>Aliments non aimés pour ce profil</span><button type="button" class="sopen" data-k="specNap" aria-label="Voir et modifier les aliments non aimés">›</button></div><h3>Aliments que je n'aime pas</h3><p class="ssub">Aliments à éviter pour ce profil</p><div class="srow" id="napRow" aria-label="Aliments que je n'aime pas"></div></div>
+ <!-- v1.45 : aliments préférés (lci_specificites_v1[profil].aimes = []), miroir de « Aliments que je n'aime pas » -->
+ <div class="card spec" id="specAimes"><div class="ssum"><span>Aliments préférés pour ce profil</span><button type="button" class="sopen" data-k="specAimes" aria-label="Voir et modifier les aliments préférés">›</button></div><h3>Mes aliments préférés</h3><p class="ssub">Aliments que ce profil aime</p><div class="srow" id="aimRow" aria-label="Mes aliments préférés"></div></div>
 </section>
 </main>
 <nav>
@@ -698,7 +706,7 @@ function navSave(){try{sessionStorage.setItem('lci_nav',JSON.stringify(navStack.
 function updNavBack(){$('#navBack').hidden=curScreen==='express'||curScreen==='demande'||curScreen==='entree'}
 function goBack(){let p;while(navStack.length&&(p=navStack.pop())===curScreen);navSave();_go(p&&p!==curScreen?p:'demande')}
 function go(s){if(curScreen&&curScreen!==s){navStack.push(curScreen);navSave()}_go(s)}
-function _go(s){curScreen=s;updNavBack();document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id==='s-'+s));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.s===s));LS.set('screen',s);document.body.classList.toggle('entree',s==='entree');updFoyerBadge();window.scrollTo(0,0)}
+function _go(s){if(s!=='spec')specHome();curScreen=s;updNavBack();document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id==='s-'+s));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.s===s));LS.set('screen',s);document.body.classList.toggle('entree',s==='entree');updFoyerBadge();window.scrollTo(0,0)}
 window.go=go;
 /* v1.26 → v1.32 : badge du profil actif (lci_profil_actif_v1) ; masqué sur l'entrée ; clic = menu profil (v1.32) */
 const PERSO_KEY='lci_profils_perso_v1';function persoGet(){try{const a=JSON.parse(localStorage.getItem(PERSO_KEY));return Array.isArray(a)?a:[]}catch(e){return[]}}
@@ -752,6 +760,11 @@ $('#aFormF').onsubmit=e=>{e.preventDefault();const v=$('#aName').value.trim().re
 $('#aDel').onclick=()=>{const a=alGet();if(alIdx==null||a[alIdx]==null)return;$('#aConfT').textContent='Supprimer '+ALT[alK].c+' « '+a[alIdx]+' » ?';$('#aConf').hidden=false;$('#aConfNo').focus()};
 $('#aConfNo').onclick=()=>{$('#aConf').hidden=true};$('#aConf').onclick=e=>{if(e.target.id==='aConf')$('#aConf').hidden=true};
 $('#aConfYes').onclick=()=>{const a=alGet();if(alIdx!=null){a.splice(alIdx,1);alSet(a)}$('#aConf').hidden=true;closeAl();updFoyerBadge()};
+let specCur=null;
+function specHome(){if(!specCur)return;const c=$('#'+specCur);c.classList.remove('full');const a=$('#s-monprofil .spec:last-of-type'),order=['specAllergies','specNap','specAimes'];
+ const nx=order.slice(order.indexOf(specCur)+1).map(x=>document.querySelector('#s-monprofil #'+x)).find(Boolean);if(nx)nx.before(c);else{const l=[...document.querySelectorAll('#s-monprofil .spec')].pop();if(l)l.after(c);else $('#s-monprofil').appendChild(c)}specCur=null}
+function specOpen(id){specHome();const c=$('#'+id);if(!c)return;specCur=id;c.classList.add('full');$('#s-spec').appendChild(c);go('spec');scrollTo(0,0)}
+document.addEventListener('click',e=>{const b=e.target.closest('.sopen');if(b)specOpen(b.dataset.k)});
 function updFoyerBadge(){renderMonProfil();renderAllergies();const fa=actGet();let f=fa;const lb=foyerLabel(f);const ok=!!lb;f=lb;const b=$('#foyerBadge');b.hidden=!ok||curScreen==='entree';
  const c=ok?couleurDe(fa):null;if(c)document.body.dataset.pc=c;else delete document.body.dataset.pc;const al=ok&&aAllergies(fa);
  const hp=$('#hdrProf');hp.hidden=!ok;hp.textContent=ok?'Profil : '+lb+(al?' · ⚠ allergies':''):'';
