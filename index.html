@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.18">
+<meta name="app-version" content="v1.19">
 <title>Liste de courses IA</title>
 <style>
 :root{--acc:#16a34a;--acc2:#dcfce7;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -85,9 +85,9 @@ details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;alig
 .spin{display:inline-block;width:18px;height:18px;border:3px solid #fff;border-top-color:transparent;border-radius:50%;animation:s 1s linear infinite;vertical-align:middle}
 @keyframes s{to{transform:rotate(360deg)}}
 
-/* v1.18 Repas express : classes propres (pas de .chip), déclarées après .pill */
-.pillgrid button.pill#expressBtn[aria-expanded="true"]{background:var(--acc)!important;color:#fff!important}
-.xpanel[hidden]{display:none!important}
+/* v1.18-1.19 Repas express : classes propres (pas de .chip), déclarées après .pill */
+.xhead{display:flex;align-items:center;gap:10px;margin-bottom:6px}.xhead h2{margin:0;font-size:1.25rem}
+.xback{min-height:44px;padding:8px 14px;border:1px solid var(--acc);border-radius:999px;background:var(--acc2);color:#14532d;font-weight:700;cursor:pointer}
 .xpanel{width:100%;margin-top:12px;display:grid;gap:8px}
 .xpanel .xopt{display:block;width:100%;text-align:left;padding:10px 12px;border:1px solid var(--acc);border-radius:14px;background:#fff;color:#14532d;font-size:.95rem;cursor:pointer;overflow-wrap:anywhere}
 .xpanel .xopt b{display:block}.xpanel .xopt small{color:#4b5563;font-size:.85rem}.xpanel .xopt .xt{float:right;font-weight:700;color:#15803d;margin-left:8px}
@@ -103,7 +103,7 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.18</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
+<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.19</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
 <main>
 <!-- PROFIL -->
 
@@ -119,15 +119,14 @@ nav button{min-width:0;font-size:.72rem}
         (papier toilette, sel, piles, sacs poubelle…) ; générerait une checklist fictive à ajouter à la liste de courses.
         Pour l'instant bouton factice : aucune action. -->
    <button type="button" class="pill pill-still" id="stillHave" style="background:#EDE4F7;border-color:#7B2D8E;color:#5B1F6B;font-weight:700">Est-ce que je l'ai toujours ?</button>
-   <button type="button" class="pill" id="expressBtn" aria-expanded="false" aria-controls="expressPanel">Repas express</button>
+   <button type="button" class="pill" id="expressBtn">Repas express</button>
    <button type="button" class="pill">Invités ce soir</button>
    <button type="button" class="pill">Budget serré</button>
    <button type="button" class="pill">Végétarien</button>
    <button type="button" class="pill">Goûter enfants</button>
    <button type="button" class="pill">Oubli du frigo</button>
   </div>
-  <!-- v1.18 : panneau Repas express (seul bouton actif de la grille). Clic sur une option = saisie + Entrée. -->
-  <div class="xpanel" id="expressPanel" hidden></div>
+
  </div>
  <!-- Ancien contenu de l'onglet Demande : conservé masqué (jamais affiché) car la logique magasin/IA/génération
       s'appuie sur ces éléments. Voir www/demande-desactive.js pour le réactiver. -->
@@ -188,6 +187,12 @@ nav button{min-width:0;font-size:.72rem}
 </section>
 <!-- PANIER -->
 
+<!-- v1.19 : vue dédiée Repas express (hors barre d'onglets). Clic sur un repas = saisie + Entrée. -->
+<section class="screen" id="s-express">
+ <div class="xhead"><button type="button" class="xback" id="expressBack" aria-label="Retour à Demande">← Retour</button><h2>⚡ Repas express</h2></div>
+ <p class="note">5 idées prêtes en 20 minutes maximum. Touchez un repas pour générer la liste de courses.</p>
+ <div class="xpanel" id="expressPanel"></div>
+</section>
 <section class="screen" id="s-monprofil">
  <div class="card pfhead" id="pfHeader"><div class="avatar" aria-hidden="true">PN</div><div class="pfid"><div class="pfname">Prénom Nom</div><div class="note">Profil fictif · données de démonstration</div></div></div>
 </section>
@@ -600,7 +605,7 @@ const EXPRESS=[
  {n:'Riz sauté aux légumes et œuf',d:'Riz, petits pois, carotte, œuf brouillé, sauce soja.',t:20,q:'Riz sauté'},
  {n:'Salade niçoise au thon',d:'Salade, tomate, thon, œuf dur, haricots verts.',t:15,q:'Salade niçoise'}];
 $('#expressPanel').innerHTML=EXPRESS.map((x,i)=>`<button type="button" class="xopt" data-i="${i}"><span class="xt">⏱ ${x.t} min</span><b>${esc(x.n)}</b><small>${esc(x.d)}</small></button>`).join('');
-$('#expressBtn').onclick=()=>{const p=$('#expressPanel'),open=p.hidden;p.hidden=!open;$('#expressBtn').setAttribute('aria-expanded',String(open))};
+$('#expressBtn').onclick=()=>go('express');$('#expressBack').onclick=()=>go('demande');
 $('#expressPanel').onclick=e=>{const b=e.target.closest('.xopt');if(!b)return;$('#request').value=EXPRESS[+b.dataset.i].q;$('#searchForm').requestSubmit()};
 $('#suggest').onclick=e=>{const b=e.target.closest('.chip');if(b)$('#request').value=b.dataset.v};
 $('#appendMode').checked=false;
@@ -626,7 +631,7 @@ const PROFIL_GENERIQUE={
 };
 try{localStorage.setItem(PF_GEN_KEY,JSON.stringify(PROFIL_GENERIQUE))}catch(e){}
 loadProfile();render();showStore();
-{const sc=LS.get('screen','demande');go(['demande','liste','monprofil'].includes(sc)?sc:'demande')}
+{const sc=LS.get('screen','demande');go(['demande','liste','monprofil','express'].includes(sc)?sc:'demande')}
 // Service worker : aucun n'est utilisé ; on désinscrit d'éventuels anciens SW pour éviter une version en cache.
 if('serviceWorker' in navigator&&navigator.serviceWorker.getRegistrations)navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});
 </script>
