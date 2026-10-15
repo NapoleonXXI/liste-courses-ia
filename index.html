@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.56">
+<meta name="app-version" content="v1.57">
 <title>Liste de courses IA</title>
 <style>
 :root{--pf:#15803d;--pc:#e3f0e8;--pe:#116631;--pm:#96c6a8;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -35,7 +35,6 @@ body[data-pc=moutarde],[data-pcx=moutarde]{--pf:#8a6400;--pc:#f1ece0;--pe:#6e500
 #s-demande.active{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 220px)}
 .searchwrap{width:100%;max-width:760px;display:flex;flex-direction:column;align-items:center;gap:18px}.searchbar{width:100%}
 .pillgrid{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-#week7{grid-column:1/-1}
 @media(min-width:600px){.pillgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(min-width:900px){.pillgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .pill{width:100%;min-height:56px;padding:6px 12px;line-height:1.2;text-align:center;overflow-wrap:anywhere;border:1px solid var(--pf);border-radius:999px;background:var(--pc);color:var(--pe);font-size:.95rem;font-weight:600;cursor:pointer}.pill:active{transform:scale(.98)}
 .dtitle{margin:0;width:100%;text-align:center;font-size:1.6rem;line-height:1.25;font-weight:800;color:var(--pe)}
@@ -259,7 +258,7 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.56</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
+<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.57</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <!-- PROFIL -->
@@ -303,7 +302,6 @@ nav button{min-width:0;font-size:.72rem}
  <h2 class="dtitle">De quoi avez-vous besoin ?</h2>
   <!-- v1.53 : cases carrées icône + titre + sous-titre, 2 par ligne -->
   <div class="pillgrid dgrid">
-   <button type="button" class="card ssum dcase" id="week7"><svg class="sico" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="8" y="12" width="48" height="44" rx="6" fill="#fff" stroke="#15803d" stroke-width="3"/><path d="M8 18a6 6 0 016-6h36a6 6 0 016 6v8H8z" fill="#dc2626"/><rect x="18" y="6" width="5" height="12" rx="2.5" fill="#374151"/><rect x="41" y="6" width="5" height="12" rx="2.5" fill="#374151"/><text x="32" y="50" font-size="22" font-weight="800" text-anchor="middle" fill="#15803d" font-family="sans-serif">7</text></svg><b>Faire les courses pour 7 jours</b><small>Une semaine de repas</small></button>
    <!-- Fonction future : « Est-ce que je l'ai toujours ? » = rappel des articles qu'on oublie toujours
         (papier toilette, sel, piles, sacs poubelle…) ; générerait une checklist fictive à ajouter à la liste de courses.
         Pour l'instant bouton factice : aucune action. -->
