@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.17">
+<meta name="app-version" content="v1.18">
 <title>Liste de courses IA</title>
 <style>
 :root{--acc:#16a34a;--acc2:#dcfce7;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -85,6 +85,12 @@ details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;alig
 .spin{display:inline-block;width:18px;height:18px;border:3px solid #fff;border-top-color:transparent;border-radius:50%;animation:s 1s linear infinite;vertical-align:middle}
 @keyframes s{to{transform:rotate(360deg)}}
 
+/* v1.18 Repas express : classes propres (pas de .chip), déclarées après .pill */
+.pillgrid button.pill#expressBtn[aria-expanded="true"]{background:var(--acc)!important;color:#fff!important}
+.xpanel[hidden]{display:none!important}
+.xpanel{width:100%;margin-top:12px;display:grid;gap:8px}
+.xpanel .xopt{display:block;width:100%;text-align:left;padding:10px 12px;border:1px solid var(--acc);border-radius:14px;background:#fff;color:#14532d;font-size:.95rem;cursor:pointer;overflow-wrap:anywhere}
+.xpanel .xopt b{display:block}.xpanel .xopt small{color:#4b5563;font-size:.85rem}.xpanel .xopt .xt{float:right;font-weight:700;color:#15803d;margin-left:8px}
 /* Bouton violet : déclaré APRÈS .pill, spécificité élevée + !important (v1.12) */
 .pillgrid button.pill.pill-still,.pillgrid button.pill.pill-still:hover,.pillgrid button.pill.pill-still:focus,.pillgrid button.pill.pill-still:active{grid-column:1/-1;background:#EDE4F7!important;border:1px solid #7B2D8E!important;color:#5B1F6B!important;font-weight:700!important;height:56px}
 .pillgrid button.pill.pill-still:active{filter:brightness(.92)}
@@ -97,7 +103,7 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.17</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
+<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.18</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
 <main>
 <!-- PROFIL -->
 
@@ -113,13 +119,15 @@ nav button{min-width:0;font-size:.72rem}
         (papier toilette, sel, piles, sacs poubelle…) ; générerait une checklist fictive à ajouter à la liste de courses.
         Pour l'instant bouton factice : aucune action. -->
    <button type="button" class="pill pill-still" id="stillHave" style="background:#EDE4F7;border-color:#7B2D8E;color:#5B1F6B;font-weight:700">Est-ce que je l'ai toujours ?</button>
-   <button type="button" class="pill">Repas express</button>
+   <button type="button" class="pill" id="expressBtn" aria-expanded="false" aria-controls="expressPanel">Repas express</button>
    <button type="button" class="pill">Invités ce soir</button>
    <button type="button" class="pill">Budget serré</button>
    <button type="button" class="pill">Végétarien</button>
    <button type="button" class="pill">Goûter enfants</button>
    <button type="button" class="pill">Oubli du frigo</button>
   </div>
+  <!-- v1.18 : panneau Repas express (seul bouton actif de la grille). Clic sur une option = saisie + Entrée. -->
+  <div class="xpanel" id="expressPanel" hidden></div>
  </div>
  <!-- Ancien contenu de l'onglet Demande : conservé masqué (jamais affiché) car la logique magasin/IA/génération
       s'appuie sur ces éléments. Voir www/demande-desactive.js pour le réactiver. -->
@@ -264,6 +272,8 @@ const R=[
  {n:'Omelette aux champignons',k:['omelette'],i:[['œufs',3,'pièce'],['champignons de Paris',80,'g'],['beurre',10,'g'],['persil',0.2,'pièce']]},
  {n:'Croque-monsieur',k:['croque'],i:[['pain',0.3,'pièce'],['jambon',60,'g'],['emmental',40,'g'],['beurre',10,'g']]},
  {n:'Dahl de lentilles',k:['dahl','dal','lentille'],i:[['lentilles corail',80,'g'],['lait de coco',0.3,'pièce'],['tomates concassées (boîte)',0.3,'pièce'],['oignon',40,'g'],['gingembre',8,'g'],['riz basmati',70,'g'],['coriandre',0.2,'pièce']]},
+ {n:'Wraps poulet-crudités',k:['wrap'],i:[['tortillas de blé',0.25,'pièce'],['blanc de poulet',110,'g'],['salade',0.15,'pièce'],['tomate',80,'g'],['carotte',60,'g'],['fromage blanc',40,'g']]},
+ {n:'Riz sauté aux légumes et œuf',k:['riz saute'],i:[['riz basmati',80,'g'],['œufs',1,'pièce'],['petits pois surgelés',60,'g'],['carotte',60,'g'],['oignon',30,'g'],['sauce soja',0.1,'pièce'],['huile',10,'ml']]},
  {n:'Salade de fruits',k:['fruit'],i:[['pomme',150,'g'],['banane',120,'g'],['mangue',0.3,'pièce'],['citron',0.25,'pièce']]}
 ];
 const GENERIC={n:'Repas équilibré (suggestion générique)',i:[['blanc de poulet',130,'g'],['riz basmati',80,'g'],['courgette',150,'g'],['tomate',100,'g'],['oignon',40,'g'],['huile d\'olive',10,'ml'],['salade',0.2,'pièce'],['pomme',150,'g']]};
@@ -582,6 +592,16 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.s)
 $('#generate').onclick=generate;
 $('#searchForm').addEventListener('submit',async e=>{e.preventDefault();if(!$('#request').value.trim())return;$('#request').blur();await generate();if(list.items.length)go('liste')});
 $('#suggest').innerHTML=['Pâtes carbonara','Ratatouille','Poulet rôti','Curry de légumes','Crêpes','Poke bowl'].map(s=>`<button type="button" class="chip" data-v="${s}">${s}</button>`).join('');
+/* v1.18 Repas express : 5 options (sans profil). q = texte envoyé au flux existant */
+const EXPRESS=[
+ {n:'Pâtes carbonara',d:'Spaghetti, lardons, œuf et parmesan.',t:15,q:'Pâtes carbonara'},
+ {n:'Omelette aux champignons',d:'Œufs battus, champignons poêlés, persil.',t:10,q:'Omelette aux champignons'},
+ {n:'Wraps poulet-crudités',d:'Tortillas garnies de poulet, salade, tomate, carotte.',t:15,q:'Wraps'},
+ {n:'Riz sauté aux légumes et œuf',d:'Riz, petits pois, carotte, œuf brouillé, sauce soja.',t:20,q:'Riz sauté'},
+ {n:'Salade niçoise au thon',d:'Salade, tomate, thon, œuf dur, haricots verts.',t:15,q:'Salade niçoise'}];
+$('#expressPanel').innerHTML=EXPRESS.map((x,i)=>`<button type="button" class="xopt" data-i="${i}"><span class="xt">⏱ ${x.t} min</span><b>${esc(x.n)}</b><small>${esc(x.d)}</small></button>`).join('');
+$('#expressBtn').onclick=()=>{const p=$('#expressPanel'),open=p.hidden;p.hidden=!open;$('#expressBtn').setAttribute('aria-expanded',String(open))};
+$('#expressPanel').onclick=e=>{const b=e.target.closest('.xopt');if(!b)return;$('#request').value=EXPRESS[+b.dataset.i].q;$('#searchForm').requestSubmit()};
 $('#suggest').onclick=e=>{const b=e.target.closest('.chip');if(b)$('#request').value=b.dataset.v};
 $('#appendMode').checked=false;
 
