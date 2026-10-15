@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.49">
+<meta name="app-version" content="v1.50">
 <title>Liste de courses IA</title>
 <style>
 :root{--pf:#15803d;--pc:#e3f0e8;--pe:#116631;--pm:#96c6a8;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -155,6 +155,10 @@ body.entree nav{display:none}body.entree main{padding-bottom:calc(16px + env(saf
 /* v1.46 : résumé par défaut, détail sur page dédiée */
 .sgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.sgrid>.spec{margin:0}
 .spec:not(.full){padding:0;display:flex}.ssum{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;min-height:96px;padding:14px;border:0;border-radius:var(--r);background:transparent;font:inherit;text-align:left;color:var(--txt);cursor:pointer;overflow-wrap:break-word}
+/* v1.50 : icônes seules dans les cases */
+.ssum{align-items:center!important;justify-content:center;min-height:110px!important}.sico{width:64px;height:64px;display:block}
+.spark{transform-origin:center;transform-box:fill-box;animation:spk 1.6s ease-in-out infinite}.spark path:nth-child(2){animation-delay:.5s}
+@keyframes spk{0%,100%{opacity:1}50%{opacity:.35}}@media(prefers-reduced-motion:reduce){.spark{animation:none}}
 .ssum b{font-size:.98rem;line-height:1.25;color:var(--pe)}.ssum small{font-size:.8rem;font-weight:400;line-height:1.3;color:var(--mut)}.ssum:active{background:var(--pc)}.ssum:focus-visible{outline:3px solid var(--pm);outline-offset:2px}
 .spec:not(.full)>h3,.spec:not(.full)>.ssub,.spec:not(.full)>.srow{display:none}.spec.full>.ssum{display:none}
 .spec.full{margin-top:0}.spec.full>h3{font-size:1.3rem}.spec.full>.srow{flex-wrap:wrap;overflow:visible}
@@ -246,7 +250,7 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.49</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
+<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.50</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <!-- PROFIL -->
@@ -366,13 +370,13 @@ nav button{min-width:0;font-size:.72rem}
  <!-- v1.36 : rangées de spécificités (localStorage lci_specificites_v1 {profilId:{allergies:[]}}) ; seule spécificité : Allergies -->
  <!-- v1.49 : résumés en cases cliquables, grille 2 colonnes -->
  <div class="sgrid" id="specGrid">
- <div class="card spec" id="specAllergies"><button type="button" class="ssum" data-k="specAllergies"><b>Allergies</b><small>Ingrédients à éviter pour ce profil</small></button><h3>Allergies</h3><p class="ssub">Ingrédients à éviter pour ce profil</p><div class="srow" id="alRow" aria-label="Allergies"></div></div>
+ <div class="card spec" id="specAllergies"><button type="button" class="ssum" data-k="specAllergies" aria-label="Allergies" title="Allergies"><svg class="sico" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M26 18c-5 0-8 4-8 9 0 3 2 5 2 7s-2 4-2 7c0 5 4 9 9 9s9-4 9-9c0-3-2-5-2-7s2-4 2-7c0-5-4-9-10-9z" transform="translate(5 -2)" fill="#d6a46b" stroke="#8a5a2b" stroke-width="2"/><circle cx="29" cy="25" r="1.6" fill="#8a5a2b"/><circle cx="35" cy="31" r="1.6" fill="#8a5a2b"/><circle cx="30" cy="40" r="1.6" fill="#8a5a2b"/><circle cx="36" cy="45" r="1.6" fill="#8a5a2b"/><circle cx="32" cy="32" r="27" fill="none" stroke="#dc2626" stroke-width="6"/><path d="M13 13l38 38" stroke="#dc2626" stroke-width="6" stroke-linecap="round"/></svg></button><h3>Allergies</h3><p class="ssub">Ingrédients à éviter pour ce profil</p><div class="srow" id="alRow" aria-label="Allergies"></div></div>
  <!-- v1.44 : aliments non aimés (lci_specificites_v1[profil].nAimePas = []), même modèle que Allergies, réutilise #aForm/#aConf -->
- <div class="card spec" id="specNap"><button type="button" class="ssum" data-k="specNap"><b>Aliments que je n'aime pas</b><small>Aliments non aimés pour ce profil</small></button><h3>Aliments que je n'aime pas</h3><p class="ssub">Aliments à éviter pour ce profil</p><div class="srow" id="napRow" aria-label="Aliments que je n'aime pas"></div></div>
+ <div class="card spec" id="specNap"><button type="button" class="ssum" data-k="specNap" aria-label="Aliments que je n'aime pas" title="Aliments que je n'aime pas"><svg class="sico" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M32 56S8 41 8 24c0-8 6-14 13-14 5 0 9 3 11 7l-4 9 7 6-5 9 4 5z" fill="#9ca3af" stroke="#4b5563" stroke-width="2" stroke-linejoin="round"/><path d="M34 54l-3-4 5-9-7-6 4-9c2-4 6-7 11-7 7 0 13 6 13 14 0 15-19 29-23 31z" fill="#9ca3af" stroke="#4b5563" stroke-width="2" stroke-linejoin="round" transform="translate(3 0)"/></svg></button><h3>Aliments que je n'aime pas</h3><p class="ssub">Aliments à éviter pour ce profil</p><div class="srow" id="napRow" aria-label="Aliments que je n'aime pas"></div></div>
  <!-- v1.45 : aliments préférés (lci_specificites_v1[profil].aimes = []), miroir de « Aliments que je n'aime pas » -->
- <div class="card spec" id="specAimes"><button type="button" class="ssum" data-k="specAimes"><b>Mes aliments préférés</b><small>Aliments préférés pour ce profil</small></button><h3>Mes aliments préférés</h3><p class="ssub">Aliments que ce profil aime</p><div class="srow" id="aimRow" aria-label="Mes aliments préférés"></div></div>
+ <div class="card spec" id="specAimes"><button type="button" class="ssum" data-k="specAimes" aria-label="Mes aliments préférés" title="Mes aliments préférés"><svg class="sico" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M32 54S10 40 10 25c0-7 5-12 11-12 5 0 9 3 11 7 2-4 6-7 11-7 6 0 11 5 11 12 0 15-22 29-22 29z" fill="#e11d48"/><g class="spark" fill="#f59e0b"><path d="M8 8l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M54 4l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z"/><path d="M57 40l1.5 3.5 3.5 1.5-3.5 1.5-1.5 3.5-1.5-3.5-3.5-1.5 3.5-1.5z"/></g></svg></button><h3>Mes aliments préférés</h3><p class="ssub">Aliments que ce profil aime</p><div class="srow" id="aimRow" aria-label="Mes aliments préférés"></div></div>
  <!-- v1.47 : aliments à consommer davantage (lci_specificites_v1[profil].aConsommerPlus = []) -->
- <div class="card spec" id="specPlus"><button type="button" class="ssum" data-k="specPlus"><b>Aliments à consommer davantage</b><small>Aliments à privilégier pour ce profil</small></button><h3>Aliments à consommer davantage</h3><p class="ssub">Aliments à privilégier pour ce profil</p><div class="srow" id="plusRow" aria-label="Aliments à consommer davantage"></div></div>
+ <div class="card spec" id="specPlus"><button type="button" class="ssum" data-k="specPlus" aria-label="Aliments à consommer davantage" title="Aliments à consommer davantage"><svg class="sico" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="28" cy="36" r="24" fill="#fff" stroke="#15803d" stroke-width="4"/><circle cx="28" cy="36" r="16" fill="#bbf7d0" stroke="#15803d" stroke-width="4"/><circle cx="28" cy="36" r="7" fill="#15803d"/><path d="M28 36L56 8" stroke="#374151" stroke-width="3.5" stroke-linecap="round"/><path d="M50 6l8-2-2 8m-10 2l8-2-2 8" fill="none" stroke="#374151" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button><h3>Aliments à consommer davantage</h3><p class="ssub">Aliments à privilégier pour ce profil</p><div class="srow" id="plusRow" aria-label="Aliments à consommer davantage"></div></div>
  </div>
 </section>
 </main>
