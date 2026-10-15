@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.29">
+<meta name="app-version" content="v1.30">
 <title>Liste de courses IA</title>
 <style>
 :root{--acc:#16a34a;--acc2:#dcfce7;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -61,6 +61,16 @@ body.entree nav{display:none}body.entree main{padding-bottom:calc(16px + env(saf
 /* v1.29 : rangée perso = bouton de sélection + actions Modifier / Supprimer */
 .epwrap{padding:4px 4px 4px 0;gap:2px;cursor:default}
 .epwrap .eperso{flex:1;min-width:0;display:flex;align-items:center;gap:12px;min-height:44px;padding:0 6px 0 14px;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.epwrap{position:relative;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:pan-y}
+/* v1.30 : actions masquées hors mode édition (appui long) */
+.epwrap:not(.editing) .eact{display:none}
+.epwrap.editing{background:#bbf7d0;border-color:#15803d;box-shadow:0 0 0 2px rgba(22,163,74,.35)}
+.epwrap.editing .eperso{padding-right:92px}.epwrap.editing .np{display:none}
+.epwrap.editing .eact{position:absolute;top:50%;margin-top:-20px;z-index:2}.epwrap.editing .eedit{right:4px}.epwrap.editing .edel{right:48px}
+.eact .bdg{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:#fff;border:2px solid #15803d;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.edel .bdg{background:#dc2626;border-color:#dc2626}.eact .bdg svg{width:16px;height:16px}
+@keyframes ejig{0%,100%{transform:rotate(-.6deg)}50%{transform:rotate(.6deg)}}
+.epwrap.editing{animation:ejig .28s ease-in-out infinite}@media(prefers-reduced-motion:reduce){.epwrap.editing{animation:none}}
 .eact{flex:0 0 40px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:0;border-radius:10px;background:none;cursor:pointer;padding:0}
 .eact:active{background:rgba(22,163,74,.15)}.eact svg{width:20px;height:20px}
 #eConf{position:fixed;inset:0;z-index:21;background:rgba(17,24,39,.45);display:flex;align-items:center;justify-content:center;padding:16px}
@@ -147,7 +157,7 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.29</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small></header>
+<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.30</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <button type="button" class="xback" id="navBack" hidden style="margin-bottom:10px" aria-label="Retour à la vue précédente">← Retour</button>
@@ -598,12 +608,24 @@ $('#foyerBadge').onclick=()=>go('entree');
 function chooseFoyer(f){try{sessionStorage.setItem('lci_foyer_session',f)}catch(e){}go('demande')}
 document.querySelectorAll('.ecase').forEach(b=>b.onclick=()=>chooseFoyer(b.dataset.foyer));
 /* v1.28 : profils perso */
-function renderPerso(){$('#ePerso').innerHTML=persoGet().map(p=>`<div class="erow epwrap"><button type="button" class="eperso" data-id="${esc(p.id)}"><span class="sc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span class="nm">${esc(p.nom)}</span><span class="np">${p.nb} pers.</span></button><button type="button" class="eact eedit" data-id="${esc(p.id)}" aria-label="Modifier" title="Modifier"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#15803d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button type="button" class="eact edel" data-id="${esc(p.id)}" aria-label="Supprimer" title="Supprimer"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#b91c1c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button></div>`).join('')}
+function renderPerso(){$('#ePerso').innerHTML=persoGet().map(p=>`<div class="erow epwrap"><button type="button" class="eperso" data-id="${esc(p.id)}"><span class="sc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span class="nm">${esc(p.nom)}</span><span class="np">${p.nb} pers.</span></button><button type="button" class="eact eedit" data-id="${esc(p.id)}" aria-label="Modifier" title="Modifier"><span class="bdg"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#15803d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></span></button><button type="button" class="eact edel" data-id="${esc(p.id)}" aria-label="Supprimer" title="Supprimer"><span class="bdg"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"><path d="M6 12h12"/></svg></span></button></div>`).join('')}
 let editId=null,delId=null;const curFoyer=()=>{try{return sessionStorage.getItem('lci_foyer_session')}catch(e){return null}};
 $('#ePerso').onclick=e=>{const ed=e.target.closest('.eedit'),dl=e.target.closest('.edel');
- if(ed){e.stopPropagation();const p=persoGet().find(x=>x.id===ed.dataset.id);if(p)openForm(p);return}
- if(dl){e.stopPropagation();const p=persoGet().find(x=>x.id===dl.dataset.id);if(!p)return;delId=p.id;$('#eConfT').textContent='Supprimer le profil « '+p.nom+' » ?';$('#eConf').hidden=false;$('#eConfNo').focus();return}
+ if(ed){e.stopPropagation();closeEdit();const p=persoGet().find(x=>x.id===ed.dataset.id);if(p)openForm(p);return}
+ if(dl){e.stopPropagation();closeEdit();const p=persoGet().find(x=>x.id===dl.dataset.id);if(!p)return;delId=p.id;$('#eConfT').textContent='Supprimer le profil « '+p.nom+' » ?';$('#eConf').hidden=false;$('#eConfNo').focus();return}
  const b=e.target.closest('.eperso');if(b)chooseFoyer('perso:'+b.dataset.id)};
+/* v1.30 : appui long (500 ms) façon iOS sur une rangée perso = mode édition (− et crayon) ; toucher ailleurs = fermeture */
+let lpT=null,lpX=0,lpY=0,lpFired=false,swallow=false;
+const editRow=()=>document.querySelector('.epwrap.editing');
+function closeEdit(){const r=editRow();if(r)r.classList.remove('editing')}
+$('#ePerso').addEventListener('contextmenu',e=>e.preventDefault());
+$('#ePerso').addEventListener('pointerdown',e=>{const b=e.target.closest('.eperso');if(!b||e.button>0)return;lpFired=false;lpX=e.clientX;lpY=e.clientY;clearTimeout(lpT);
+ lpT=setTimeout(()=>{lpT=null;lpFired=true;closeEdit();b.parentNode.classList.add('editing');if(navigator.vibrate)try{navigator.vibrate(15)}catch(_){}},500)});
+const lpCancel=()=>{clearTimeout(lpT);lpT=null};
+$('#ePerso').addEventListener('pointermove',e=>{if(lpT&&Math.hypot(e.clientX-lpX,e.clientY-lpY)>10)lpCancel()});
+['pointerup','pointercancel','pointerleave'].forEach(t=>$('#ePerso').addEventListener(t,lpCancel));$('#ePerso').addEventListener('scroll',lpCancel,{passive:true});
+document.addEventListener('pointerdown',e=>{const r=editRow();if(!r||!$('#eForm').hidden||!$('#eConf').hidden)return;if(r.contains(e.target)&&e.target.closest('.eact'))return;closeEdit();swallow=true;setTimeout(()=>{swallow=false},600)},true);
+document.addEventListener('click',e=>{if(lpFired&&e.target.closest('.eperso')){lpFired=false;e.stopPropagation();e.preventDefault();return}if(swallow){swallow=false;e.stopPropagation();e.preventDefault()}},true);
 $('#eConfNo').onclick=()=>{$('#eConf').hidden=true;delId=null};$('#eConf').onclick=e=>{if(e.target.id==='eConf'){$('#eConf').hidden=true;delId=null}};
 $('#eConfYes').onclick=()=>{if(delId){persoSet(persoGet().filter(x=>x.id!==delId));if(curFoyer()==='perso:'+delId){try{sessionStorage.removeItem('lci_foyer_session')}catch(e){}}renderPerso();updFoyerBadge()}$('#eConf').hidden=true;delId=null};
 let eNb=2;const setNb=n=>{eNb=Math.max(1,Math.min(12,n));$('#eNb').textContent=eNb;$('#eMinus').disabled=eNb<=1;$('#ePlus').disabled=eNb>=12};
