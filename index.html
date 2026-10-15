@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.61">
+<meta name="app-version" content="v1.62">
 <title>Liste de courses IA</title>
 <!-- v1.59 : police fun Fredoka (Google Fonts, display=swap) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -287,10 +287,6 @@ nav button{min-width:0;font-size:.72rem}
 .ichips button{flex:1 1 auto;min-width:56px;min-height:52px;padding:0 14px;border:2px solid #ead1d8;border-radius:999px;background:#fff;color:var(--txt);font-family:"Fredoka","Baloo 2",ui-rounded,system-ui,sans-serif;font-weight:600;font-size:1.1rem;cursor:pointer;transition:transform .12s ease,background .15s ease}
 .ichips button:active{transform:scale(.96)}
 .ichips button[aria-pressed="true"]{background:linear-gradient(135deg,var(--inv),var(--invd));border-color:var(--invd);color:#fdf6e3}
-.iopt summary{cursor:pointer;list-style:none;font-family:"Fredoka","Baloo 2",ui-rounded,system-ui,sans-serif;font-weight:600;font-size:1.15rem;color:var(--invd);min-height:32px;display:flex;align-items:center;gap:6px}
-.iopt summary::-webkit-details-marker{display:none}.iopt summary::after{content:"▾";margin-left:auto;transition:transform .2s}.iopt[open] summary::after{transform:rotate(180deg)}
-.iopt summary small{font-family:inherit;font-weight:400;font-size:.85rem;color:var(--mut)}.iopt[open] .ichips{margin-top:10px}
-.ichips.multi button{font-size:1rem}
 .ialg{margin:0 0 12px;padding:8px 12px;border-radius:12px;background:var(--invc);color:var(--invd);font-size:.85rem}
 .invgo{display:block;width:100%;min-height:58px;margin:6px 0 10px;border:0;border-radius:999px;background:linear-gradient(135deg,var(--inv),var(--invd));color:#fdf6e3;font-family:"Fredoka","Baloo 2",ui-rounded,system-ui,sans-serif;font-weight:700;font-size:1.3rem;cursor:pointer;box-shadow:0 6px 18px rgba(76,5,25,.3)}
 .invgo:disabled{opacity:.4;cursor:default;box-shadow:none}.invgo:not(:disabled):active{transform:scale(.98)}
@@ -301,10 +297,35 @@ nav button{min-width:0;font-size:.72rem}
 .icard p{margin:0 0 6px;color:var(--mut);font-size:.9rem}
 .icard ul{margin:0;padding-left:18px;font-size:.9rem}.icard li{margin:1px 0}
 .iempty{text-align:center;color:var(--mut);margin:10px 0}
+/* v1.62 : entonnoir, propositions à cocher, Ma liste de courses */
+#s-maliste{--inv:#9f1239;--invd:#4c0519;--invc:#fdf2f4}
+.fdots{display:flex;align-items:center;justify-content:center;gap:8px;margin:6px 0 12px}.fdots span{width:10px;height:10px;border-radius:50%;background:#ead1d8}.fdots span.done{background:var(--inv)}.fdots span.on{background:var(--inv);box-shadow:0 0 0 4px rgba(159,18,57,.18)}.fdots b{margin-left:6px;font-size:.85rem;color:var(--invd)}
+.fq h3{font-size:1.35rem;text-align:center;margin-bottom:14px}.fq.fin{animation:fqIn .28s ease}@keyframes fqIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.fopts{flex-direction:column}.fopts button{min-height:56px;font-size:1.15rem;display:flex;align-items:center;justify-content:center;gap:8px}
+.fopts button.rec{border-color:var(--inv);background:var(--invc)}.fopts button.rec small{font-family:system-ui,sans-serif;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--inv);background:#fff;border-radius:999px;padding:2px 7px}
+.fopts button[aria-pressed="true"] small{background:rgba(255,255,255,.2);color:#fdf6e3}
+.fskip{display:block;margin:12px auto 0;border:0;background:none;color:var(--mut);font:inherit;font-size:.9rem;text-decoration:underline;padding:8px 12px;cursor:pointer}
+@media(prefers-reduced-motion:reduce){.fq.fin{animation:none}}
+.pcard{padding:0;overflow:hidden}.pcard.off{opacity:.55}.phead{display:flex;align-items:flex-start}
+.pchk{padding:16px 4px 16px 14px;display:flex}.pchk input,.ping input{width:24px;height:24px;accent-color:var(--inv);margin:0;flex:0 0 auto}
+.ptog{flex:1;min-width:0;text-align:left;border:0;background:none;font:inherit;color:inherit;padding:12px 14px 12px 8px;cursor:pointer}.ptog h3{margin:6px 0 2px}.ptog p{margin:0 0 4px}
+.pmore{color:var(--inv);font-weight:700;font-size:.82rem}
+.ping{list-style:none;margin:0;padding:0 14px 12px 14px;border-top:1px solid #f3e1e6}.ping li{margin:0}.ping label{display:flex;align-items:center;gap:10px;min-height:44px;font-size:.95rem}.ping span{flex:1;min-width:0}.ping em{font-style:normal;color:var(--mut);font-size:.88rem;white-space:nowrap}
+.pbar{position:sticky;bottom:calc(70px + env(safe-area-inset-bottom));padding-top:8px;background:linear-gradient(transparent,var(--bg) 30%)}
+.lt{margin-bottom:12px}.lcard{background:#fff;border-radius:var(--r);box-shadow:0 1px 3px rgba(0,0,0,.07);padding:14px;margin-bottom:12px}
+.lhead{display:flex;align-items:center;gap:8px}.lhead h3{flex:1;min-width:0;margin:0;font-family:"Fredoka","Baloo 2",ui-rounded,system-ui,sans-serif;font-size:1.3rem;color:var(--invd);overflow-wrap:break-word}
+.lcnt{font-size:.85rem;color:var(--mut);white-space:nowrap}.ldel{border:1px solid #fca5a5;background:#fff;color:#b91c1c;border-radius:999px;font:inherit;font-size:.8rem;font-weight:700;padding:6px 10px;cursor:pointer;white-space:nowrap}
+.lray{margin:14px 0 4px;font-size:.78rem;text-transform:uppercase;letter-spacing:.6px;color:var(--inv)}
+.litems{list-style:none;margin:0;padding:0}.litems li{display:flex;align-items:center;border-bottom:1px solid #f1f1f1}.litems li:last-child{border-bottom:0}
+.litem{flex:1;min-width:0;display:flex;align-items:center;gap:12px;min-height:52px;border:0;background:none;font:inherit;font-size:1.12rem;text-align:left;color:var(--txt);cursor:pointer;padding:4px 0}
+.lbox{width:26px;height:26px;border:2px solid #d1d5db;border-radius:8px;flex:0 0 auto;display:flex;align-items:center;justify-content:center}.lok .lbox{background:var(--inv);border-color:var(--inv)}.lok .lbox::after{content:"✓";color:#fff;font-weight:800;font-size:.95rem}
+.lnm{flex:1;min-width:0;overflow-wrap:break-word}.litem em{font-style:normal;color:var(--mut);font-size:.95rem;white-space:nowrap}
+.lok .lnm,.lok em{text-decoration:line-through;color:#9ca3af}
+.lx{flex:0 0 40px;height:40px;border:0;background:none;color:#9ca3af;font-size:1.4rem;cursor:pointer;border-radius:50%}.lx:active{background:#f3f4f6}
 </style>
 </head>
 <body>
-<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.61</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
+<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.62</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <!-- PROFIL -->
@@ -395,20 +416,27 @@ nav button{min-width:0;font-size:.72rem}
 <!-- PANIER -->
 
 <!-- v1.19 : vue dédiée Repas express (hors barre d'onglets). Clic sur un repas = saisie + Entrée. -->
-<!-- v1.61 : « Des invités ce soir » : questions rapides (chips) puis idées tirées d'une base locale -->
+<!-- v1.62 : « Des invités ce soir » en entonnoir (4 questions, un toucher chacune), puis propositions à cocher -->
 <section class="screen" id="s-invites">
- <h2 class="ftitle">Des invités ce soir</h2><p class="fsub">Quelques touches et on vous souffle le menu.</p>
- <div class="iq"><h3 id="iqN">Combien de personnes ?</h3><div class="ichips" id="invN" role="group" aria-labelledby="iqN"><button type="button" data-v="2">2</button><button type="button" data-v="4">4</button><button type="button" data-v="6">6</button><button type="button" data-v="8">8</button><button type="button" data-v="10">10+</button></div></div>
- <div class="iq"><h3 id="iqF">Quel format ?</h3><div class="ichips" id="invF" role="group" aria-labelledby="iqF"><button type="button" data-v="apero">Apéro</button><button type="button" data-v="repas">Repas</button><button type="button" data-v="both">Apéro + repas</button></div></div>
- <details class="iq iopt" id="invOptBox"><summary>Options <small>(facultatif)</small></summary><div class="ichips multi" id="invO" role="group" aria-label="Options"><button type="button" data-v="v">Végétarien</button><button type="button" data-v="G">Sans gluten</button><button type="button" data-v="L">Sans lactose</button><button type="button" data-v="p">Sans porc</button><button type="button" data-v="k">Enfants présents</button></div></details>
+ <h2 class="ftitle">Des invités ce soir</h2>
+ <div class="fdots" id="funDots" aria-label="Progression"></div>
+ <div class="iq fq" id="funCard"><h3 id="funQ"></h3><div class="ichips fopts" id="funOpts" role="group" aria-labelledby="funQ"></div>
+ <button type="button" class="fskip" id="funSkip">Peu importe</button></div>
  <p class="ialg" id="invAlg" hidden></p>
- <button type="button" class="invgo" id="invGo" disabled>Voir les idées</button>
 </section>
 <section class="screen" id="s-idees">
- <h2 class="ftitle">Idées pour ce soir</h2><p class="fsub" id="ideesSum"></p>
+ <h2 class="ftitle">Nos idées pour ce soir</h2><p class="fsub" id="ideesSum"></p>
  <div id="ideesList" class="ilist"></div>
- <p class="iempty" id="ideesEmpty" hidden>Aucune idée ne correspond à tous ces critères. Retirez une option pour en voir plus.</p>
- <button type="button" class="invgo" id="invMore">Autres idées</button>
+ <p class="iempty" id="ideesEmpty" hidden>Aucune idée ne correspond à ces critères et aux allergies du profil.</p>
+ <button type="button" class="fskip" id="invMore">Autres idées</button>
+ <div class="pbar"><button type="button" class="invgo" id="invList" disabled>Créer ma liste (0)</button></div>
+</section>
+<!-- v1.62 : onglet « Ma liste de courses » (listes créées, une par occasion, articles groupés par rayon) -->
+<section class="screen" id="s-maliste">
+ <h2 class="ftitle lt">Ma liste de courses</h2>
+ <div id="lstAll"></div>
+ <p class="iempty" id="lstEmpty">Aucune liste pour l’instant. Lancez « Des invités ce soir » depuis Demande pour en créer une.</p>
+ <button type="button" class="flownew" id="lstNew">+ Créer une nouvelle liste</button>
 </section>
 <section class="screen" id="s-express">
  <div class="xhead"><h2>⚡ Repas express</h2></div>
@@ -451,6 +479,7 @@ nav button{min-width:0;font-size:.72rem}
 </main>
 <nav>
  <button data-s="demande"><span>💬</span>Demande</button>
+ <button data-s="maliste"><span>🧺</span>Ma liste de courses</button>
  <button data-s="monprofil"><span>👤</span>Mon profil</button>
 </nav>
 <div class="toast" id="toast"></div>
@@ -791,7 +820,7 @@ function navSave(){try{sessionStorage.setItem('lci_nav',JSON.stringify(navStack.
 function updNavBack(){$('#navBack').hidden=curScreen==='demande'||curScreen==='entree'}
 function goBack(){let p;while(navStack.length&&(p=navStack.pop())===curScreen);navSave();_go(p&&p!==curScreen?p:'demande')}
 function go(s){if(curScreen&&curScreen!==s){navStack.push(curScreen);navSave()}_go(s)}
-function _go(s){if(s!=='spec')specHome();curScreen=s;updNavBack();document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id==='s-'+s));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.s===s));LS.set('screen',s);document.body.classList.toggle('entree',s==='entree');updFoyerBadge();window.scrollTo(0,0)}
+function _go(s){if(s==='maliste')lstRender();lstWakeSet(s==='maliste');if(s!=='spec')specHome();curScreen=s;updNavBack();document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id==='s-'+s));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.s===s));LS.set('screen',s);document.body.classList.toggle('entree',s==='entree');updFoyerBadge();window.scrollTo(0,0)}
 window.go=go;
 /* v1.26 → v1.32 : badge du profil actif (lci_profil_actif_v1) ; masqué sur l'entrée ; clic = menu profil (v1.32) */
 const PERSO_KEY='lci_profils_perso_v1';function persoGet(){try{const a=JSON.parse(localStorage.getItem(PERSO_KEY));return Array.isArray(a)?a:[]}catch(e){return[]}}
@@ -934,9 +963,7 @@ function flowSet(o){const f=$('#flow');if(!f)return;f.classList.toggle('open',o)
 $('#flowBtn').onclick=()=>flowSet(!$('#flow').classList.contains('open'));
 document.addEventListener('click',e=>{if($('#flow').classList.contains('open')&&!e.target.closest('#flowBtn,.fbub'))flowSet(false)});
 
-// v1.61 : Des invités ce soir — base locale (aucun appel réseau). Format : [type, nom, description, drapeaux, allergènes, ingrédients]
-// drapeaux : v = végétarien, p = contient du porc, k = adapté aux enfants. Allergènes : G gluten, L lactose, O œufs, N fruits à coque, A arachides,
-// P poisson, C crustacés, S soja, Se sésame, M moutarde, Ce céleri, Su sulfites. Ingrédients : « nom:quantité par personne:unité » séparés par |.
+// v1.62 : « Des invités ce soir » en entonnoir (4 questions) + propositions à cocher + listes de courses. Base locale, aucun appel réseau.
 const IDEES_INV=[
 ['apero','Gougères au comté','Petits choux soufflés au fromage, tout chauds','vk','G L O','Comté:15:g|Farine:12:g|Œufs:0.5:|Beurre:10:g'],
 ['apero','Tapenade et gressins','Olives noires mixées, câpres et anchois','','G P','Olives noires:30:g|Anchois:5:g|Câpres:3:g|Gressins:4:'],
@@ -990,40 +1017,87 @@ const IDEES_INV=[
 ['dessert','Riz au lait','Riz crémeux à la vanille','vk','L','Riz rond:25:g|Lait:15:cl|Sucre:12:g|Vanille::'],
 ['dessert','Poires pochées au vin','Poires, vin rouge et épices','v','Su','Poires:1:|Vin rouge:10:cl|Cannelle::'],
 ['dessert','Brownies aux noix','Carrés fondants chocolat et noix de pécan','vk','G L O N','Chocolat noir:30:g|Beurre:20:g|Noix de pécan:10:g|Œufs:0.5:']
+,
+['apero','Verrines avocat-saumon','Crème d’avocat, saumon fumé et citron vert','','P L','Avocats:0.3:|Saumon fumé:25:g|Fromage frais:15:g|Citron vert:0.1:'],
+['apero','Toasts de foie gras, chutney de figues','Foie gras mi-cuit sur pain d’épices','','G','Foie gras:25:g|Pain d’épices:1:tranches|Chutney de figues:10:g'],
+['entree','Saint-Jacques snackées','Noix de Saint-Jacques poêlées, beurre citronné','','L','Saint-Jacques:4:|Beurre:10:g|Citron:0.2:|Persil::'],
+['entree','Velouté de châtaignes','Velouté onctueux, éclats de noisettes','v','L N','Châtaignes:100:g|Crème:4:cl|Oignon:0.25:|Noisettes:5:g'],
+['plat','Magret de canard au miel','Magret rosé, sauce miel-balsamique, pommes sarladaises','k','','Magret de canard:0.5:|Miel:10:g|Pommes de terre:200:g|Vinaigre balsamique:1:cl'],
+['plat','Filet mignon en croûte','Filet mignon de porc, champignons, pâte feuilletée','p','G L O','Filet mignon:150:g|Pâte feuilletée:0.25:|Champignons:60:g|Œufs:0.2:'],
+['plat','Pizzas maison à garnir','Chacun garnit sa pizza, ambiance assurée','vk','G L','Pâte à pizza:0.5:|Sauce tomate:60:g|Mozzarella:60:g|Champignons:40:g'],
+['dessert','Tiramisu','Mascarpone, café et biscuits, à préparer la veille','vk','G L O','Mascarpone:60:g|Biscuits cuillère:4:|Café:5:cl|Œufs:0.5:'],
+['dessert','Plateau de fromages affinés','Trois fromages, noix et raisins','v','L N','Fromages:80:g|Noix:10:g|Raisin:40:g|Pain:2:tranches']
 ].map(a=>({t:a[0],n:a[1],d:a[2],f:a[3],al:a[4]?a[4].split(' '):[],ing:a[5].split('|').map(x=>{const[n,q,u]=x.split(':');return{n,q:q?+q:0,u:u||''}})}));
-const INV_TYP={apero:'Apéro',entree:'Entrée',plat:'Plat',dessert:'Dessert'},INV_FMT={apero:'Apéro',repas:'Repas',both:'Apéro + repas'},INV_OPT={v:'Végétarien',G:'Sans gluten',L:'Sans lactose',p:'Sans porc',k:'Enfants présents'};
-// allergies du profil (texte libre) → codes d'allergènes ; sinon recherche du mot dans les ingrédients
+const INV_META={"Gougères au comté": "2 cf", "Tapenade et gressins": "1 dc", "Houmous maison et crudités": "1 dm", "Rillettes de saumon": "1 cf", "Planche charcuterie-fromages": "1 df", "Mini-quiches lorraines": "2 mf", "Guacamole et chips de maïs": "1 df", "Brochettes tomate-mozza": "1 dm", "Feuilletés aux saucisses": "1 mf", "Crevettes sautées ail-persil": "1 cf", "Cake olives-jambon": "2 dm", "Chips de légumes, dip yaourt": "2 dm", "Toasts chèvre-miel": "1 dc", "Amandes grillées au paprika": "1 d", "Bruschetta tomate-basilic": "1 df", "Velouté de potiron": "2 dm", "Salade de chèvre chaud": "1 dc", "Œufs mimosa": "1 dm", "Carpaccio de bœuf": "1 c", "Taboulé libanais": "2 df", "Poireaux vinaigrette": "2 d", "Gaspacho": "1 d", "Terrine de campagne": "1 dm", "Avocat-crevettes": "1 cf", "Salade de lentilles": "2 dm", "Bœuf bourguignon": "3 cm", "Blanquette de veau": "3 cm", "Lasagnes végétariennes": "2 mf", "Poulet rôti, pommes de terre": "2 dm", "Tartiflette": "2 mf", "Curry de légumes au coco": "2 df", "Saumon en papillote": "1 cd", "Risotto aux champignons": "2 cd", "Chili sin carne": "2 df", "Hachis parmentier": "2 m", "Paella": "3 f", "Gratin dauphinois et salade": "2 m", "Couscous poulet-légumes": "3 fm", "Quiche aux poireaux": "2 dm", "Soupe de poissons, rouille": "3 c", "Fajitas au poulet": "1 fm", "Mousse au chocolat": "1 mf", "Tarte Tatin": "2 cm", "Salade de fruits frais": "1 dm", "Fondant au chocolat": "1 cf", "Crème brûlée": "2 c", "Panna cotta aux fruits rouges": "1 cd", "Île flottante": "2 m", "Sorbet citron et tuiles": "1 c", "Riz au lait": "2 m", "Poires pochées au vin": "2 c", "Brownies aux noix": "1 fm", "Verrines avocat-saumon": "1 c", "Toasts de foie gras, chutney de figues": "1 cf", "Saint-Jacques snackées": "1 c", "Velouté de châtaignes": "2 c", "Magret de canard au miel": "1 cf", "Filet mignon en croûte": "3 c", "Pizzas maison à garnir": "2 fm", "Tiramisu": "2 fc", "Plateau de fromages affinés": "1 cd"};
+IDEES_INV.forEach(it=>{const m=(INV_META[it.n]||'2 d').split(' ');it.tm=+m[0];it.st=m[1]||'d'});
+const INV_TYP={apero:'Apéro',entree:'Entrée',plat:'Plat',dessert:'Dessert'};
 const INV_ALK=[[/gluten|ble|farine/,'G'],[/lactose|lait|fromage|creme|beurre/,'L'],[/oeuf/,'O'],[/fruits? a coque|noix|amande|noisette|pecan|pistache|cajou/,'N'],[/arachide|cacahuete/,'A'],[/poisson|saumon|thon|anchois/,'P'],[/crustace|crevette|crabe|homard/,'C'],[/soja/,'S'],[/sesame/,'Se'],[/moutarde/,'M'],[/celeri/,'Ce'],[/sulfite|vin/,'Su']];
 const invNorm=x=>String(x).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/œ/g,'oe').trim();
-let inv={n:0,f:'',o:[]};
-function invUpd(){$('#invGo').disabled=!(inv.n&&inv.f);
- [['#invN',[String(inv.n)]],['#invF',[inv.f]],['#invO',inv.o]].forEach(([g,v])=>document.querySelectorAll(g+' button').forEach(b=>b.setAttribute('aria-pressed',v.includes(b.dataset.v))));
- const al=alGet('allergies');const p=$('#invAlg');p.hidden=!al.length;p.textContent=al.length?'Rappel : allergies du profil ('+al.join(', ')+'), exclues des idées.':''}
-function invOpen(){flowSet(false);invUpd();go('invites')}
-$('#invN').onclick=e=>{const b=e.target.closest('button');if(!b)return;inv.n=+b.dataset.v;invUpd()};
-$('#invF').onclick=e=>{const b=e.target.closest('button');if(!b)return;inv.f=b.dataset.v;invUpd()};
-$('#invO').onclick=e=>{const b=e.target.closest('button');if(!b)return;const v=b.dataset.v;inv.o=inv.o.includes(v)?inv.o.filter(x=>x!==v):inv.o.concat(v);invUpd()};
-function invOk(it){const o=inv.o;if(o.includes('v')&&!it.f.includes('v'))return false;if(o.includes('p')&&it.f.includes('p'))return false;if(o.includes('k')&&!it.f.includes('k'))return false;
- if(o.includes('G')&&it.al.includes('G'))return false;if(o.includes('L')&&it.al.includes('L'))return false;
- for(const a of alGet('allergies')){const w=invNorm(a);if(!w)continue;const m=INV_ALK.find(([r])=>r.test(w));if(m&&it.al.includes(m[1]))return false;if(it.ing.some(g=>{const x=invNorm(g.n);return x.includes(w)||w.includes(x)}))return false}return true}
 const invShuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-let invLast=[];
-function invPick(){const pool=IDEES_INV.filter(invOk);const plan=inv.f==='apero'?{apero:6}:inv.f==='repas'?{entree:2,plat:2,dessert:2}:{apero:2,entree:1,plat:2,dessert:1};
- const fresh=x=>!invLast.includes(x.n);const out=[];
- for(const[t,c]of Object.entries(plan)){const all=invShuf(pool.filter(x=>x.t===t));const pref=all.filter(fresh).concat(all.filter(x=>!fresh(x)));out.push(...pref.slice(0,c))}
- const want=Object.values(plan).reduce((a,b)=>a+b,0);if(out.length<want){const rest=invShuf(pool.filter(x=>plan[x.t]!==undefined&&!out.includes(x)));out.push(...rest.slice(0,want-out.length))}
- const ord=['apero','entree','plat','dessert'];out.sort((a,b)=>ord.indexOf(a.t)-ord.indexOf(b.t));invLast=out.map(x=>x.n);return out}
-function invQty(g){const n=inv.n;if(!g.q)return esc(g.n);let q=g.q*n,u=g.u;
- if(u==='g'){if(q>=1000){q=(Math.round(q/100)/10).toString().replace('.',',');u='kg'}else q=Math.round(q/5)*5||5}else if(u==='cl'){if(q>=100){q=(Math.round(q/10)/10).toString().replace('.',',');u='L'}else q=Math.round(q)}else q=Math.ceil(q);
- return esc(g.n)+' : '+q+(u?' '+esc(u)+(u==='gousse'||u==='tranches'?'':''):'')}
-function invRender(){const L=invPick();const tags=inv.o.map(x=>INV_OPT[x]);
- $('#ideesSum').textContent=(inv.n>=10?'10 personnes et plus (quantités pour 10)':inv.n+' personnes')+' · '+INV_FMT[inv.f]+(tags.length?' · '+tags.join(', '):'');
- $('#ideesList').innerHTML=L.map(it=>`<article class="icard"><span class="ityp">${INV_TYP[it.t]}</span><h3>${esc(it.n)}</h3><p>${esc(it.d)}</p><ul>${it.ing.slice(0,5).map(g=>'<li>'+invQty(g)+'</li>').join('')}</ul></article>`).join('');
- $('#ideesEmpty').hidden=L.length>0;$('#invMore').hidden=!L.length}
-$('#invGo').onclick=()=>{if($('#invGo').disabled)return;invLast=[];invRender();go('idees');scrollTo(0,0)};
-$('#invMore').onclick=()=>{invRender();scrollTo(0,0)};
+// Entonnoir : 4 questions, un toucher chacune ; « def » = choix recommandé (mis en avant, utilisé par « Peu importe »)
+const FUN=[
+ {id:'n',q:'Combien serez-vous à table ?',opts:()=>[['2','2'],['4','4'],['6','6'],['8','8'],['10','10 et +']],def:()=> '4'},
+ {id:'s',q:'Quel genre de soirée ?',opts:()=>[['apero','Apéro décontracté'],['diner','Dîner convivial'],['chic','Dîner chic'],['dinatoire','Apéro dînatoire festif']],def:()=>'diner'},
+ {id:'t',q:A=>A.s==='apero'||A.s==='dinatoire'?'Combien de temps pour préparer ?':'Combien de temps pour cuisiner ?',opts:A=>A.s==='apero'||A.s==='dinatoire'?[['1','10 min, du tout prêt'],['2','Une petite heure'],['3','J’ai le temps']]:[['1','Moins de 30 min'],['2','Environ 1 h'],['3','J’ai le temps']],def:A=>A.s==='chic'?'2':'1'},
+ {id:'r',q:'Un régime à respecter ?',opts:()=>[['-','Aucun'],['v','Végétarien'],['p','Sans porc'],['G','Sans gluten'],['L','Sans lactose']],def:()=>'-'}
+];
+const FUN_KEY='lci_invites_v1';let funA={},funStep=0;
+try{const o=JSON.parse(localStorage.getItem(FUN_KEY));if(o&&o.a){funA=o.a;funStep=Math.min(+o.step||0,FUN.length-1)}}catch(e){}
+const funSave=()=>{try{localStorage.setItem(FUN_KEY,JSON.stringify({a:funA,step:funStep}))}catch(e){}};
+const fv=(x,A)=>typeof x==='function'?x(A):x;
+function funRender(){const st=FUN[funStep],A=funA,def=st.def(A),cur=A[st.id];
+ $('#funDots').innerHTML=FUN.map((_,i)=>`<span class="${i<funStep?'done':i===funStep?'on':''}"></span>`).join('')+`<b>${funStep+1}/${FUN.length}</b>`;
+ $('#funQ').textContent=fv(st.q,A);
+ $('#funOpts').innerHTML=st.opts(A).map(([v,l])=>`<button type="button" data-v="${v}" class="${v===def?'rec':''}" aria-pressed="${cur===v}">${esc(l)}${v===def?'<small>conseillé</small>':''}</button>`).join('');
+ const al=alGet('allergies');const p=$('#invAlg');p.hidden=!(st.id==='r'&&al.length);p.textContent=al.length?'Allergies du profil exclues d’office : '+al.join(', ')+'.':'';
+ const c=$('#funCard');c.classList.remove('fin');void c.offsetWidth;c.classList.add('fin')}
+function funAnswer(v){funA[FUN[funStep].id]=v;if(funStep<FUN.length-1){funStep++;funSave();funRender()}else{funSave();invLast=[];invPropose();go('idees')}}
+$('#funOpts').onclick=e=>{const b=e.target.closest('button');if(b)funAnswer(b.dataset.v)};
+$('#funSkip').onclick=()=>funAnswer(FUN[funStep].def(funA));
+function invOpen(){flowSet(false);funStep=0;funSave();funRender();go('invites')}
+// Filtrage dur AVANT affichage : régime + allergies du profil ; puis score (style, temps)
+function invOk(it){const r=funA.r;if(r==='v'&&!it.f.includes('v'))return false;if(r==='p'&&it.f.includes('p'))return false;if((r==='G'||r==='L')&&it.al.includes(r))return false;
+ for(const a of alGet('allergies')){const w=invNorm(a);if(!w)continue;const m=INV_ALK.find(([x])=>x.test(w));if(m&&it.al.includes(m[1]))return false;if(it.ing.some(g=>{const x=invNorm(g.n);return x.includes(w)||w.includes(x)}))return false}return true}
+const INV_STY={apero:'d',diner:'m',chic:'c',dinatoire:'f'},INV_PLAN={apero:['apero','apero','apero'],diner:['entree','plat','dessert'],chic:['entree','plat','dessert'],dinatoire:['apero','apero','plat']};
+let invLast=[],invSel=[];
+function invScore(it){const sty=INV_STY[funA.s]||'d',t=+funA.t||3;return (it.st.includes(sty)?3:0)+(sty==='m'&&it.f.includes('k')?1:0)+(it.tm<=t?2:-4)+Math.random()*2.5}
+function invPropose(){const pool=IDEES_INV.filter(invOk);const plan=INV_PLAN[funA.s]||INV_PLAN.diner;const out=[];
+ for(const t of plan){const c=pool.filter(x=>x.t===t&&!out.includes(x)).map(x=>({x,s:invScore(x)-(invLast.includes(x.n)?3:0)})).sort((a,b)=>b.s-a.s);if(c[0])out.push(c[0].x)}
+ invLast=out.map(x=>x.n);invSel=out.map(x=>({it:x,on:true,ing:x.ing.map(()=>true)}));invRenderP()}
+const invN=()=>Math.min(+funA.n||4,10);
+function invQ(g){if(!g.q)return {q:0,u:''};let q=g.q*invN(),u=g.u;if(u==='g'){if(q>=1000){q=Math.round(q/100)/10;u='kg'}else q=Math.round(q/5)*5||5}else if(u==='cl'){if(q>=100){q=Math.round(q/10)/10;u='L'}else q=Math.round(q)}else q=Math.ceil(q);return {q,u}}
+const fmtQ=(q,u)=>q?String(q).replace('.',',')+(u?' '+u:''):'';
+function invCount(){return invSel.reduce((a,s)=>a+(s.on?s.ing.filter(Boolean).length:0),0)}
+function invRenderP(){const S={apero:'Apéro décontracté',diner:'Dîner convivial',chic:'Dîner chic',dinatoire:'Apéro dînatoire festif'};
+ $('#ideesSum').textContent=(+funA.n>=10?'10 et +':funA.n)+' personnes · '+(S[funA.s]||'')+(funA.r&&funA.r!=='-'?' · '+{v:'Végétarien',p:'Sans porc',G:'Sans gluten',L:'Sans lactose'}[funA.r]:'');
+ $('#ideesList').innerHTML=invSel.map((s,i)=>{const it=s.it;return `<article class="icard pcard${s.on?'':' off'}" data-i="${i}"><div class="phead"><label class="pchk"><input type="checkbox" data-d="${i}" ${s.on?'checked':''} aria-label="Garder ${esc(it.n)}"></label><button type="button" class="ptog" data-t="${i}" aria-expanded="false"><span class="ityp">${INV_TYP[it.t]}</span><h3>${esc(it.n)}</h3><p>${esc(it.d)}</p><small class="pmore">Voir les ingrédients (${it.ing.length}) ▾</small></button></div><ul class="ping" hidden>${it.ing.map((g,j)=>{const z=invQ(g);return `<li><label><input type="checkbox" data-d="${i}" data-g="${j}" ${s.ing[j]?'checked':''}><span>${esc(g.n)}</span><em>${fmtQ(z.q,z.u)}</em></label></li>`}).join('')}</ul></article>`}).join('');
+ $('#ideesEmpty').hidden=invSel.length>0;invUpdBtn()}
+function invUpdBtn(){const n=invCount();const b=$('#invList');b.textContent='Créer ma liste ('+n+')';b.disabled=!n}
+$('#ideesList').onclick=e=>{const t=e.target.closest('.ptog');if(t){const c=t.closest('.pcard'),u=c.querySelector('.ping'),o=u.hidden;u.hidden=!o;t.setAttribute('aria-expanded',o);t.querySelector('.pmore').textContent=(o?'Masquer':'Voir')+' les ingrédients ('+u.children.length+') '+(o?'▴':'▾')}};
+$('#ideesList').onchange=e=>{const x=e.target;if(x.type!=='checkbox')return;const s=invSel[+x.dataset.d];if(x.dataset.g!==undefined)s.ing[+x.dataset.g]=x.checked;else{s.on=x.checked;x.closest('.pcard').classList.toggle('off',!s.on)}invUpdBtn()};
+$('#invMore').onclick=()=>{invPropose();scrollTo(0,0)};
+// Listes de courses (une par occasion) : localStorage lci_listes_v1 = [{id,nom,cree,items:[{n,q,u,r,ok}]}]
+const LST_KEY='lci_listes_v1';
+const lstGet=()=>{try{const a=JSON.parse(localStorage.getItem(LST_KEY));return Array.isArray(a)?a:[]}catch(e){return[]}};
+const lstSet=a=>{try{localStorage.setItem(LST_KEY,JSON.stringify(a))}catch(e){}};
+const RAYONS=[['Fruits et légumes',/avocat|tomate|carotte|concombre|citron|basilic|persil|ciboulette|aneth|thym|menthe|salade|roquette|poireau|courgette|poivron|oignon|echalote|ail|champignon|potiron|betterave|patate|pomme de terre|fenouil|epinard|fruits|pomme|poire|raisin|chataigne|figue|coriandre/],['Boucherie, volaille',/boeuf|veau|poulet|magret|canard|filet mignon|hache/],['Charcuterie, traiteur',/saucisson|jambon|lardon|chipolata|chorizo|terrine|foie gras/],['Poissonnerie',/saumon|crevette|anchois|poisson|saint-jacques/],['Crèmerie, fromages',/comte|beurre|creme|fromage|mozzarella|parmesan|reblochon|chevre|emmental|yaourt|lait|mascarpone|oeuf/],['Boulangerie',/pain|gressin|croutons|tortilla|brioche/],['Surgelés',/sorbet/],['Boissons, vins',/vin |vin$|cafe/]];
+const rayonOf=n=>{const x=invNorm(n);const r=RAYONS.find(([,re])=>re.test(x));return r?r[0]:'Épicerie'};
+const RORD=RAYONS.map(r=>r[0]).concat('Épicerie');
+$('#invList').onclick=()=>{const m=new Map();invSel.forEach(s=>{if(!s.on)return;s.it.ing.forEach((g,j)=>{if(!s.ing[j])return;const z=invQ(g);const k=invNorm(g.n)+'|'+z.u;const e=m.get(k);if(e)e.q=Math.round((e.q+z.q)*10)/10;else m.set(k,{n:g.n,q:z.q,u:z.u,r:rayonOf(g.n),ok:false})})});
+ if(!m.size)return;const d=new Date(),dd=String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');const L=lstGet();let nom='Invités – '+dd,k=2;while(L.some(x=>x.nom===nom))nom='Invités – '+dd+' ('+(k++)+')';
+ L.unshift({id:Date.now().toString(36),nom,cree:d.toISOString(),items:[...m.values()]});lstSet(L);go('maliste')};
+let lstDel=null,lstDelT=0;
+function lstRender(){const L=lstGet();$('#lstEmpty').hidden=L.length>0;
+ $('#lstAll').innerHTML=L.map(l=>{const done=l.items.filter(x=>x.ok).length;const by={};l.items.forEach((x,i)=>{(by[x.r]=by[x.r]||[]).push([x,i])});
+  return `<article class="lcard" data-l="${l.id}"><div class="lhead"><h3>${esc(l.nom)}</h3><span class="lcnt">${done}/${l.items.length}</span><button type="button" class="ldel" data-dl="${l.id}">${lstDel===l.id?'Confirmer':'Supprimer'}</button></div>`+
+  RORD.filter(r=>by[r]).map(r=>`<h4 class="lray">${esc(r)}</h4><ul class="litems">`+by[r].sort((a,b)=>a[0].ok-b[0].ok).map(([x,i])=>`<li class="${x.ok?'lok':''}"><button type="button" class="litem" data-i="${i}" aria-pressed="${x.ok}"><span class="lbox"></span><span class="lnm">${esc(x.n)}</span><em>${fmtQ(x.q,x.u)}</em></button><button type="button" class="lx" data-x="${i}" aria-label="Retirer ${esc(x.n)}">×</button></li>`).join('')+'</ul>').join('')+'</article>'}).join('')}
+$('#lstAll').onclick=e=>{const c=e.target.closest('.lcard');if(!c)return;const L=lstGet(),l=L.find(x=>x.id===c.dataset.l);if(!l)return;
+ const d=e.target.closest('.ldel');if(d){if(lstDel===l.id&&Date.now()-lstDelT<4000){lstSet(L.filter(x=>x!==l));lstDel=null}else{lstDel=l.id;lstDelT=Date.now();setTimeout(()=>{if(lstDel===l.id){lstDel=null;lstRender()}},4000)}lstRender();return}
+ const x=e.target.closest('.lx');if(x){l.items.splice(+x.dataset.x,1);lstSet(L);lstRender();return}
+ const it=e.target.closest('.litem');if(it){const o=l.items[+it.dataset.i];o.ok=!o.ok;lstSet(L);lstRender()}};
+let lstWake=null;function lstWakeSet(on){try{if(on&&!lstWake&&navigator.wakeLock)navigator.wakeLock.request('screen').then(w=>{lstWake=w;w.addEventListener('release',()=>{lstWake=null})}).catch(()=>{});else if(!on&&lstWake){lstWake.release();lstWake=null}}catch(e){}}
 $('#invitesBtn').onclick=invOpen;
-$('#expressBtn').onclick=()=>{flowSet(false);go('express')};$('#navBack').onclick=goBack;
+$('#expressBtn').onclick=()=>{flowSet(false);go('express')};$('#navBack').onclick=()=>{if(curScreen==='invites'&&funStep>0){funStep--;funSave();funRender()}else goBack()};
 /* v1.22 : clic sur un plat = vue aperçu (titre + cases d'ingrédients non cliquables, sans quantités ni prix) */
 function showApercu(i){const x=EXPRESS[i];if(!x)return;LS.set('apercu',i);$('#apTitle').textContent=x.n;$('#apGrid').innerHTML=x.ing.map(g=>`<div class="pill apcase">${esc(g)}</div>`).join('')}
 $('#expressPanel').onclick=e=>{const b=e.target.closest('.xopt');if(!b)return;showApercu(+b.dataset.i);go('apercu')};
