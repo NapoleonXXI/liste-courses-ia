@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.55">
+<meta name="app-version" content="v1.56">
 <title>Liste de courses IA</title>
 <style>
 :root{--pf:#15803d;--pc:#e3f0e8;--pe:#116631;--pm:#96c6a8;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -252,15 +252,14 @@ nav button{min-width:0;font-size:.72rem}
 .pillgrid.dgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 .pillgrid.dgrid>button.pill.dcase{grid-column:auto!important;aspect-ratio:1/1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:12px;border-radius:var(--r);overflow-wrap:break-word;line-height:1.2}
 .dcase .dico{width:30px;height:30px;flex:0 0 auto}.dcase b{font-size:.98rem;font-weight:700}.dcase small{font-size:.8rem;font-weight:400;opacity:.85}
-/* « Est-ce que je l'ai toujours ? » : jaune doré fixe, ne suit pas le profil */
-.pillgrid.dgrid>button.pill.dcase#stillHave,.pillgrid.dgrid>button.pill.dcase#stillHave:hover,.pillgrid.dgrid>button.pill.dcase#stillHave:focus,.pillgrid.dgrid>button.pill.dcase#stillHave:active{background:#FACC15!important;border:1px solid #A16207!important;color:#3B2600!important;height:auto!important}
 /* v1.55 : cases de Demande au style exact de Mon profil (.card + .ssum + .sico) */
 .pillgrid.dgrid>.ssum.dcase{grid-column:auto!important;margin:0;padding:14px;aspect-ratio:1/1;justify-content:center!important;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.07);border:0;border-radius:var(--r)}
-.pillgrid.dgrid>.ssum.dcase#stillHave{background:#FACC15;border:1px solid #A16207}.pillgrid.dgrid>.ssum.dcase#stillHave b,.pillgrid.dgrid>.ssum.dcase#stillHave small{color:#3B2600}
+/* v1.56 : plus d'air sous le titre de Demande */
+.dtitle{margin-bottom:28px!important}
 </style>
 </head>
 <body>
-<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.55</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
+<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.56</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <!-- PROFIL -->
@@ -308,7 +307,7 @@ nav button{min-width:0;font-size:.72rem}
    <!-- Fonction future : « Est-ce que je l'ai toujours ? » = rappel des articles qu'on oublie toujours
         (papier toilette, sel, piles, sacs poubelle…) ; générerait une checklist fictive à ajouter à la liste de courses.
         Pour l'instant bouton factice : aucune action. -->
-   <button type="button" class="card ssum dcase" id="stillHave"><svg class="sico" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="12" y="8" width="40" height="50" rx="5" fill="#a16207"/><rect x="17" y="14" width="30" height="40" rx="2" fill="#fff"/><rect x="24" y="4" width="16" height="9" rx="3" fill="#6b7280"/><path d="M21 26l3 3 6-6M21 40l3 3 6-6" fill="none" stroke="#16a34a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M34 27h9M34 41h9" stroke="#9ca3af" stroke-width="3" stroke-linecap="round"/></svg><b>Est-ce que je l'ai toujours ?</b><small>Vérifier les indispensables</small></button>
+   <button type="button" class="card ssum dcase" id="stillHave"><svg class="sico" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="12" y="8" width="40" height="50" rx="5" fill="#64748b"/><rect x="17" y="14" width="30" height="40" rx="2" fill="#fff"/><rect x="24" y="4" width="16" height="9" rx="3" fill="#6b7280"/><path d="M21 26l3 3 6-6M21 40l3 3 6-6" fill="none" stroke="#16a34a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M34 27h9M34 41h9" stroke="#9ca3af" stroke-width="3" stroke-linecap="round"/></svg><b>Est-ce que je l'ai toujours ?</b><small>Vérifier les indispensables</small></button>
    <button type="button" class="card ssum dcase" id="expressBtn"><svg class="sico" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M37 4L12 36h17l-4 24 27-34H35z" fill="#facc15" stroke="#ea580c" stroke-width="3" stroke-linejoin="round"/></svg><b>Repas express</b><small>Prêt en 20 minutes</small></button>
    <button type="button" class="card ssum dcase" id="invitesBtn"><svg class="sico" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M10 8h18l-2 16a7 7 0 01-14 0z" fill="#fff" stroke="#6b7280" stroke-width="2.5"/><path d="M11.5 16h15l-1 8a6.5 6.5 0 01-13 0z" fill="#be123c"/><path d="M19 31v20M12 54h14" stroke="#6b7280" stroke-width="3" stroke-linecap="round"/><path d="M36 14h18l-2 16a7 7 0 01-14 0z" fill="#fff" stroke="#6b7280" stroke-width="2.5"/><path d="M37.5 22h15l-1 8a6.5 6.5 0 01-13 0z" fill="#be123c"/><path d="M45 37v15M38 55h14" stroke="#6b7280" stroke-width="3" stroke-linecap="round"/></svg><b>Invités ce soir</b><small>Un repas pour recevoir</small></button>
    <!-- v1.43 : bouton factice « Idées de recettes » (non branché) -->
