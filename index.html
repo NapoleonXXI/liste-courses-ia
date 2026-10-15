@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.27">
+<meta name="app-version" content="v1.28">
 <title>Liste de courses IA</title>
 <style>
 :root{--acc:#16a34a;--acc2:#dcfce7;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -50,8 +50,23 @@ header{padding-right:72px}
 #foyerBadge .bcirc{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#fff}
 #foyerBadge svg{width:18px;height:18px}
 body.entree nav{display:none}body.entree main{padding-bottom:calc(16px + env(safe-area-inset-bottom))}
-#s-entree.active{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:1fr 1fr;gap:12px;min-height:calc(100vh - 120px);min-height:calc(100dvh - 120px)}
-.ecase{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-width:0;padding:16px 10px;border:1px solid var(--acc);border-radius:var(--r);background:var(--acc2);color:#14532d;font:inherit;font-weight:700;font-size:1.05rem;line-height:1.25;text-align:center;overflow-wrap:anywhere;cursor:pointer}
+/* v1.28 : entrée = grille des 3 cases (réduite) + profils perso (défilants) + rangée « Nouveau profil » */
+#s-entree.active{display:flex;flex-direction:column;gap:10px;height:calc(100vh - 120px);height:calc(100dvh - 120px);min-height:420px}
+.egrid{flex:1 1 auto;min-height:260px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:1fr 1fr;gap:12px}
+#ePerso{flex:0 1 auto;max-height:34%;overflow-y:auto;display:flex;flex-direction:column;gap:8px;-webkit-overflow-scrolling:touch}#ePerso:empty{display:none}
+.erow{flex:0 0 auto;display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:6px 14px;border:1px solid var(--acc);border-radius:var(--r);background:var(--acc2);color:#14532d;font:inherit;font-weight:700;font-size:1rem;text-align:left;cursor:pointer;min-width:0}
+.erow .sc{display:flex;align-items:center;justify-content:center;flex:0 0 36px;width:36px;height:36px;border-radius:50%;background:#fff;border:2px solid var(--acc)}.erow .sc svg{width:20px;height:20px}
+.erow .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.erow .np{flex:0 0 auto;font-size:.85rem;font-weight:600;color:#15803d}
+#eNew{background:#fff;border-style:dashed}
+#eForm{position:fixed;inset:0;z-index:20;background:rgba(17,24,39,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+#eForm form{width:100%;max-width:420px;background:#fff;border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+#eForm h2{margin:0;font-size:1.15rem;color:#14532d}#eForm label{font-weight:600;font-size:.95rem;display:flex;flex-direction:column;gap:6px}
+#eForm input[type=text]{height:48px;padding:0 14px;font-size:1rem;border:1px solid #d1d5db;border-radius:12px;width:100%}
+#eForm .stepper{margin-top:0}#eForm .ferr{color:var(--err);font-size:.85rem;min-height:1em;margin:-4px 0 0}
+#eForm .fbtns{display:flex;gap:10px}#eForm .fbtns button{flex:1;min-height:48px;border-radius:999px;font:inherit;font-weight:700;cursor:pointer}
+#eCancel{background:#fff;border:1px solid #d1d5db;color:var(--txt)}#eOk{background:var(--acc);border:1px solid var(--acc);color:#fff}
+#foyerLbl{max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.15}
+.ecase{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:0;min-width:0;padding:16px 10px;border:1px solid var(--acc);border-radius:var(--r);background:var(--acc2);color:#14532d;font:inherit;font-weight:700;font-size:1.05rem;line-height:1.25;text-align:center;overflow-wrap:anywhere;cursor:pointer}
 .ecase:active{filter:brightness(.95)}#eSolo{grid-column:1/-1;font-size:1.2rem}
 .eicons{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .ecirc{display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:#fff;border:2px solid var(--acc)}
@@ -122,7 +137,7 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.27</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small></header>
+<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.28</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <button type="button" class="xback" id="navBack" hidden style="margin-bottom:10px" aria-label="Retour à la vue précédente">← Retour</button>
@@ -130,9 +145,21 @@ nav button{min-width:0;font-size:.72rem}
 
 <!-- v1.25 : PAGE D'ENTRÉE (racine) : présélection du foyer, choix gardé en session (lci_foyer_session), non exploité -->
 <section class="screen" id="s-entree" aria-label="Pour qui faites-vous les courses ?">
+ <div class="egrid">
  <button type="button" class="ecase" id="eSolo" data-foyer="solo"><span class="eicons"><span class="ecirc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span></span>Je fais les courses pour moi seul</button>
  <button type="button" class="ecase" id="eDuo" data-foyer="duo"><span class="eicons"><span class="ecirc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span class="ecirc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span></span>Je fais les courses pour mon couple</button>
  <button type="button" class="ecase" id="eGroupe" data-foyer="groupe"><span class="eicons"><span class="ecirc"><svg style="width:46px" viewBox="0 0 36 24" aria-hidden="true" fill="#15803d"><circle cx="8" cy="9" r="3"/><path d="M2.5 20c0-3.4 2.4-5.8 5.5-5.8s5.5 2.4 5.5 5.8z"/><circle cx="28" cy="9" r="3"/><path d="M22.5 20c0-3.4 2.4-5.8 5.5-5.8s5.5 2.4 5.5 5.8z"/><circle cx="18" cy="7" r="3.6"/><path d="M11 21c0-4 3.1-7 7-7s7 3 7 7z"/></svg></span></span>Je fais les courses pour plus de personnes</button>
+ </div>
+ <!-- v1.28 : profils perso (localStorage lci_profils_perso_v1) puis rangée « Nouveau profil » -->
+ <div id="ePerso" aria-label="Profils personnalisés"></div>
+ <button type="button" class="erow" id="eNew"><span class="sc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#15803d" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="nm">Nouveau profil</span></button>
+ <div id="eForm" hidden role="dialog" aria-modal="true" aria-labelledby="eFormT"><form id="eFormF" novalidate>
+  <h2 id="eFormT">Nouveau profil</h2>
+  <label>Nom du profil<input type="text" id="eName" maxlength="30" autocomplete="off" placeholder="Ex. Famille Martin"></label>
+  <p class="ferr" id="eErr" aria-live="polite"></p>
+  <div class="stepper"><span>Nombre de personnes</span><button type="button" id="eMinus" aria-label="Moins">−</button><output id="eNb">2</output><button type="button" id="ePlus" aria-label="Plus">+</button></div>
+  <div class="fbtns"><button type="button" id="eCancel">Annuler</button><button type="submit" id="eOk">Valider</button></div>
+ </form></div>
 </section>
 <!-- DEMANDE -->
 <section class="screen" id="s-demande">
@@ -552,9 +579,24 @@ function go(s){if(curScreen&&curScreen!==s){navStack.push(curScreen);navSave()}_
 function _go(s){curScreen=s;updNavBack();document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id==='s-'+s));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.s===s));LS.set('screen',s);document.body.classList.toggle('entree',s==='entree');updFoyerBadge();window.scrollTo(0,0)}
 window.go=go;
 /* v1.26 : badge foyer (solo/duo/groupe) depuis lci_foyer_session ; masqué sur l'entrée et avant tout choix ; clic = rouvre l'entrée */
-function updFoyerBadge(){let f=null;try{f=sessionStorage.getItem('lci_foyer_session')}catch(e){}const ok=['solo','duo','groupe'].includes(f);const b=$('#foyerBadge');b.hidden=!ok||curScreen==='entree';if(ok){$('#foyerLbl').textContent=f;b.setAttribute('aria-label','Foyer : '+f+'. Changer')}}
+const PERSO_KEY='lci_profils_perso_v1';function persoGet(){try{const a=JSON.parse(localStorage.getItem(PERSO_KEY));return Array.isArray(a)?a:[]}catch(e){return[]}}
+function persoSet(a){try{localStorage.setItem(PERSO_KEY,JSON.stringify(a))}catch(e){}}
+function foyerLabel(f){if(['solo','duo','groupe'].includes(f))return f;if(f&&f.startsWith('perso:')){const p=persoGet().find(x=>x.id===f.slice(6));return p?p.nom:null}return null}
+function updFoyerBadge(){let f=null;try{f=sessionStorage.getItem('lci_foyer_session')}catch(e){}const lb=foyerLabel(f);const ok=!!lb;f=lb;const b=$('#foyerBadge');b.hidden=!ok||curScreen==='entree';if(ok){$('#foyerLbl').textContent=f;$('#foyerLbl').title=f;b.setAttribute('aria-label','Foyer : '+f+'. Changer')}}
 $('#foyerBadge').onclick=()=>go('entree');
-document.querySelectorAll('.ecase').forEach(b=>b.onclick=()=>{try{sessionStorage.setItem('lci_foyer_session',b.dataset.foyer)}catch(e){}go('demande')});
+function chooseFoyer(f){try{sessionStorage.setItem('lci_foyer_session',f)}catch(e){}go('demande')}
+document.querySelectorAll('.ecase').forEach(b=>b.onclick=()=>chooseFoyer(b.dataset.foyer));
+/* v1.28 : profils perso */
+function renderPerso(){$('#ePerso').innerHTML=persoGet().map(p=>`<button type="button" class="erow eperso" data-id="${esc(p.id)}"><span class="sc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span class="nm">${esc(p.nom)}</span><span class="np">${p.nb} pers.</span></button>`).join('')}
+$('#ePerso').onclick=e=>{const b=e.target.closest('.eperso');if(b)chooseFoyer('perso:'+b.dataset.id)};
+let eNb=2;const setNb=n=>{eNb=Math.max(1,Math.min(12,n));$('#eNb').textContent=eNb;$('#eMinus').disabled=eNb<=1;$('#ePlus').disabled=eNb>=12};
+$('#eMinus').onclick=()=>setNb(eNb-1);$('#ePlus').onclick=()=>setNb(eNb+1);
+const closeForm=()=>{$('#eForm').hidden=true};
+$('#eNew').onclick=()=>{$('#eName').value='';$('#eErr').textContent='';setNb(2);$('#eForm').hidden=false;$('#eName').focus()};
+$('#eCancel').onclick=closeForm;$('#eForm').onclick=e=>{if(e.target.id==='eForm')closeForm()};
+$('#eFormF').onsubmit=e=>{e.preventDefault();const nom=$('#eName').value.trim().replace(/\s+/g,' ');if(!nom){$('#eErr').textContent='Veuillez saisir un nom de profil.';$('#eName').focus();return}
+const a=persoGet();a.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),nom:nom.slice(0,30),nb:eNb});persoSet(a);renderPerso();closeForm();const l=$('#ePerso');l.scrollTop=l.scrollHeight};
+renderPerso();
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.s));
 $('#generate').onclick=generate;
 /* v1.22 : Liste désactivée → Entrée ne fait rien (pas de génération), simple fermeture du clavier */
@@ -598,7 +640,7 @@ const PROFIL_GENERIQUE={
 try{localStorage.setItem(PF_GEN_KEY,JSON.stringify(PROFIL_GENERIQUE))}catch(e){}
 loadProfile();render();showStore();
 /* v1.27 : l'écran initial est TOUJOURS la page d'entrée (lancement, rechargement, retour via cache bfcache) ; pile vidée. lci_foyer_session reste mémorisé. */
-function startEntree(){navStack=[];navSave();try{sessionStorage.removeItem('lci_screen')}catch(e){}curScreen=null;go('entree')}
+function startEntree(){navStack=[];navSave();try{sessionStorage.removeItem('lci_screen')}catch(e){}curScreen=null;$('#eForm').hidden=true;renderPerso();go('entree')}
 startEntree();window.addEventListener('pageshow',e=>{if(e.persisted)startEntree()});
 // Service worker : aucun n'est utilisé ; on désinscrit d'éventuels anciens SW pour éviter une version en cache.
 if('serviceWorker' in navigator&&navigator.serviceWorker.getRegistrations)navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});
