@@ -7,8 +7,12 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.58">
+<meta name="app-version" content="v1.59">
 <title>Liste de courses IA</title>
+<!-- v1.59 : police fun Fredoka (Google Fonts, display=swap) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap">
 <style>
 :root{--pf:#15803d;--pc:#e3f0e8;--pe:#116631;--pm:#96c6a8;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
 [hidden]{display:none!important}
@@ -263,10 +267,14 @@ nav button{min-width:0;font-size:.72rem}
 @media(max-width:359px){.flow.open .fb1{transform:translate(-96px,-96px) scale(.92)}.flow.open .fb2{transform:translate(96px,-96px) scale(.92)}.flow.open .fb3{transform:translate(-96px,96px) scale(.92)}.flow.open .fb4{transform:translate(96px,96px) scale(.92)}}
 .flownew{margin-top:4px;border:0;background:none;color:var(--pe);font:inherit;font-weight:700;font-size:1rem;padding:10px 14px;cursor:pointer;border-radius:999px}.flownew:active{background:var(--pc)}
 @media(prefers-reduced-motion:reduce){.flowc{animation:none}.flowc,.flowc svg,.fbub{transition:none!important}}
+/* v1.59 : typo fun (Fredoka) sur Demande */
+#s-demande .dtitle,.flowc span{font-family:"Fredoka","Baloo 2",ui-rounded,"SF Pro Rounded","Arial Rounded MT Bold",system-ui,sans-serif}
+#s-demande .dtitle{font-size:clamp(1.7rem,8vw,2.1rem);text-wrap:balance;font-weight:700;letter-spacing:.2px;line-height:1.15}
+.flowc span{font-size:1.45rem;font-weight:700;line-height:1;white-space:nowrap}
 </style>
 </head>
 <body>
-<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.58</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
+<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.59</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <!-- PROFIL -->
@@ -307,14 +315,14 @@ nav button{min-width:0;font-size:.72rem}
 <section class="screen" id="s-demande">
  <div class="searchwrap">
  <!-- v1.34 : barre « Que voulez-vous cuisiner ? » supprimée, remplacée par un titre -->
- <h2 class="dtitle">Besoin d'une idée ?</h2>
+ <h2 class="dtitle">Les courses, version&nbsp;fun&nbsp;!</h2>
   <!-- v1.58 : bouton central façon Flow (Deezer) ; au toucher, étoile de 4 bulles -->
   <div class="flow" id="flow">
    <button type="button" class="fbub fb1" id="invitesBtn" tabindex="-1">Des invités ce soir</button>
    <button type="button" class="fbub fb2" id="elaboreeBtn" tabindex="-1">Une recette élaborée</button>
    <button type="button" class="fbub fb3" id="repasBtn" tabindex="-1">Un repas</button>
    <button type="button" class="fbub fb4" id="expressBtn" tabindex="-1">Un repas rapide</button>
-   <button type="button" class="flowc" id="flowBtn" aria-expanded="false" aria-controls="flow" aria-label="Afficher les idées"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M16 3l2.6 7.4L26 13l-7.4 2.6L16 23l-2.6-7.4L6 13l7.4-2.6z" fill="#fff"/><path d="M25 20l1.2 3 3 1.2-3 1.2L25 28l-1.2-2.6-3-1.2 3-1.2z" fill="#fff" opacity=".85"/></svg><span>Idées</span></button>
+   <button type="button" class="flowc" id="flowBtn" aria-expanded="false" aria-controls="flow" aria-label="Afficher les idées"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M16 3l2.6 7.4L26 13l-7.4 2.6L16 23l-2.6-7.4L6 13l7.4-2.6z" fill="#fff"/><path d="M25 20l1.2 3 3 1.2-3 1.2L25 28l-1.2-2.6-3-1.2 3-1.2z" fill="#fff" opacity=".85"/></svg><span>Des idées</span></button>
   </div>
   <button type="button" class="flownew" id="newListBtn">+ Créer une nouvelle liste</button>
 
