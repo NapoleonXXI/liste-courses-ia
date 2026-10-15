@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.35">
+<meta name="app-version" content="v1.36">
 <title>Liste de courses IA</title>
 <style>
 :root{--acc:#16a34a;--acc2:#dcfce7;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -118,6 +118,26 @@ body.entree nav{display:none}body.entree main{padding-bottom:calc(16px + env(saf
 #eForm .stepper{margin-top:0}#eForm .ferr{color:var(--err);font-size:.85rem;min-height:1em;margin:-4px 0 0}
 #eForm .fbtns{display:flex;gap:10px}#eForm .fbtns button{flex:1;min-height:48px;border-radius:999px;font:inherit;font-weight:700;cursor:pointer}
 #eCancel{background:#fff;border:1px solid #d1d5db;color:var(--txt)}#eOk{background:var(--acc);border:1px solid var(--acc);color:#fff}
+/* v1.36 : mini-formulaire et confirmation Allergies (copie du style eForm/eConf) */
+#aConf{position:fixed;inset:0;z-index:21;background:rgba(17,24,39,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+#aConf .cbox{width:100%;max-width:420px;background:#fff;border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+#aConf p{margin:0;font-weight:700;font-size:1.05rem;color:var(--txt);overflow-wrap:anywhere}
+#aConf .fbtns{display:flex;gap:10px}#aConf .fbtns button{flex:1;min-height:48px;border-radius:999px;font:inherit;font-weight:700;cursor:pointer}
+#aConfNo{background:#fff;border:1px solid #d1d5db;color:var(--txt)}#aConfYes{background:var(--err);border:1px solid var(--err);color:#fff}
+#aForm{position:fixed;inset:0;z-index:20;background:rgba(17,24,39,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+#aForm form{width:100%;max-width:420px;background:#fff;border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+#aForm h2{margin:0;font-size:1.15rem;color:#14532d}#aForm label{font-weight:600;font-size:.95rem;display:flex;flex-direction:column;gap:6px}
+#aForm input[type=text]{height:48px;padding:0 14px;font-size:1rem;border:1px solid #d1d5db;border-radius:12px;width:100%}
+#aForm .stepper{margin-top:0}#aForm .ferr{color:var(--err);font-size:.85rem;min-height:1em;margin:-4px 0 0}
+#aForm .fbtns{display:flex;gap:10px}#aForm .fbtns button{flex:1;min-height:48px;border-radius:999px;font:inherit;font-weight:700;cursor:pointer}
+#aCancel{background:#fff;border:1px solid #d1d5db;color:var(--txt)}#aOk{background:var(--acc);border:1px solid var(--acc);color:#fff}
+/* v1.36 : rangées de spécificités (Mon profil) : style minimaliste */
+.spec{margin-top:12px}.spec h3{margin:0;font-size:1.05rem;color:#14532d}.spec .ssub{margin:2px 0 8px;font-size:.82rem;color:#6b7280}
+.srow{display:flex;gap:8px;align-items:center;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:2px 0}.srow::-webkit-scrollbar{display:none}
+.schip{flex:0 0 auto;max-width:180px;min-height:40px;padding:0 14px;border:1px solid #d1d5db;border-radius:999px;background:#fff;color:var(--txt);font:inherit;font-size:.9rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.sadd{flex:0 0 40px;width:40px;height:40px;border:1px dashed var(--acc);border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}.sadd svg{width:20px;height:20px}
+.sempty{flex:0 0 auto;font-size:.88rem;color:#9ca3af}
+#aDel{background:#fff;border:1px solid #fca5a5;color:#b91c1c}
 #foyerLbl{max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.15}
 .ecase{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:0;min-width:0;padding:16px 10px;border:1px solid var(--acc);border-radius:var(--r);background:var(--acc2);color:#14532d;font:inherit;font-weight:700;font-size:1.05rem;line-height:1.25;text-align:center;overflow-wrap:anywhere;cursor:pointer}
 .ecase:active{filter:brightness(.95)}#eSolo{grid-column:1/-1;font-size:1.2rem}
@@ -193,7 +213,7 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.35</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small></header>
+<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.36</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <button type="button" class="xback" id="navBack" hidden style="margin-bottom:10px" aria-label="Retour à la vue précédente">← Retour</button>
@@ -299,6 +319,16 @@ nav button{min-width:0;font-size:.72rem}
 <section class="screen" id="s-monprofil">
  <div class="card pfhead" id="pfHeader"><div class="avatar" id="pfAv" aria-hidden="true"></div><div class="pfid"><div class="pfname" id="pfName">Aucun profil connecté</div><div class="note" id="pfType"></div><div class="note" id="pfNb"></div></div></div>
  <!-- v1.35 : en-tête relié au profil actif (lci_profil_actif_v1), lecture seule -->
+ <!-- v1.36 : rangées de spécificités (localStorage lci_specificites_v1 {profilId:{allergies:[]}}) ; seule spécificité : Allergies -->
+ <div class="card spec" id="specAllergies"><h3>Allergies</h3><p class="ssub">Ingrédients à éviter pour ce profil</p><div class="srow" id="alRow" aria-label="Allergies"></div></div>
+ <div id="aForm" hidden role="dialog" aria-modal="true" aria-labelledby="aFormT"><form id="aFormF" novalidate>
+  <h2 id="aFormT">Nouvelle allergie</h2>
+  <label>Nom de l'allergie<input type="text" id="aName" maxlength="40" autocomplete="off" placeholder="Ex. Arachides"></label>
+  <p class="ferr" id="aErr" aria-live="polite"></p>
+  <div class="fbtns" id="aDelWrap" hidden><button type="button" id="aDel">Supprimer</button></div>
+  <div class="fbtns"><button type="button" id="aCancel">Annuler</button><button type="submit" id="aOk">Valider</button></div>
+ </form></div>
+ <div id="aConf" hidden role="alertdialog" aria-modal="true" aria-labelledby="aConfT"><div class="cbox"><p id="aConfT"></p><div class="fbtns"><button type="button" id="aConfNo">Annuler</button><button type="button" id="aConfYes">Supprimer</button></div></div></div>
 </section>
 </main>
 <nav>
@@ -662,7 +692,27 @@ function renderMonProfil(){const f=actGet(),nm=foyerLabel(f);const av=$('#pfAv')
  const D={solo:['Solo','1 personne'],duo:['Duo','2 personnes'],groupe:['Groupe','Plusieurs personnes']};let n,t,nb;
  if(D[f]){[n,nb]=D[f];t='Profil par défaut'}else{const p=persoGet().find(x=>'perso:'+x.id===f);n=p.nom;t='Profil personnalisé';nb=p.nb+(p.nb>1?' personnes':' personne')}
  $('#pfName').textContent=n;$('#pfType').textContent=t;$('#pfNb').textContent='Nombre de personnes : '+nb.replace(/ personnes?$/,'').replace('Plusieurs','plusieurs');av.innerHTML=f==='groupe'?G:O}
-function updFoyerBadge(){renderMonProfil();let f=actGet();const lb=foyerLabel(f);const ok=!!lb;f=lb;const b=$('#foyerBadge');b.hidden=!ok||curScreen==='entree';if(ok){$('#foyerLbl').textContent=f;$('#foyerLbl').title=f;b.setAttribute('aria-label','Profil actif : '+f+'. Menu du profil')}}
+/* v1.36 : spécificités par profil (lecture/écriture, sans influence sur le reste de l'app) */
+const SPEC_KEY='lci_specificites_v1';
+function specAll(){try{const o=JSON.parse(localStorage.getItem(SPEC_KEY));return o&&typeof o==='object'&&!Array.isArray(o)?o:{}}catch(e){return{}}}
+function specSave(o){try{localStorage.setItem(SPEC_KEY,JSON.stringify(o))}catch(e){}}
+function alGet(){const f=actGet();const o=specAll();return f&&o[f]&&Array.isArray(o[f].allergies)?o[f].allergies:[]}
+function alSet(a){const f=actGet();if(!f)return;const o=specAll();o[f]=Object.assign({},o[f],{allergies:a});specSave(o)}
+const PLUS='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#15803d" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
+function renderAllergies(){const w=$('#specAllergies');if(!w)return;w.hidden=!foyerLabel(actGet());const a=alGet();
+ $('#alRow').innerHTML=(a.length?a.map((x,i)=>`<button type="button" class="schip" data-i="${i}" title="${esc(x)}">${esc(x)}</button>`).join(''):'<span class="sempty">Aucune allergie déclarée</span>')+`<button type="button" class="sadd" id="alAdd" aria-label="Ajouter une allergie" title="Ajouter une allergie">${PLUS}</button>`}
+let alIdx=null;
+function openAl(i){alIdx=i;const a=alGet();$('#aFormT').textContent=i==null?'Nouvelle allergie':'Modifier l\'allergie';$('#aName').value=i==null?'':a[i];$('#aErr').textContent='';$('#aDelWrap').hidden=i==null;$('#aForm').hidden=false;$('#aName').focus()}
+const closeAl=()=>{$('#aForm').hidden=true;alIdx=null};
+$('#alRow').onclick=e=>{if(e.target.closest('#alAdd')){openAl(null);return}const c=e.target.closest('.schip');if(c)openAl(+c.dataset.i)};
+$('#aCancel').onclick=closeAl;$('#aForm').onclick=e=>{if(e.target.id==='aForm')closeAl()};
+$('#aFormF').onsubmit=e=>{e.preventDefault();const v=$('#aName').value.trim().replace(/\s+/g,' ');if(!v){$('#aErr').textContent='Veuillez saisir un nom.';$('#aName').focus();return}
+ const a=alGet();const k=v.toLocaleLowerCase('fr');if(a.some((x,i)=>i!==alIdx&&x.toLocaleLowerCase('fr')===k)){$('#aErr').textContent='Cette allergie est déjà déclarée.';$('#aName').focus();return}
+ if(alIdx==null)a.push(v.slice(0,40));else a[alIdx]=v.slice(0,40);alSet(a);closeAl();renderAllergies();if(alIdx==null){const r=$('#alRow');r.scrollLeft=r.scrollWidth}};
+$('#aDel').onclick=()=>{const a=alGet();if(alIdx==null||a[alIdx]==null)return;$('#aConfT').textContent='Supprimer l\'allergie « '+a[alIdx]+' » ?';$('#aConf').hidden=false;$('#aConfNo').focus()};
+$('#aConfNo').onclick=()=>{$('#aConf').hidden=true};$('#aConf').onclick=e=>{if(e.target.id==='aConf')$('#aConf').hidden=true};
+$('#aConfYes').onclick=()=>{const a=alGet();if(alIdx!=null){a.splice(alIdx,1);alSet(a)}$('#aConf').hidden=true;closeAl();renderAllergies()};
+function updFoyerBadge(){renderMonProfil();renderAllergies();let f=actGet();const lb=foyerLabel(f);const ok=!!lb;f=lb;const b=$('#foyerBadge');b.hidden=!ok||curScreen==='entree';if(ok){$('#foyerLbl').textContent=f;$('#foyerLbl').title=f;b.setAttribute('aria-label','Profil actif : '+f+'. Menu du profil')}}
 const ICO1='<svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg>';
 function profilsAll(){return[{f:'solo',nm:'Solo',np:'1 pers.'},{f:'duo',nm:'Duo',np:'2 pers.'},{f:'groupe',nm:'Groupe',np:'3+ pers.'}].concat(persoGet().map(p=>({f:'perso:'+p.id,nm:p.nom,np:p.nb+' pers.'})))}
 function openPMenu(){const a=actGet();const L=profilsAll();L.sort((x,y)=>(y.f===a)-(x.f===a));$('#pmList').innerHTML=L.map(p=>`<button type="button" class="pmrow${p.f===a?' on':''}" data-f="${esc(p.f)}" title="${esc(p.nm)} · ${esc(p.np)}"${p.f===a?' aria-current="true"':''}><span class="sc">${ICO1}</span><span class="nm">${esc(p.nm)}</span></button>`).join('')+`<button type="button" class="pmplus" id="pmNew" aria-label="Créer un profil" title="Créer un profil"><span class="sc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#15803d" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Créer</button><button type="button" class="pmplus pmgest" id="pmGest" aria-label="Gérer les profils" title="Gérer les profils"><span class="sc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#15803d" stroke-width="2.6" stroke-linecap="round"><path d="M5 7h14M5 12h14M5 17h14"/></svg></span>Gérer</button>`;$('#pmList').scrollLeft=0;$('#pMenu').hidden=false}
@@ -706,7 +756,7 @@ $('#pGest').onclick=e=>{if(e.target.id==='pGest'){closeGest();return}
  if(sl){actSet(sl.dataset.f);updFoyerBadge();renderGest()}};
 $('#gNew').onclick=()=>{formFromMenu=true;openForm(null)};
 $('#eConfNo').onclick=()=>{$('#eConf').hidden=true;delId=null};$('#eConf').onclick=e=>{if(e.target.id==='eConf'){$('#eConf').hidden=true;delId=null}};
-$('#eConfYes').onclick=()=>{if(delId){persoSet(persoGet().filter(x=>x.id!==delId));const wasAct=curFoyer()==='perso:'+delId;if(wasAct)actSet(null);renderPerso();updFoyerBadge();$('#eConf').hidden=true;delId=null;if(wasAct&&curScreen!=='entree'){closeGest();startEntree()}else gestRefresh();return}$('#eConf').hidden=true;delId=null};
+$('#eConfYes').onclick=()=>{if(delId){persoSet(persoGet().filter(x=>x.id!==delId));{const o=specAll();if(o['perso:'+delId]){delete o['perso:'+delId];specSave(o)}}const wasAct=curFoyer()==='perso:'+delId;if(wasAct)actSet(null);renderPerso();updFoyerBadge();$('#eConf').hidden=true;delId=null;if(wasAct&&curScreen!=='entree'){closeGest();startEntree()}else gestRefresh();return}$('#eConf').hidden=true;delId=null};
 let eNb=2;const setNb=n=>{eNb=Math.max(1,Math.min(12,n));$('#eNb').textContent=eNb;$('#eMinus').disabled=eNb<=1;$('#ePlus').disabled=eNb>=12};
 $('#eMinus').onclick=()=>setNb(eNb-1);$('#ePlus').onclick=()=>setNb(eNb+1);
 const closeForm=()=>{$('#eForm').hidden=true;formFromMenu=false;gestRefresh()};
