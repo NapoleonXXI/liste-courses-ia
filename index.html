@@ -149,6 +149,8 @@ details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;alig
 .pillgrid button.pill.pill-still,.pillgrid button.pill.pill-still:hover,.pillgrid button.pill.pill-still:focus,.pillgrid button.pill.pill-still:active{grid-column:1/-1;background:#EDE4F7!important;border:1px solid #7B2D8E!important;color:#5B1F6B!important;font-weight:700!important;height:56px}
 .pillgrid button.pill.pill-still:active{filter:brightness(.92)}
 .pillgrid button.pill.pill-still:focus-visible{outline:3px solid #b48ac4;outline-offset:2px}
+/* v1.31 : Végétarien retiré -> 5 pastilles ; sur 2 colonnes la dernière prend toute la largeur (pas de trou) */
+@media(max-width:599px){.pillgrid:not(#apGrid)>button.pill:last-child{grid-column:1/-1}}
 
 nav button{min-width:0;font-size:.72rem}
 .pfhead{display:flex;align-items:center;gap:14px}
