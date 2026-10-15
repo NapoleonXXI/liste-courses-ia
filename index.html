@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.21">
+<meta name="app-version" content="v1.22">
 <title>Liste de courses IA</title>
 <style>
 :root{--acc:#16a34a;--acc2:#dcfce7;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -87,6 +87,8 @@ details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;alig
 
 /* v1.18-1.19 Repas express : classes propres (pas de .chip), déclarées après .pill */
 #navBack[hidden]{display:none!important}
+.aptitle{text-align:center;margin:4px 0 14px;font-size:1.3rem}
+.pillgrid .pill.apcase{display:flex;align-items:center;justify-content:center;cursor:default}.pillgrid .pill.apcase:active{transform:none}
 .xhead{display:flex;align-items:center;gap:10px;margin-bottom:6px}.xhead h2{margin:0;font-size:1.25rem}
 .xback{min-height:44px;padding:8px 14px;border:1px solid var(--acc);border-radius:999px;background:var(--acc2);color:#14532d;font-weight:700;cursor:pointer}
 .xpanel{width:100%;margin-top:12px;display:grid;gap:8px}
@@ -104,7 +106,7 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.21</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
+<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.22</span></h1><small id="hdrSub">Vos courses, pensées pour vous</small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <button type="button" class="xback" id="navBack" hidden style="margin-bottom:10px" aria-label="Retour à la vue précédente">← Retour</button>
@@ -166,35 +168,18 @@ nav button{min-width:0;font-size:.72rem}
  </div>
 </section>
 <!-- LISTE -->
-<section class="screen" id="s-liste">
- <div class="card"><h2 id="listTitle">Ma liste</h2>
-  <div class="prog"><div id="progBar"></div></div>
-  <div class="stats">
-   <div>Articles cochés<b id="stCount">0 / 0</b></div>
-   <div>Progression<b id="stPct">0 %</b></div>
-   <div>Dans le panier<b id="stCart">0,00 €</b></div>
-   <div>Reste estimé<b id="stRemain">0,00 €</b></div>
-  </div>
-  <div id="listWarn"></div>
-  <p class="note" id="factorInfo"></p>
-  <p class="note">💡 Prix indicatifs estimés (moyennes supermarchés France), non contractuels.</p>
- </div>
- <div id="listBody"></div>
- <button class="btn" id="finish">✅ Terminer les courses</button>
- <button class="btn danger" id="reset">Vider la liste</button>
- <div class="card"><h3>Ajouter un article</h3>
-  <input id="addName" placeholder="Nom de l'article">
-  <div class="row" style="margin-top:8px"><input id="addQty" placeholder="Quantité" inputmode="decimal"><input id="addUnit" placeholder="Unité (g, pièce…)"></div>
-  <button class="btn sec" id="addBtn">+ Ajouter</button>
- </div>
-</section>
 <!-- PANIER -->
 
 <!-- v1.19 : vue dédiée Repas express (hors barre d'onglets). Clic sur un repas = saisie + Entrée. -->
 <section class="screen" id="s-express">
  <div class="xhead"><button type="button" class="xback" id="expressBack" aria-label="Retour à Demande">← Retour</button><h2>⚡ Repas express</h2></div>
- <p class="note">5 idées prêtes en 20 minutes maximum. Touchez un repas pour générer la liste de courses.</p>
+ <p class="note">5 idées prêtes en 20 minutes maximum. Touchez un repas pour voir ses ingrédients.</p>
  <div class="xpanel" id="expressPanel"></div>
+</section>
+<!-- v1.22 : aperçu d'un plat express (lecture seule) -->
+<section class="screen" id="s-apercu">
+ <h2 id="apTitle" class="aptitle"></h2>
+ <div class="pillgrid" id="apGrid"></div>
 </section>
 <section class="screen" id="s-monprofil">
  <div class="card pfhead" id="pfHeader"><div class="avatar" aria-hidden="true">PN</div><div class="pfid"><div class="pfname">Prénom Nom</div><div class="note">Profil fictif · données de démonstration</div></div></div>
@@ -202,7 +187,6 @@ nav button{min-width:0;font-size:.72rem}
 </main>
 <nav>
  <button data-s="demande"><span>💬</span>Demande</button>
- <button data-s="liste"><span>📝</span>Liste<i class="badge" id="badgeList" hidden></i></button>
  <button data-s="monprofil"><span>👤</span>Mon profil</button>
 </nav>
 <div class="toast" id="toast"></div>
@@ -401,65 +385,8 @@ function budgetMsg(total,what){
 
 /* ---- Rendu liste ---- */
 const CAT_ORDER=['Fruits & légumes','Boucherie','Poissonnerie','Crèmerie','Boulangerie','Épicerie','Surgelés','Boissons','Divers'];
-function totals(){const t=list.items.length,c=list.items.filter(i=>i.checked);const all=list.items.reduce((s,i)=>s+pp(i),0);const cart=c.reduce((s,i)=>s+pp(i),0);return {t,c:c.length,cart,remain:all-cart,all}}
-function updateStats(){
- const s=totals();const pct=s.t?Math.round(s.c/s.t*100):0;
- $('#progBar').style.width=pct+'%';$('#stCount').textContent=`${s.c} / ${s.t}`;$('#stPct').textContent=pct+' %';$('#stCart').textContent=eur(s.cart);$('#stRemain').textContent=eur(s.remain);
- $('#listWarn').innerHTML=s.t?budgetMsg(s.all):'';
- $('#factorInfo').innerHTML=store?`🏪 Prix indicatifs chez <b>${esc(store.name)}</b> (niveau moyen ${fmtPct(Math.round((fac()-1)*100))}) : ${levelsText()}`:'🏪 Aucun magasin choisi : prix moyens nationaux.';
- const b=$('#badgeList');b.hidden=!(s.t-s.c);b.textContent=s.t-s.c;
-
-}
-function renderGen(){
- const g=LS.get('lastGen',null),el=$('#genResult');if(!g){el.innerHTML='';return}
- const items=list.items.filter(i=>g.ids.includes(i.id));if(!items.length){el.innerHTML='';return}
- const tot=items.reduce((s,i)=>s+pp(i),0);
- let h=`<div class="card"><h3>${g.source==='ia'?'🤖 Généré par IA':'🧪 Génération simulée'}</h3><div><b>${esc(g.title)}</b> — ${items.length} articles, ~${eur(tot)} pour ${profile.people} pers.</div>`;
- h+=`<p class="note">Prix indicatifs ${store?'chez <b>'+esc(store.name)+'</b>':'moyens (aucun magasin choisi)'}</p>`;
- h+='<div class="genlist">'+items.map(i=>`<div class="gl"><div class="iname">${esc(i.name)} <span class="sub">(${i.quantity} ${esc(i.unit)})</span></div><div class="iprice" data-price="${pp(i).toFixed(2)}">${priceLine(i)}</div></div>`).join('')+'</div>';
- if(g.generic)h+=`<div class="warn">Plat non reconnu : voici une liste générique équilibrée. Ajoutez une clé IA pour des résultats sur mesure.</div>`;
- if(g.notes&&g.notes.length)h+=`<div class="warn">Adapté à votre profil : ${g.notes.map(esc).join(' ; ')}</div>`;
- h+=budgetMsg(tot)+`<button class="btn" onclick="go('liste')">Voir ma liste →</button></div>`;el.innerHTML=h;
-}
-function render(){
- renderGen();
- $('#listTitle').textContent=list.title?'Ma liste : '+list.title:'Ma liste';
- const body=$('#listBody');
- if(!list.items.length){body.innerHTML='<div class="card empty">Votre liste est vide.<br>Allez dans « Demande » pour la générer ✨</div>';updateStats();return}
- const g={};list.items.forEach(i=>{(g[i.category]=g[i.category]||[]).push(i)});
- const cats=Object.keys(g).sort((a,b)=>(CAT_ORDER.indexOf(a)+99)%108-(CAT_ORDER.indexOf(b)+99)%108);
- body.innerHTML=cats.map(c=>`<div class="card"><h3>${esc(c)}</h3>${g[c].map(i=>`
-  <div class="item${i.checked?' done':''}" data-id="${i.id}">
-   <input type="checkbox" ${i.checked?'checked':''} aria-label="Cocher ${esc(i.name)}">
-   <div class="nm"><div class="iname">${esc(i.name)}</div><div class="iprice" data-price="${pp(i).toFixed(2)}">${priceLine(i)}</div><span class="sub">en ${esc(i.unit)}</span>${i.alt?`<div class="sub alt">↺ ${esc(i.alt)}</div>`:''}</div>
-   <input class="qty" type="number" min="0" step="any" inputmode="decimal" value="${i.quantity}" aria-label="Quantité">
-   <button class="del" aria-label="Supprimer">✕</button></div>`).join('')}</div>`).join('');
- updateStats();
-}
-$('#listBody').addEventListener('change',e=>{
- const row=e.target.closest('.item');if(!row)return;const it=list.items.find(i=>i.id===row.dataset.id);if(!it)return;
- if(e.target.type==='checkbox'){it.checked=e.target.checked;row.classList.toggle('done',it.checked)}
- else if(e.target.classList.contains('qty')){const q=Math.max(0,+e.target.value||0);const known=P[it.name]||Object.keys(P).some(k=>norm(it.name).includes(norm(k)));it.price=+(known?priceFor(it.name,q,it.unit):(it.price||0)*q/(it.quantity||1)).toFixed(2);it.quantity=q;render()}
- save();updateStats();
-});
-$('#listBody').addEventListener('click',e=>{
- if(!e.target.classList.contains('del'))return;const id=e.target.closest('.item').dataset.id;
- list.items=list.items.filter(i=>i.id!==id);save();render();toast('Article supprimé');
-});
-$('#addBtn').onclick=()=>{
- const name=$('#addName').value.trim();if(!name){toast("Indiquez un nom d'article");return}
- const q=parseFloat(($('#addQty').value||'1').replace(',','.'))||1,u=$('#addUnit').value.trim()||'pièce';
- if(isBlocked(name).length)toast('⚠️ Cet article ne respecte pas votre profil');
- list.items.push({id:uid(),name,quantity:q,unit:u,category:guessCat(name),price:+priceFor(name,q,u).toFixed(2),alt:'',checked:false});
- save();render();$('#addName').value=$('#addQty').value=$('#addUnit').value='';toast('Article ajouté');
-};
-
-/* ---- Panier ---- */
-$('#finish').onclick=()=>{const s=totals();if(!s.t){toast('Liste vide');return}
- if(!confirm(`Terminer les courses ? Total estimé : ${eur(s.cart)}. Les articles cochés seront retirés de la liste.`))return;
- const hist=LS.get('history',[]);hist.push({date:new Date().toISOString(),title:list.title,total:s.cart});LS.set('history',hist.slice(-50));
- list.items=list.items.filter(i=>!i.checked);if(!list.items.length)list.title='';save();render();toast('Courses terminées 🎉');};
-$('#reset').onclick=()=>{if(!confirm('Vider complètement la liste ?'))return;list={title:'',items:[]};save();render();$('#genResult').innerHTML='';toast('Liste vidée')};
+/* v1.22 Liste désactivée : code déplacé dans liste-desactive.js (non chargé). render() est un stub. */
+function render(){}
 
 /* ---- Profil désactivé (voir profil-desactive.js) : valeurs neutres ---- */
 function loadProfile(){
@@ -604,18 +531,22 @@ function _go(s){curScreen=s;updNavBack();document.querySelectorAll('.screen').fo
 window.go=go;
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.s));
 $('#generate').onclick=generate;
-$('#searchForm').addEventListener('submit',async e=>{e.preventDefault();if(!$('#request').value.trim())return;$('#request').blur();await generate();if(list.items.length)go('liste')});
+/* v1.22 : Liste désactivée → Entrée ne fait rien (pas de génération), simple fermeture du clavier */
+$('#searchForm').addEventListener('submit',e=>{e.preventDefault();$('#request').blur()});
 $('#suggest').innerHTML=['Pâtes carbonara','Ratatouille','Poulet rôti','Curry de légumes','Crêpes','Poke bowl'].map(s=>`<button type="button" class="chip" data-v="${s}">${s}</button>`).join('');
 /* v1.18 Repas express : 5 options (sans profil). q = texte envoyé au flux existant */
 const EXPRESS=[
- {n:'Pâtes carbonara',d:'Spaghetti, lardons, œuf et parmesan.',t:15,q:'Pâtes carbonara'},
- {n:'Omelette aux champignons',d:'Œufs battus, champignons poêlés, persil.',t:10,q:'Omelette aux champignons'},
- {n:'Wraps poulet-crudités',d:'Tortillas garnies de poulet, salade, tomate, carotte.',t:15,q:'Wraps'},
- {n:'Riz sauté aux légumes et œuf',d:'Riz, petits pois, carotte, œuf brouillé, sauce soja.',t:20,q:'Riz sauté'},
- {n:'Salade niçoise au thon',d:'Salade, tomate, thon, œuf dur, haricots verts.',t:15,q:'Salade niçoise'}];
+ {n:'Pâtes carbonara',d:'Spaghetti, lardons, œuf et parmesan.',t:15,q:'Pâtes carbonara',ing:['spaghetti','lardons','œufs','parmesan','poivre noir','sel']},
+ {n:'Omelette aux champignons',d:'Œufs battus, champignons poêlés, persil.',t:10,q:'Omelette aux champignons',ing:['œufs','champignons de Paris','beurre','persil','ciboulette','sel','poivre']},
+ {n:'Wraps poulet-crudités',d:'Tortillas garnies de poulet, salade, tomate, carotte.',t:15,q:'Wraps',ing:['tortillas de blé','blancs de poulet','salade','tomates','carotte','concombre','fromage blanc','citron','huile d\'olive','sel','poivre']},
+ {n:'Riz sauté aux légumes et œuf',d:'Riz, petits pois, carotte, œuf brouillé, sauce soja.',t:20,q:'Riz sauté',ing:['riz','œufs','petits pois','carottes','oignon','ail','sauce soja','huile','ciboule']},
+ {n:'Salade niçoise au thon',d:'Salade, tomate, thon, œuf dur, haricots verts.',t:15,q:'Salade niçoise',ing:['salade','tomates','thon en boîte','œufs','haricots verts','pommes de terre','olives noires','oignon rouge','huile d\'olive','vinaigre','sel','poivre']}];
 $('#expressPanel').innerHTML=EXPRESS.map((x,i)=>`<button type="button" class="xopt" data-i="${i}"><span class="xt">⏱ ${x.t} min</span><b>${esc(x.n)}</b><small>${esc(x.d)}</small></button>`).join('');
 $('#expressBtn').onclick=()=>go('express');$('#expressBack').onclick=goBack;$('#navBack').onclick=goBack;
-$('#expressPanel').onclick=e=>{const b=e.target.closest('.xopt');if(!b)return;$('#request').value=EXPRESS[+b.dataset.i].q;$('#searchForm').requestSubmit()};
+/* v1.22 : clic sur un plat = vue aperçu (titre + cases d'ingrédients non cliquables, sans quantités ni prix) */
+function showApercu(i){const x=EXPRESS[i];if(!x)return;LS.set('apercu',i);$('#apTitle').textContent=x.n;$('#apGrid').innerHTML=x.ing.map(g=>`<div class="pill apcase">${esc(g)}</div>`).join('')}
+$('#expressPanel').onclick=e=>{const b=e.target.closest('.xopt');if(!b)return;showApercu(+b.dataset.i);go('apercu')};
+showApercu(LS.get('apercu',0));
 $('#suggest').onclick=e=>{const b=e.target.closest('.chip');if(b)$('#request').value=b.dataset.v};
 $('#appendMode').checked=false;
 
@@ -640,7 +571,7 @@ const PROFIL_GENERIQUE={
 };
 try{localStorage.setItem(PF_GEN_KEY,JSON.stringify(PROFIL_GENERIQUE))}catch(e){}
 loadProfile();render();showStore();
-{const sc=LS.get('screen','demande');go(['demande','liste','monprofil','express'].includes(sc)?sc:'demande')}
+{const sc=LS.get('screen','demande');go(['demande','monprofil','express','apercu'].includes(sc)?sc:'demande')}
 // Service worker : aucun n'est utilisé ; on désinscrit d'éventuels anciens SW pour éviter une version en cache.
 if('serviceWorker' in navigator&&navigator.serviceWorker.getRegistrations)navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});
 </script>
