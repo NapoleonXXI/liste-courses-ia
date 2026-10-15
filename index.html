@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.67">
+<meta name="app-version" content="v1.68">
 <title>Liste de courses IA</title>
 <!-- v1.59 : police fun Fredoka (Google Fonts, display=swap) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -297,12 +297,12 @@ nav button{min-width:0;font-size:.72rem}
 .icard p{margin:0 0 6px;color:var(--mut);font-size:.9rem}
 .icard ul{margin:0;padding-left:18px;font-size:.9rem}.icard li{margin:1px 0}
 .iempty{text-align:center;color:var(--mut);margin:10px 0}
-/* v1.67 : questions Invités sur une seule page, rangées de bulles défilantes */
+/* v1.68 : questions Invités sur une seule page, rangées de bulles défilantes */
 .fqrow{margin:14px 0 4px}.fqrow h3{font-size:1.05rem;margin:0 0 8px}
 .fqrow .srow{padding:2px 2px 6px}
 .fqrow .schip{min-width:44px;text-align:center}
 .fqrow .schip[aria-pressed="true"]{background:var(--inv);border-color:var(--inv);color:#fdf6e3}
-/* v1.67 : entonnoir, propositions à cocher, Ma liste de courses */
+/* v1.68 : entonnoir, propositions à cocher, Ma liste de courses */
 #s-maliste{--inv:#9f1239;--invd:#4c0519;--invc:#fdf2f4}
 .fdots{display:flex;align-items:center;justify-content:center;gap:8px;margin:6px 0 12px}.fdots span{width:10px;height:10px;border-radius:50%;background:#ead1d8}.fdots span.done{background:var(--inv)}.fdots span.on{background:var(--inv);box-shadow:0 0 0 4px rgba(159,18,57,.18)}.fdots b{margin-left:6px;font-size:.85rem;color:var(--invd)}
 .fq h3{font-size:1.35rem;text-align:center;margin-bottom:14px}.fq.fin{animation:fqIn .28s ease}@keyframes fqIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
@@ -330,7 +330,7 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.67</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
+<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.68</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <!-- PROFIL -->
@@ -371,7 +371,7 @@ nav button{min-width:0;font-size:.72rem}
 <section class="screen" id="s-demande">
  <div class="searchwrap">
  <!-- v1.34 : barre « Que voulez-vous cuisiner ? » supprimée, remplacée par un titre -->
- <h2 class="dtitle">Les courses, version&nbsp;fun&nbsp;!</h2>
+ <h2 class="dtitle">Besoin d’idéesLes courses, version&nbsp;fun&nbsp;!nbsp;?</h2>
   <!-- v1.58 : bouton central façon Flow (Deezer) ; au toucher, étoile de 4 bulles -->
   <div class="flow" id="flow">
    <button type="button" class="fbub fb1" id="invitesBtn" tabindex="-1">Des invités ce soir</button>
@@ -421,7 +421,7 @@ nav button{min-width:0;font-size:.72rem}
 <!-- PANIER -->
 
 <!-- v1.19 : vue dédiée Repas express (hors barre d'onglets). Clic sur un repas = saisie + Entrée. -->
-<!-- v1.67 : « Des invités ce soir » en entonnoir (4 questions, un toucher chacune), puis propositions à cocher -->
+<!-- v1.68 : « Des invités ce soir » en entonnoir (4 questions, un toucher chacune), puis propositions à cocher -->
 <section class="screen" id="s-invites">
  <h2 class="ftitle">Des invités ce soir</h2>
  <div id="funAll"></div>
@@ -435,7 +435,7 @@ nav button{min-width:0;font-size:.72rem}
  <button type="button" class="fskip" id="invMore">Autres idées</button>
  <div class="pbar"><button type="button" class="invgo" id="invList" disabled>Créer ma liste (0)</button></div>
 </section>
-<!-- v1.67 : onglet « Ma liste de courses » (listes créées, une par occasion, articles groupés par rayon) -->
+<!-- v1.68 : onglet « Ma liste de courses » (listes créées, une par occasion, articles groupés par rayon) -->
 <section class="screen" id="s-maliste">
  <h2 class="ftitle lt">Ma liste de courses</h2>
  <div id="lstAll"></div>
@@ -967,7 +967,7 @@ function flowSet(o){const f=$('#flow');if(!f)return;f.classList.toggle('open',o)
 $('#flowBtn').onclick=()=>flowSet(!$('#flow').classList.contains('open'));
 document.addEventListener('click',e=>{if($('#flow').classList.contains('open')&&!e.target.closest('#flowBtn,.fbub'))flowSet(false)});
 
-// v1.67 : « Des invités ce soir » en entonnoir (4 questions) + propositions à cocher + listes de courses. Base locale, aucun appel réseau.
+// v1.68 : « Des invités ce soir » en entonnoir (4 questions) + propositions à cocher + listes de courses. Base locale, aucun appel réseau.
 const IDEES_INV=[
 ['plat','Pâtes carbonara','Lardons, œufs et parmesan, prêtes en 15 minutes','pk','G L O','Pâtes:100:g|Lardons:50:g|Œufs:1:|Parmesan:20:g'],
 ['plat','Omelette aux champignons','Œufs battus, champignons poêlés et ciboulette','vk','O L','Œufs:2:|Champignons:60:g|Beurre:5:g|Ciboulette:0.1:'],
