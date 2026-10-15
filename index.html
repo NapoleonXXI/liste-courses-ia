@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.26">
+<meta name="app-version" content="v1.27">
 <title>Liste de courses IA</title>
 <style>
 :root{--acc:#16a34a;--acc2:#dcfce7;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -122,7 +122,7 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.26</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small></header>
+<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.27</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="#15803d"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <button type="button" class="xback" id="navBack" hidden style="margin-bottom:10px" aria-label="Retour à la vue précédente">← Retour</button>
@@ -549,7 +549,7 @@ function navSave(){try{sessionStorage.setItem('lci_nav',JSON.stringify(navStack.
 function updNavBack(){$('#navBack').hidden=curScreen==='express'||curScreen==='demande'||curScreen==='entree'}
 function goBack(){let p;while(navStack.length&&(p=navStack.pop())===curScreen);navSave();_go(p&&p!==curScreen?p:'demande')}
 function go(s){if(curScreen&&curScreen!==s){navStack.push(curScreen);navSave()}_go(s)}
-function _go(s){curScreen=s;updNavBack();document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id==='s-'+s));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.s===s));LS.set('screen',s);try{sessionStorage.setItem('lci_screen',s)}catch(e){}document.body.classList.toggle('entree',s==='entree');updFoyerBadge();window.scrollTo(0,0)}
+function _go(s){curScreen=s;updNavBack();document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id==='s-'+s));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.s===s));LS.set('screen',s);document.body.classList.toggle('entree',s==='entree');updFoyerBadge();window.scrollTo(0,0)}
 window.go=go;
 /* v1.26 : badge foyer (solo/duo/groupe) depuis lci_foyer_session ; masqué sur l'entrée et avant tout choix ; clic = rouvre l'entrée */
 function updFoyerBadge(){let f=null;try{f=sessionStorage.getItem('lci_foyer_session')}catch(e){}const ok=['solo','duo','groupe'].includes(f);const b=$('#foyerBadge');b.hidden=!ok||curScreen==='entree';if(ok){$('#foyerLbl').textContent=f;b.setAttribute('aria-label','Foyer : '+f+'. Changer')}}
@@ -597,8 +597,9 @@ const PROFIL_GENERIQUE={
 };
 try{localStorage.setItem(PF_GEN_KEY,JSON.stringify(PROFIL_GENERIQUE))}catch(e){}
 loadProfile();render();showStore();
-/* v1.25 : nouveau lancement (session vide) = page d'entrée ; rechargement dans le même onglet = restauration de la vue et de la pile */
-{let sc=null;try{sc=sessionStorage.getItem('lci_screen')}catch(e){}if(['entree','demande','monprofil','express','apercu'].includes(sc))go(sc);else{navStack=[];navSave();go('entree')}}
+/* v1.27 : l'écran initial est TOUJOURS la page d'entrée (lancement, rechargement, retour via cache bfcache) ; pile vidée. lci_foyer_session reste mémorisé. */
+function startEntree(){navStack=[];navSave();try{sessionStorage.removeItem('lci_screen')}catch(e){}curScreen=null;go('entree')}
+startEntree();window.addEventListener('pageshow',e=>{if(e.persisted)startEntree()});
 // Service worker : aucun n'est utilisé ; on désinscrit d'éventuels anciens SW pour éviter une version en cache.
 if('serviceWorker' in navigator&&navigator.serviceWorker.getRegistrations)navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});
 </script>
