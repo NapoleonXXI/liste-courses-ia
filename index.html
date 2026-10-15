@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.39">
+<meta name="app-version" content="v1.40">
 <title>Liste de courses IA</title>
 <style>
 :root{--pf:#15803d;--pc:#e3f0e8;--pe:#116631;--pm:#96c6a8;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -151,16 +151,6 @@ body.entree nav{display:none}body.entree main{padding-bottom:calc(16px + env(saf
 #aForm .stepper{margin-top:0}#aForm .ferr{color:var(--err);font-size:.85rem;min-height:1em;margin:-4px 0 0}
 #aForm .fbtns{display:flex;gap:10px}#aForm .fbtns button{flex:1;min-height:48px;border-radius:999px;font:inherit;font-weight:700;cursor:pointer}
 #aCancel{background:#fff;border:1px solid #d1d5db;color:var(--txt)}#aOk{background:var(--pf);border:1px solid var(--pf);color:#fff}
-/* v1.39 : Style de vie (curseur 5 stades) */
-.sdvcur{margin:0 0 4px;font-weight:700;color:var(--pe)}.sdvcur.nr{color:var(--mut);font-weight:600}
-.sdv{display:block;width:100%;height:44px;margin:0;accent-color:var(--pf);cursor:pointer;background:transparent;-webkit-appearance:none;appearance:none}
-.sdv::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:var(--pc);border:1px solid var(--pm)}
-.sdv::-moz-range-track{height:6px;border-radius:3px;background:var(--pc);border:1px solid var(--pm)}
-.sdv::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;margin-top:-12px;border-radius:50%;background:var(--pf);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3)}
-.sdv::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--pf);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3)}
-.sdv.nr::-webkit-slider-thumb{background:#fff;border:3px solid var(--mut)}.sdv.nr::-moz-range-thumb{background:#fff;border:3px solid var(--mut)}
-.sdvticks{display:flex;justify-content:space-between;padding:0 13px;margin-top:-6px}.sdvticks span{width:2px;height:8px;background:var(--pm);border-radius:1px}
-.sdvends{display:flex;justify-content:space-between;font-size:.78rem;color:var(--mut);margin-top:4px}
 /* v1.36 : rangées de spécificités (Mon profil) : style minimaliste */
 .spec{margin-top:12px}.spec h3{margin:0;font-size:1.05rem;color:var(--pe)}.spec .ssub{margin:2px 0 8px;font-size:.82rem;color:#6b7280}
 .srow{display:flex;gap:8px;align-items:center;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:2px 0}.srow::-webkit-scrollbar{display:none}
@@ -243,7 +233,7 @@ nav button{min-width:0;font-size:.72rem}
 </style>
 </head>
 <body>
-<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.39</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
+<header><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.40</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <button type="button" class="xback" id="navBack" hidden style="margin-bottom:10px" aria-label="Retour à la vue précédente">← Retour</button>
@@ -353,12 +343,6 @@ nav button{min-width:0;font-size:.72rem}
  <!-- v1.35 : en-tête relié au profil actif (lci_profil_actif_v1), lecture seule -->
  <!-- v1.36 : rangées de spécificités (localStorage lci_specificites_v1 {profilId:{allergies:[]}}) ; seule spécificité : Allergies -->
  <div class="card spec" id="specAllergies"><h3>Allergies</h3><p class="ssub">Ingrédients à éviter pour ce profil</p><div class="srow" id="alRow" aria-label="Allergies"></div></div>
- <!-- v1.39 : Style de vie (lci_specificites_v1[profil].styleDeVie = 1..5 ; absent = non renseigné) -->
- <div class="card spec" id="specSdv"><h3>Style de vie</h3><p class="ssub">Niveau d'activité physique au quotidien</p>
-  <p class="sdvcur" id="sdvCur" aria-live="polite"></p>
-  <input type="range" class="sdv" id="sdvRange" min="1" max="5" step="1" value="3" aria-label="Niveau d'activité physique au quotidien">
-  <div class="sdvticks" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
-  <div class="sdvends" aria-hidden="true"><span>Sédentaire</span><span>Sportif</span></div></div>
  <div id="aForm" hidden role="dialog" aria-modal="true" aria-labelledby="aFormT"><form id="aFormF" novalidate>
   <h2 id="aFormT">Nouvelle allergie</h2>
   <label>Nom de l'allergie<input type="text" id="aName" maxlength="40" autocomplete="off" placeholder="Ex. Arachides"></label>
@@ -757,12 +741,7 @@ $('#aFormF').onsubmit=e=>{e.preventDefault();const v=$('#aName').value.trim().re
 $('#aDel').onclick=()=>{const a=alGet();if(alIdx==null||a[alIdx]==null)return;$('#aConfT').textContent='Supprimer l\'allergie « '+a[alIdx]+' » ?';$('#aConf').hidden=false;$('#aConfNo').focus()};
 $('#aConfNo').onclick=()=>{$('#aConf').hidden=true};$('#aConf').onclick=e=>{if(e.target.id==='aConf')$('#aConf').hidden=true};
 $('#aConfYes').onclick=()=>{const a=alGet();if(alIdx!=null){a.splice(alIdx,1);alSet(a)}$('#aConf').hidden=true;closeAl();updFoyerBadge()};
-const SDV=['Sédentaire','Peu actif','Modéré','Actif','Sportif'];
-function sdvGet(){const f=actGet();const o=specAll();const v=f&&o[f]?+o[f].styleDeVie:0;return v>=1&&v<=5?v:0}
-function renderSdv(){const w=$('#specSdv');if(!w)return;w.hidden=!foyerLabel(actGet());const v=sdvGet(),r=$('#sdvRange');r.value=v||3;r.classList.toggle('nr',!v);
- const t=v?SDV[v-1]:'Non renseigné';$('#sdvCur').textContent=v?t+' ('+v+'/5)':'Non renseigné · déplacez le curseur';$('#sdvCur').classList.toggle('nr',!v);r.setAttribute('aria-valuetext',t)}
-$('#sdvRange').addEventListener('input',e=>{const f=actGet();if(!f)return;const o=specAll();o[f]=Object.assign({},o[f],{styleDeVie:+e.target.value});specSave(o);renderSdv()});
-function updFoyerBadge(){renderMonProfil();renderAllergies();renderSdv();const fa=actGet();let f=fa;const lb=foyerLabel(f);const ok=!!lb;f=lb;const b=$('#foyerBadge');b.hidden=!ok||curScreen==='entree';
+function updFoyerBadge(){renderMonProfil();renderAllergies();const fa=actGet();let f=fa;const lb=foyerLabel(f);const ok=!!lb;f=lb;const b=$('#foyerBadge');b.hidden=!ok||curScreen==='entree';
  const c=ok?couleurDe(fa):null;if(c)document.body.dataset.pc=c;else delete document.body.dataset.pc;const al=ok&&aAllergies(fa);
  const hp=$('#hdrProf');hp.hidden=!ok;hp.textContent=ok?'Profil : '+lb+(al?' · ⚠ allergies':''):'';
  if(ok){$('#foyerLbl').textContent=f;$('#foyerLbl').title=f;b.setAttribute('aria-label','Profil actif : '+f+', couleur '+PAL[c]+(al?', allergies déclarées':'')+'. Menu du profil')}
