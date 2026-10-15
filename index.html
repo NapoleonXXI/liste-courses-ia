@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="v1.57">
+<meta name="app-version" content="v1.58">
 <title>Liste de courses IA</title>
 <style>
 :root{--pf:#15803d;--pc:#e3f0e8;--pe:#116631;--pm:#96c6a8;--bg:#f6f7f9;--card:#fff;--txt:#1f2937;--mut:#6b7280;--warn:#b45309;--err:#dc2626;--r:14px}
@@ -236,10 +236,6 @@ header h1{text-align:center;white-space:nowrap;font-size:clamp(.95rem,4.6vw,1.2r
 .xpanel .xopt{display:block;width:100%;text-align:left;padding:10px 12px;border:1px solid var(--pf);border-radius:14px;background:#fff;color:var(--pe);font-size:.95rem;cursor:pointer;overflow-wrap:anywhere}
 .xpanel .xopt b{display:block}.xpanel .xopt small{color:#4b5563;font-size:.85rem}.xpanel .xopt .xt{float:right;font-weight:700;color:var(--pf);margin-left:8px}
 /* Bouton violet : déclaré APRÈS .pill, spécificité élevée + !important (v1.12) */
-.pillgrid button.pill.pill-still,.pillgrid button.pill.pill-still:hover,.pillgrid button.pill.pill-still:focus,.pillgrid button.pill.pill-still:active{grid-column:1/-1;background:#EDE4F7!important;border:1px solid #7B2D8E!important;color:#5B1F6B!important;font-weight:700!important;height:56px}
-.pillgrid button.pill.pill-still:active{filter:brightness(.92)}
-@media(max-width:599px){.pillgrid:not(#apGrid)>button.pill:last-child:nth-child(odd){grid-column:1/-1}}
-.pillgrid button.pill.pill-still:focus-visible{outline:3px solid #b48ac4;outline-offset:2px}
 /* v1.31 : Végétarien retiré -> 5 pastilles ; sur 2 colonnes la dernière prend toute la largeur (pas de trou) */
 
 nav button{min-width:0;font-size:.72rem}
@@ -247,18 +243,30 @@ nav button{min-width:0;font-size:.72rem}
 .avatar{flex:0 0 64px;width:64px;height:64px;border-radius:50%;background:#EDE4F7;border:2px solid #7B2D8E;color:#5B1F6B;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.3rem}
 .avatar.pfav{background:var(--pc);border-color:var(--pf)}.avatar.pfav svg{width:38px;height:38px}
 .pfid{min-width:0}.pfname{font-size:1.2rem;font-weight:700;overflow-wrap:anywhere}
-/* v1.53 : Demande en cases carrées (même modèle que Mon profil) */
-.pillgrid.dgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-.pillgrid.dgrid>button.pill.dcase{grid-column:auto!important;aspect-ratio:1/1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:12px;border-radius:var(--r);overflow-wrap:break-word;line-height:1.2}
-.dcase .dico{width:30px;height:30px;flex:0 0 auto}.dcase b{font-size:.98rem;font-weight:700}.dcase small{font-size:.8rem;font-weight:400;opacity:.85}
-/* v1.55 : cases de Demande au style exact de Mon profil (.card + .ssum + .sico) */
-.pillgrid.dgrid>.ssum.dcase{grid-column:auto!important;margin:0;padding:14px;aspect-ratio:1/1;justify-content:center!important;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.07);border:0;border-radius:var(--r)}
-/* v1.56 : plus d'air sous le titre de Demande */
-.dtitle{margin-bottom:28px!important}
+/* v1.58 : bouton Flow (inspiré de Deezer) + étoile de 4 bulles */
+.dtitle{margin-bottom:8px}
+.flow{position:relative;width:min(100%,320px);aspect-ratio:1/1;margin:0 auto}
+.flowc{position:absolute;left:50%;top:50%;width:144px;height:144px;margin:-72px 0 0 -72px;border:0;border-radius:50%;cursor:pointer;color:#fff;font:inherit;font-weight:800;font-size:1.05rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;z-index:2;
+ background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.35),transparent 45%),linear-gradient(135deg,var(--pf) 0%,#a855f7 55%,#ec4899 100%);
+ box-shadow:0 10px 30px rgba(168,85,247,.35),0 0 0 0 rgba(236,72,153,.45);animation:flowPulse 2.6s ease-in-out infinite;transition:transform .45s cubic-bezier(.34,1.56,.64,1)}
+.flowc svg{width:40px;height:40px;transition:transform .45s ease}
+.flowc:focus-visible{outline:3px solid var(--pm);outline-offset:4px}
+@keyframes flowPulse{0%,100%{box-shadow:0 10px 30px rgba(168,85,247,.35),0 0 0 0 rgba(236,72,153,.40)}50%{box-shadow:0 10px 30px rgba(168,85,247,.35),0 0 0 16px rgba(236,72,153,0)}}
+.flow.open .flowc{transform:scale(.82) rotate(45deg)}.flow.open .flowc>*{transform:rotate(-45deg)}
+.fbub{position:absolute;left:50%;top:50%;width:100px;height:100px;margin:-50px 0 0 -50px;border:0;border-radius:50%;color:#fff;font:inherit;font-size:.82rem;font-weight:800;line-height:1.15;padding:10px;text-align:center;cursor:pointer;
+ opacity:0;visibility:hidden;transform:translate(0,0) scale(.2);transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .3s ease,visibility 0s linear .5s;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.fb1{background:linear-gradient(135deg,#f472b6,#f97316)}.fb2{background:linear-gradient(135deg,#8b5cf6,#4f46e5)}.fb3{background:linear-gradient(135deg,#14b8a6,#16a34a)}.fb4{background:linear-gradient(135deg,#f59e0b,#ef4444)}
+.flow.open .fbub{opacity:1;visibility:visible;transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .3s ease,visibility 0s}
+.flow.open .fb1{transform:translate(-106px,-106px) scale(1)}.flow.open .fb2{transform:translate(106px,-106px) scale(1);transition-delay:.05s}
+.flow.open .fb3{transform:translate(-106px,106px) scale(1);transition-delay:.1s}.flow.open .fb4{transform:translate(106px,106px) scale(1);transition-delay:.15s}
+.fbub:active{filter:brightness(.92)}
+@media(max-width:359px){.flow.open .fb1{transform:translate(-96px,-96px) scale(.92)}.flow.open .fb2{transform:translate(96px,-96px) scale(.92)}.flow.open .fb3{transform:translate(-96px,96px) scale(.92)}.flow.open .fb4{transform:translate(96px,96px) scale(.92)}}
+.flownew{margin-top:4px;border:0;background:none;color:var(--pe);font:inherit;font-weight:700;font-size:1rem;padding:10px 14px;cursor:pointer;border-radius:999px}.flownew:active{background:var(--pc)}
+@media(prefers-reduced-motion:reduce){.flowc{animation:none}.flowc,.flowc svg,.fbub{transition:none!important}}
 </style>
 </head>
 <body>
-<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.57</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
+<header><!-- v1.48 : en-tête minimal : Retour à gauche, titre centré, badge à droite --><button type="button" class="hback" id="navBack" hidden aria-label="Retour à la vue précédente" title="Retour">←<span class="hbl"> Retour</span></button><h1>🛒 Liste de courses IA <span id="ver" class="ver">v1.58</span></h1><button type="button" id="foyerBadge" hidden aria-label="Changer de foyer"><span class="bcirc"><svg viewBox="0 0 24 24" aria-hidden="true" class="pfi"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg></span><span id="foyerLbl"></span></button><small id="hdrSub">Vos courses, pensées pour vous</small><small id="hdrProf" hidden></small></header>
 <main>
 <!-- v1.20 : bouton retour global (pile de navigation), masqué sur Demande sans historique et sur Repas express (qui a son propre Retour) -->
 <!-- PROFIL -->
@@ -299,18 +307,16 @@ nav button{min-width:0;font-size:.72rem}
 <section class="screen" id="s-demande">
  <div class="searchwrap">
  <!-- v1.34 : barre « Que voulez-vous cuisiner ? » supprimée, remplacée par un titre -->
- <h2 class="dtitle">De quoi avez-vous besoin ?</h2>
-  <!-- v1.53 : cases carrées icône + titre + sous-titre, 2 par ligne -->
-  <div class="pillgrid dgrid">
-   <!-- Fonction future : « Est-ce que je l'ai toujours ? » = rappel des articles qu'on oublie toujours
-        (papier toilette, sel, piles, sacs poubelle…) ; générerait une checklist fictive à ajouter à la liste de courses.
-        Pour l'instant bouton factice : aucune action. -->
-   <button type="button" class="card ssum dcase" id="stillHave"><svg class="sico" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="12" y="8" width="40" height="50" rx="5" fill="#64748b"/><rect x="17" y="14" width="30" height="40" rx="2" fill="#fff"/><rect x="24" y="4" width="16" height="9" rx="3" fill="#6b7280"/><path d="M21 26l3 3 6-6M21 40l3 3 6-6" fill="none" stroke="#16a34a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M34 27h9M34 41h9" stroke="#9ca3af" stroke-width="3" stroke-linecap="round"/></svg><b>Est-ce que je l'ai toujours ?</b><small>Vérifier les indispensables</small></button>
-   <button type="button" class="card ssum dcase" id="expressBtn"><svg class="sico" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M37 4L12 36h17l-4 24 27-34H35z" fill="#facc15" stroke="#ea580c" stroke-width="3" stroke-linejoin="round"/></svg><b>Repas express</b><small>Prêt en 20 minutes</small></button>
-   <button type="button" class="card ssum dcase" id="invitesBtn"><svg class="sico" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M10 8h18l-2 16a7 7 0 01-14 0z" fill="#fff" stroke="#6b7280" stroke-width="2.5"/><path d="M11.5 16h15l-1 8a6.5 6.5 0 01-13 0z" fill="#be123c"/><path d="M19 31v20M12 54h14" stroke="#6b7280" stroke-width="3" stroke-linecap="round"/><path d="M36 14h18l-2 16a7 7 0 01-14 0z" fill="#fff" stroke="#6b7280" stroke-width="2.5"/><path d="M37.5 22h15l-1 8a6.5 6.5 0 01-13 0z" fill="#be123c"/><path d="M45 37v15M38 55h14" stroke="#6b7280" stroke-width="3" stroke-linecap="round"/></svg><b>Invités ce soir</b><small>Un repas pour recevoir</small></button>
-   <!-- v1.43 : bouton factice « Idées de recettes » (non branché) -->
-   <button type="button" class="card ssum dcase" id="ideesBtn"><svg class="sico" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M32 4a18 18 0 00-11 32c2 2 3 4 3 7v3h16v-3c0-3 1-5 3-7A18 18 0 0032 4z" fill="#fde047" stroke="#ca8a04" stroke-width="3"/><path d="M27 30l5-6 5 6" fill="none" stroke="#ca8a04" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="24" y="48" width="16" height="5" rx="2" fill="#9ca3af"/><rect x="26" y="55" width="12" height="5" rx="2.5" fill="#6b7280"/></svg><b>Idées de recettes</b><small>Trouver l'inspiration</small></button>
+ <h2 class="dtitle">Besoin d'une idée ?</h2>
+  <!-- v1.58 : bouton central façon Flow (Deezer) ; au toucher, étoile de 4 bulles -->
+  <div class="flow" id="flow">
+   <button type="button" class="fbub fb1" id="invitesBtn" tabindex="-1">Des invités ce soir</button>
+   <button type="button" class="fbub fb2" id="elaboreeBtn" tabindex="-1">Une recette élaborée</button>
+   <button type="button" class="fbub fb3" id="repasBtn" tabindex="-1">Un repas</button>
+   <button type="button" class="fbub fb4" id="expressBtn" tabindex="-1">Un repas rapide</button>
+   <button type="button" class="flowc" id="flowBtn" aria-expanded="false" aria-controls="flow" aria-label="Afficher les idées"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M16 3l2.6 7.4L26 13l-7.4 2.6L16 23l-2.6-7.4L6 13l7.4-2.6z" fill="#fff"/><path d="M25 20l1.2 3 3 1.2-3 1.2L25 28l-1.2-2.6-3-1.2 3-1.2z" fill="#fff" opacity=".85"/></svg><span>Idées</span></button>
   </div>
+  <button type="button" class="flownew" id="newListBtn">+ Créer une nouvelle liste</button>
 
  </div>
  <!-- Ancien contenu de l'onglet Demande : conservé masqué (jamais affiché) car la logique magasin/IA/génération
@@ -870,7 +876,11 @@ const EXPRESS=[
  {n:'Riz sauté aux légumes et œuf',d:'Riz, petits pois, carotte, œuf brouillé, sauce soja.',t:20,q:'Riz sauté',ing:['riz','œufs','petits pois','carottes','oignon','ail','sauce soja','huile','ciboule']},
  {n:'Salade niçoise au thon',d:'Salade, tomate, thon, œuf dur, haricots verts.',t:15,q:'Salade niçoise',ing:['salade','tomates','thon en boîte','œufs','haricots verts','pommes de terre','olives noires','oignon rouge','huile d\'olive','vinaigre','sel','poivre']}];
 $('#expressPanel').innerHTML=EXPRESS.map((x,i)=>`<button type="button" class="xopt" data-i="${i}"><b>${esc(x.n)}</b></button>`).join('');
-$('#expressBtn').onclick=()=>go('express');$('#navBack').onclick=goBack;
+// v1.58 : étoile Flow
+function flowSet(o){const f=$('#flow');if(!f)return;f.classList.toggle('open',o);$('#flowBtn').setAttribute('aria-expanded',o);$('#flowBtn').setAttribute('aria-label',o?'Masquer les idées':'Afficher les idées');f.querySelectorAll('.fbub').forEach(b=>b.tabIndex=o?0:-1)}
+$('#flowBtn').onclick=()=>flowSet(!$('#flow').classList.contains('open'));
+document.addEventListener('click',e=>{if($('#flow').classList.contains('open')&&!e.target.closest('#flowBtn,.fbub'))flowSet(false)});
+$('#expressBtn').onclick=()=>{flowSet(false);go('express')};$('#navBack').onclick=goBack;
 /* v1.22 : clic sur un plat = vue aperçu (titre + cases d'ingrédients non cliquables, sans quantités ni prix) */
 function showApercu(i){const x=EXPRESS[i];if(!x)return;LS.set('apercu',i);$('#apTitle').textContent=x.n;$('#apGrid').innerHTML=x.ing.map(g=>`<div class="pill apcase">${esc(g)}</div>`).join('')}
 $('#expressPanel').onclick=e=>{const b=e.target.closest('.xopt');if(!b)return;showApercu(+b.dataset.i);go('apercu')};
